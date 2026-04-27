@@ -280,7 +280,7 @@ public interface ShopManager {
    *
    * @return Shops
    */
-  @Nullable
+  @NotNull
   Map<Location, Shop> getShops(@NotNull Chunk c);
 
   /**
@@ -292,7 +292,7 @@ public interface ShopManager {
    *
    * @return The shop at the world and specific chunk.
    */
-  @Nullable
+  @NotNull
   Map<Location, Shop> getShops(@NotNull String world, int chunkX, int chunkZ);
 
   /**
@@ -302,7 +302,7 @@ public interface ShopManager {
    *
    * @return The shop at the world and specific chunk.
    */
-  @Nullable
+  @NotNull
   Map<Location, Shop> getShops(@NotNull ShopChunk shopChunk);
 
   /**
@@ -312,7 +312,7 @@ public interface ShopManager {
    *
    * @return a map of Chunk - Shop
    */
-  @Nullable
+  @NotNull
   Map<ShopChunk, Map<Location, Shop>> getShops(@NotNull String world);
 
   /**

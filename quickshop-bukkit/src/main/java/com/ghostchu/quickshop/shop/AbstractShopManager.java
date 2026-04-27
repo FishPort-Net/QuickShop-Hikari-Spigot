@@ -509,24 +509,26 @@ public abstract class AbstractShopManager implements ShopManager {
    * @return Shops
    */
   @Override
-  public @Nullable Map<Location, Shop> getShops(@NotNull final Chunk c) {
+  public @NotNull Map<Location, Shop> getShops(@NotNull final Chunk c) {
 
     return getShops(c.getWorld().getName(), c.getX(), c.getZ());
   }
 
   @Override
-  public @Nullable Map<Location, Shop> getShops(@NotNull final String world, final int chunkX, final int chunkZ) {
+  public @NotNull Map<Location, Shop> getShops(@NotNull final String world, final int chunkX, final int chunkZ) {
 
     final Map<ShopChunk, Map<Location, Shop>> inWorld = this.getShops(world);
-    if(inWorld == null) {
+    if(inWorld.isEmpty()) {
 
-      return null;
+      return Collections.emptyMap();
     }
-    return inWorld.get(new SimpleShopChunk(world, chunkX, chunkZ));
+
+    final Map<Location, Shop> shops = inWorld.get(new SimpleShopChunk(world, chunkX, chunkZ));
+    return shops != null ? shops : Collections.emptyMap();
   }
 
   @Override
-  public @Nullable Map<Location, Shop> getShops(@NotNull final ShopChunk shopChunk) {
+  public @NotNull Map<Location, Shop> getShops(@NotNull final ShopChunk shopChunk) {
 
     return getShops(shopChunk.getWorld(), shopChunk.getX(), shopChunk.getZ());
   }
@@ -539,9 +541,14 @@ public abstract class AbstractShopManager implements ShopManager {
    * @return a map of Chunk - Shop
    */
   @Override
-  public @Nullable Map<ShopChunk, Map<Location, Shop>> getShops(@NotNull final String world) {
+  public @NotNull Map<ShopChunk, Map<Location, Shop>> getShops(@NotNull final String world) {
 
-    return this.shops.get(world);
+    final Map<ShopChunk, Map<Location, Shop>> shopsInWorld = this.shops.get(world);
+    if(shopsInWorld == null) {
+      return Collections.emptyMap();
+    }
+
+    return shopsInWorld;
   }
 
   /**
