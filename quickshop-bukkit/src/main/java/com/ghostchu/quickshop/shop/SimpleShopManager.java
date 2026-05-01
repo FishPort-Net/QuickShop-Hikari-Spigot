@@ -88,6 +88,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 
 /**
  * Manage a lot of shops.
@@ -273,30 +274,21 @@ public class SimpleShopManager extends AbstractShopManager implements ShopManage
   private void notifySold(@NotNull final QUser buyerQUser, @NotNull final Shop shop, final int amount, final int space) {
 
     Util.asyncThreadRun(()->{
-      final String langCode = plugin.text().findRelativeLanguages(buyerQUser, true).getLocale();
-      final List<Component> sendList = new ArrayList<>();
-      Component notify = plugin.text().of("player-sold-to-your-store", buyerQUser.getDisplay(), amount, Util.getItemStackName(shop.getItem())).forLocale(langCode);
-      notify = plugin.getPlatform().setItemStackHoverEvent(notify, shop.getItem());
+      final List<Function<String, Component>> sendList = new ArrayList<>();
+      final Function<String, Component> notify = langCode->plugin.getPlatform().setItemStackHoverEvent(plugin.text().of("player-sold-to-your-store", buyerQUser.getDisplay(), amount, Util.getItemStackName(shop.getItem())).forLocale(langCode), shop.getItem());
       sendList.add(notify);
       if(space == amount) {
-        Component spaceWarn;
+        Function<String, Component> spaceWarn;
         if(shop.getShopName() == null) {
-          spaceWarn = plugin.text().of("shop-out-of-space", shop.getLocation().getBlockX(), shop.getLocation().getBlockY(), shop.getLocation().getBlockZ()).forLocale(langCode);
+          spaceWarn = langCode->plugin.text().of("shop-out-of-space", shop.getLocation().getBlockX(), shop.getLocation().getBlockY(), shop.getLocation().getBlockZ()).forLocale(langCode);
         } else {
-          spaceWarn = plugin.text().of("shop-out-of-space-name", shop.getShopName(), Util.getItemStackName(shop.getItem())).forLocale(langCode);
+          spaceWarn = langCode->plugin.text().of("shop-out-of-space-name", shop.getShopName(), Util.getItemStackName(shop.getItem())).forLocale(langCode);
         }
-        spaceWarn = plugin.getPlatform().setItemStackHoverEvent(spaceWarn, shop.getItem());
+        final Function<String, Component> finalSpaceWarn = spaceWarn;
+        spaceWarn = langCode->plugin.getPlatform().setItemStackHoverEvent(finalSpaceWarn.apply(langCode), shop.getItem());
         sendList.add(spaceWarn);
       }
-      for(final Component component : sendList) {
-        if(sendStockMessageToStaff) {
-          for(final UUID recv : shop.playersCanAuthorize(BuiltInShopPermission.RECEIVE_ALERT)) {
-            MsgUtil.send(shop, recv, component);
-          }
-        } else {
-          MsgUtil.send(shop, shop.getOwner(), component);
-        }
-      }
+      sendStockMessages(shop, sendList);
     });
   }
 
@@ -1019,37 +1011,46 @@ public class SimpleShopManager extends AbstractShopManager implements ShopManage
   private void notifyBought(@NotNull final QUser seller, @NotNull final Shop shop, final int amount, final int stock, final double tax, final double total) {
 
     Util.asyncThreadRun(()->{
-      final String langCode = plugin.text().findRelativeLanguages(shop.getOwner(), true).getLocale();
-      final List<Component> sendList = new ArrayList<>();
-      Component notify;
+      final List<Function<String, Component>> sendList = new ArrayList<>();
+      Function<String, Component> notify;
       if(plugin.getConfig().getBoolean("show-tax")) {
-        notify = plugin.text().of("player-bought-from-your-store-tax", seller, amount * shop.getItem().getAmount(), Util.getItemStackName(shop.getItem()), this.formatter.format(total - tax, shop), this.formatter.format(tax, shop)).forLocale(langCode);
+        notify = langCode->plugin.text().of("player-bought-from-your-store-tax", seller, amount * shop.getItem().getAmount(), Util.getItemStackName(shop.getItem()), this.formatter.format(total - tax, shop), this.formatter.format(tax, shop)).forLocale(langCode);
       } else {
-        notify = plugin.text().of("player-bought-from-your-store", seller, amount * shop.getItem().getAmount(), Util.getItemStackName(shop.getItem()), this.formatter.format(total - tax, shop)).forLocale(langCode);
+        notify = langCode->plugin.text().of("player-bought-from-your-store", seller, amount * shop.getItem().getAmount(), Util.getItemStackName(shop.getItem()), this.formatter.format(total - tax, shop)).forLocale(langCode);
       }
-      notify = plugin.getPlatform().setItemStackHoverEvent(notify, shop.getItem());
+      final Function<String, Component> finalNotify = notify;
+      notify = langCode->plugin.getPlatform().setItemStackHoverEvent(finalNotify.apply(langCode), shop.getItem());
       sendList.add(notify);
       // Transfers the item from A to B
       if(stock == amount) {
-        Component stockWarn;
+        Function<String, Component> stockWarn;
         if(shop.getShopName() == null) {
-          stockWarn = plugin.text().of("shop-out-of-stock", shop.getLocation().getBlockX(), shop.getLocation().getBlockY(), shop.getLocation().getBlockZ(), Util.getItemStackName(shop.getItem())).forLocale(langCode);
+          stockWarn = langCode->plugin.text().of("shop-out-of-stock", shop.getLocation().getBlockX(), shop.getLocation().getBlockY(), shop.getLocation().getBlockZ(), Util.getItemStackName(shop.getItem())).forLocale(langCode);
         } else {
-          stockWarn = plugin.text().of("shop-out-of-stock-name", shop.getShopName(), Util.getItemStackName(shop.getItem())).forLocale(langCode);
+          stockWarn = langCode->plugin.text().of("shop-out-of-stock-name", shop.getShopName(), Util.getItemStackName(shop.getItem())).forLocale(langCode);
         }
-        stockWarn = plugin.getPlatform().setItemStackHoverEvent(stockWarn, shop.getItem());
+        final Function<String, Component> finalStockWarn = stockWarn;
+        stockWarn = langCode->plugin.getPlatform().setItemStackHoverEvent(finalStockWarn.apply(langCode), shop.getItem());
         sendList.add(stockWarn);
       }
-      for(final Component component : sendList) {
-        if(sendStockMessageToStaff) {
-          for(final UUID recv : shop.playersCanAuthorize(BuiltInShopPermission.RECEIVE_ALERT)) {
-            MsgUtil.send(shop, recv, component);
-          }
-        } else {
-          MsgUtil.send(shop, shop.getOwner(), component);
+      sendStockMessages(shop, sendList);
+    });
+  }
+
+  private void sendStockMessages(@NotNull final Shop shop, final List<Function<String, Component>> messages) {
+    if(sendStockMessageToStaff) {
+      for(final UUID recv : shop.playersCanAuthorize(BuiltInShopPermission.RECEIVE_ALERT)) {
+        final String recvLang = plugin.text().findRelativeLanguages(recv, true).getLocale();
+        for(final Function<String, Component> component : messages) {
+          MsgUtil.send(shop, recv, component.apply(recvLang));
         }
       }
-    });
+    } else {
+      final String langCode = plugin.text().findRelativeLanguages(shop.getOwner(), true).getLocale();
+      for(final Function<String, Component> component : messages) {
+        MsgUtil.send(shop, shop.getOwner(), component.apply(langCode));
+      }
+    }
   }
 
   @Override
