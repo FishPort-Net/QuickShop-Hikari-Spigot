@@ -586,10 +586,10 @@ public interface Shop {
   /**
    * Save the extra data to the shop.
    *
-   * @param plugin Plugin instace
-   * @param data   The data table
+   * @param plugin Plugin instance
+   * @param data   The data table, or null to remove it
    */
-  void setExtra(@NotNull Plugin plugin, @NotNull ConfigurationSection data);
+  void setExtra(@NotNull Plugin plugin, @Nullable ConfigurationSection data);
 
   void setInventory(@NotNull InventoryWrapper wrapper, @NotNull InventoryWrapperManager manager);
 
