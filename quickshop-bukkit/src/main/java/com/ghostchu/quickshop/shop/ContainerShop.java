@@ -552,6 +552,11 @@ public class ContainerShop implements Shop, Reloadable {
     }
     this.displayItem = null;
     checkDisplay();
+    if(this.inventoryPreview != null) {
+
+      this.inventoryPreview.close();
+      this.inventoryPreview = null;
+    }
     setSignText();
     setDirty();
   }
