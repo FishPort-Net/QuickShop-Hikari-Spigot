@@ -22,6 +22,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
@@ -671,15 +672,14 @@ public class Util {
   @Nullable
   public static Component getItemCustomName(@NotNull final ItemStack itemStack) {
 
+    final ItemMeta meta = itemStack.getItemMeta();
     if(useEnchantmentForEnchantedBook() && itemStack.getType() == Material.ENCHANTED_BOOK) {
-      final ItemMeta meta = itemStack.getItemMeta();
       if(meta instanceof final EnchantmentStorageMeta enchantmentStorageMeta && enchantmentStorageMeta.hasStoredEnchants()) {
         return getFirstEnchantmentName(enchantmentStorageMeta);
       }
     }
 
-
-    if(!itemStack.hasItemMeta() || QuickShop.getInstance().getConfig().getBoolean("shop.force-use-item-original-name")) {
+    if(meta == null) {
 
       return null;
     }
@@ -687,15 +687,42 @@ public class Util {
     boolean itemName = false;
 
     try {
-      final ItemMeta itemMeta = Objects.requireNonNull(itemStack.getItemMeta());
-      itemName = (boolean)itemMeta.getClass().getMethod("hasItemName").invoke(itemMeta);
+      itemName = (boolean)meta.getClass().getMethod("hasItemName").invoke(meta);
     } catch(final ReflectiveOperationException | LinkageError ignore) {
       // Item names were added after the oldest supported Spigot API.
     }
 
-    if(Objects.requireNonNull(itemStack.getItemMeta()).hasDisplayName() || itemName) {
+    if(QuickShop.getInstance().getConfig().getBoolean("shop.force-use-item-original-name")) {
 
-      return plugin.getPlatform().getDisplayName(itemStack.getItemMeta());
+      return itemName ? getModernItemName(meta) : null;
+    }
+
+    if(meta.hasDisplayName() || itemName) {
+
+      return plugin.getPlatform().getDisplayName(meta);
+    }
+    return null;
+  }
+
+  @Nullable
+  private static Component getModernItemName(@NotNull final ItemMeta meta) {
+
+    try {
+      final Object component = meta.getClass().getMethod("itemName").invoke(meta);
+      if(component instanceof final Component adventureComponent) {
+        return adventureComponent;
+      }
+    } catch(final ReflectiveOperationException | LinkageError ignore) {
+      // Paper's component item-name API is not available on this platform.
+    }
+
+    try {
+      final Object itemName = meta.getClass().getMethod("getItemName").invoke(meta);
+      if(itemName instanceof final String legacyName) {
+        return LegacyComponentSerializer.legacySection().deserialize(legacyName);
+      }
+    } catch(final ReflectiveOperationException | LinkageError ignore) {
+      // Spigot's string item-name API is not available on this server version.
     }
     return null;
   }
