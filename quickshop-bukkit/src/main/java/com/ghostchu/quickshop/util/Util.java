@@ -816,9 +816,11 @@ public class Util {
       name = MsgUtil.setHandleFailedHover(null, Component.text(enchantment.getKey().getKey()));
       plugin.logger().warn("Failed to handle translation for Enchantment {}", enchantment.getKey(), throwable);
     }
-    if(level > 1) {
-      name.append(Component.text(" " + RomanNumber.toRoman(level)));
+    if(enchantment.getMaxLevel() > 1 || level > 1) {
+
+      name = name.append(Component.text(" " + RomanNumber.toRoman(level)));
     }
+
     return name;
   }
 
