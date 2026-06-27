@@ -101,8 +101,7 @@ public class SubCommand_Benefit implements CommandHandler<Player> {
           event = event.clone(Phase.MAIN);
           if(event.callCancellableEvent()) {
 
-            plugin.logger().info("Plugin cancelled ShopBenefitAddEvent");
-            plugin.text().of(sender, "internal-error").send();
+            plugin.text().of(sender, "plugin-cancelled", event.getCancelReason()).send();
             return;
           }
 
@@ -163,8 +162,7 @@ public class SubCommand_Benefit implements CommandHandler<Player> {
               event = event.clone(Phase.MAIN);
               if(event.callCancellableEvent()) {
 
-                plugin.logger().info("Plugin cancelled ShopBenefitRemoveEvent");
-                plugin.text().of(sender, "internal-error").send();
+                plugin.text().of(sender, "plugin-cancelled", event.getCancelReason()).send();
                 return;
               }
 
