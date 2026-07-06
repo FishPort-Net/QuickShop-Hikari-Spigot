@@ -16,12 +16,13 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
+import org.bukkit.util.NumberConversions;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -42,8 +43,7 @@ public class SubCommand_Find implements CommandHandler<Player> {
       return;
     }
 
-    final Location loc = sender.getLocation().clone();
-    final Vector playerVector = loc.toVector();
+    final Location loc = sender.getLocation();
 
     //Combing command args
     final StringBuilder sb = new StringBuilder(parser.getArgs().get(0));
@@ -52,14 +52,14 @@ public class SubCommand_Find implements CommandHandler<Player> {
     }
 
 
-    final String lookFor = sb.toString().toLowerCase();
+    final String lookFor = sb.toString().toLowerCase(Locale.ROOT);
 
     final StringBuilder originLookForSb = new StringBuilder(parser.getArgs().get(0));
     for(int i = 1; i < parser.getArgs().size(); i++) {
       originLookForSb.append(" ").append(parser.getArgs().get(i));
     }
     final String originLookFor = originLookForSb.toString();
-    final double maxDistance = plugin.getConfig().getInt("shop.finding.distance");
+    final double maxDistanceSquared = NumberConversions.square(plugin.getConfig().getInt("shop.finding.distance"));
     final boolean usingOldLogic = plugin.getConfig().getBoolean("shop.finding.oldLogic");
     final int shopLimit = usingOldLogic? 1 : plugin.getConfig().getInt("shop.finding.limit");
     final boolean allShops = plugin.getConfig().getBoolean("shop.finding.all");
@@ -77,6 +77,9 @@ public class SubCommand_Find implements CommandHandler<Player> {
     } else {
       scanPool = plugin.getShopManager().getLoadedShops();
     }
+
+    final boolean canSearchOther = plugin.perm().hasPermission(sender, "quickshop.other.search");
+
     //Calc distance between player and shop
     for(final Shop shop : scanPool) {
       if(!Objects.equals(shop.getLocation().getWorld(), loc.getWorld())) {
@@ -85,17 +88,16 @@ public class SubCommand_Find implements CommandHandler<Player> {
       if(aroundShops.size() == shopLimit) {
         break;
       }
-      if(!shop.playerAuthorize(sender.getUniqueId(), BuiltInShopPermission.SEARCH)
-         && !plugin.perm().hasPermission(sender, "quickshop.other.search")) {
-        continue;
-      }
-      final Vector shopVector = shop.getLocation().toVector();
-      final double distance = shopVector.distance(playerVector);
+      final Location shopLocation = shop.getLocation();
+      final double distanceSquared = shopLocation.distanceSquared(loc);
       //Check distance
-      if(distance <= maxDistance || global) {
+      if(distanceSquared <= maxDistanceSquared || global) {
+        if(!shop.playerAuthorize(sender.getUniqueId(), BuiltInShopPermission.SEARCH) && !canSearchOther) {
+          continue;
+        }
         //Collect valid shop that trading items we want
-        if(!ChatColor.stripColor(LegacyComponentSerializer.legacySection().serialize(Util.getItemStackName(shop.getItem()))).toLowerCase().contains(lookFor)
-           && !shop.getItem().getType().name().toLowerCase().contains(lookFor)
+        if(!ChatColor.stripColor(LegacyComponentSerializer.legacySection().serialize(Util.getItemStackName(shop.getItem()))).toLowerCase(Locale.ROOT).contains(lookFor)
+           && !shop.getItem().getType().name().toLowerCase(Locale.ROOT).contains(lookFor)
            && !Util.findStringInList(Util.getEnchantsForItemStack(shop.getItem()), lookFor)
            && plugin.getItemMarker().get(originLookFor) == null) {
           continue;
@@ -105,7 +107,7 @@ public class SubCommand_Find implements CommandHandler<Player> {
             continue;
           }
         }
-        aroundShops.put(shop, distance);
+        aroundShops.put(shop, Math.sqrt(distanceSquared));
       }
     }
     //Check if no shops found
