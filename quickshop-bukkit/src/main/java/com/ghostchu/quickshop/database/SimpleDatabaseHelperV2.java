@@ -88,7 +88,7 @@ public class SimpleDatabaseHelperV2 implements DatabaseHelper {
     final boolean metadataExists = DataTables.METADATA.isExists(manager, prefix);
     DataTables.initializeTables(manager, prefix);
     if(!metadataExists) {
-      setDatabaseVersion(LATEST_DATABASE_VERSION);
+      setDatabaseVersion(LATEST_DATABASE_VERSION).join();
     }
   }
 
