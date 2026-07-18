@@ -33,6 +33,7 @@ import com.ghostchu.quickshop.obj.QUserImpl;
 import com.ghostchu.quickshop.shop.inventory.BukkitInventoryWrapper;
 import com.ghostchu.quickshop.shop.inventory.BukkitInventoryWrapperManager;
 import com.ghostchu.quickshop.util.ChatSheetPrinter;
+import com.ghostchu.quickshop.util.ExpiringSet;
 import com.ghostchu.quickshop.util.MsgUtil;
 import com.ghostchu.quickshop.util.PackageUtil;
 import com.ghostchu.quickshop.util.PotionCompat;
@@ -95,6 +96,18 @@ import java.util.function.Function;
  */
 public class SimpleShopManager extends AbstractShopManager implements ShopManager, Reloadable {
 
+  /**
+   * Per-(player, shop) sliding-window rate-limit for the shop info panel send. A key of
+   * {@code playerUuid|world:x,y,z} still present in the set means the player clicked this
+   * same shop within {@code shop.info-panel.click-cooldown} ms, so {@link #sendShopInfo}
+   * returns early—no header/owner/item/stock lines are rebuilt and re-sent, while trading
+   * and the how-many prompt (which live in {@code ShopUtil} after this call) keep working.
+   *
+   * <p>The cooldown is refreshed on every click (sliding window): a player spam-clicking
+   * the same shop sees the info panel exactly once and never again until they stop clicking
+   * for longer than the configured cooldown.</p>
+   */
+  private ExpiringSet<String> infoRateLimit;
   protected final InteractiveManager interactiveManager;
   @Getter
   @Nullable
@@ -171,6 +184,7 @@ public class SimpleShopManager extends AbstractShopManager implements ShopManage
     this.sendStockMessageToStaff = plugin.getConfig().getBoolean("shop.sending-stock-message-to-staffs");
     this.useShopableChecks = PackageUtil.parsePackageProperly("shoppableChecks").asBoolean(false);
     this.useShopCache = plugin.getConfig().getBoolean("shop.use-cache", true);
+    this.infoRateLimit = new ExpiringSet<>(Math.max(0L, plugin.getConfig().getLong("shop.info-panel.click-cooldown", 100L)), TimeUnit.MILLISECONDS);
 
   }
 
@@ -871,6 +885,17 @@ public class SimpleShopManager extends AbstractShopManager implements ShopManage
       }
       if(Util.fireCancellableEvent(new ShopInfoPanelEvent(shop, p.getUniqueId()))) {
         Log.debug("ShopInfoPanelEvent cancelled by some plugin");
+        return;
+      }
+      final Location shopLoc = shop.bukkitLocation();
+      final String infoKey = p.getUniqueId() + "|" + shopLoc.getWorld().getName() + ":" + shopLoc.getBlockX() + "," + shopLoc.getBlockY() + "," + shopLoc.getBlockZ();
+      final boolean throttled = infoRateLimit.contains(infoKey);
+      // Always (re)add so every click slides the expiry forward: a player spam-clicking the
+      // same shop is throttled indefinitely and sees the info panel exactly once until they
+      // stop clicking for longer than the configured cooldown.
+      infoRateLimit.add(infoKey);
+      if(throttled) {
+        Log.debug("Shop info panel skipped: same shop clicked too fast by " + p.getName());
         return;
       }
       final ProxiedLocale locale = plugin.text().findRelativeLanguages(p);

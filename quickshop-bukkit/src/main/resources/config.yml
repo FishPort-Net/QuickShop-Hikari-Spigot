@@ -474,6 +474,11 @@ shop:
     show-enchantments: true
     # Display the effects on the item (e.g. Tools)
     show-durability: true
+    # Minimum interval (in milliseconds) between repeated shop info-panel sends to the same
+    # player for the same shop. Trading and the amount prompt still work while throttled.
+    # Set to 0 to disable.
+    click-cooldown: 100
+
 #List of items that can't be sold in shops.
 #Anyone with the quickshop.bypass.<itemID> permission can bypass it.
 #Add the reference the item lookup table by adding @ before the name.
