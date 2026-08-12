@@ -102,7 +102,9 @@ public class InventoryPreview implements Listener {
     }
     if(inventory == null) {
       final int size = 9;
-      inventory = Bukkit.createInventory(new QuickShopPreviewGUIHolder(), size, LegacyComponentSerializer.legacySection().serialize(plugin.text().of(player, "menu.preview").forLocale()));
+      final QuickShopPreviewGUIHolder holder = new QuickShopPreviewGUIHolder();
+      inventory = Bukkit.createInventory(holder, size, LegacyComponentSerializer.legacySection().serialize(plugin.text().of(player, "menu.preview").forLocale()));
+      holder.setInventory(inventory);
       for(int i = 0; i < size; i++) {
         inventory.setItem(i, itemStack);
       }
