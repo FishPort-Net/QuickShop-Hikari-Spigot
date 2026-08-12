@@ -278,6 +278,8 @@ public class QuickShop implements QuickShopAPI, Reloadable {
   private ShopLoader shopLoader;
   @Getter
   private DisplayAutoDespawnWatcher displayAutoDespawnWatcher;
+  private LockListener shopLockListener;
+  private DisplayProtectionListener displayProtectionListener;
   @Getter
   private OngoingFeeWatcher ongoingFeeWatcher;
   @Getter
@@ -896,12 +898,18 @@ public class QuickShop implements QuickShopAPI, Reloadable {
   private void registerDisplayAutoDespawn() {
 
     if(this.display && getConfig().getBoolean("shop.display-auto-despawn")) {
-      this.displayAutoDespawnWatcher = new DisplayAutoDespawnWatcher(this);
-      this.displayAutoDespawnWatcher.start(20, getConfig().getInt("shop.display-check-time"));
+      final int checkTime = getConfig().getInt("shop.display-check-time");
+      if(this.displayAutoDespawnWatcher != null && this.displayAutoDespawnWatcher.getTaskPeriod() == checkTime) {
+        return;
+      }
+      if(this.displayAutoDespawnWatcher == null) {
+        this.displayAutoDespawnWatcher = new DisplayAutoDespawnWatcher(this);
+      }
+      this.displayAutoDespawnWatcher.start(20, checkTime);
       logger.warn("Unrecommended use of display-auto-despawn. This feature may have a heavy impact on the server's performance!");
     } else {
       if(this.displayAutoDespawnWatcher != null) {
-        this.displayAutoDespawnWatcher.stop();
+        this.displayAutoDespawnWatcher.unregister();
         this.displayAutoDespawnWatcher = null;
       }
     }
@@ -985,33 +993,42 @@ public class QuickShop implements QuickShopAPI, Reloadable {
       } else {
         logger.error("shop.display-items-check-ticks has been set to an invalid value. Please use a value above 3000.");
       }
-      new DisplayProtectionListener(this).register();
+      if(this.displayProtectionListener == null) {
+        this.displayProtectionListener = new DisplayProtectionListener(this);
+        this.displayProtectionListener.register();
+      }
     } else {
-      Util.unregisterListenerClazz(javaPlugin, DisplayProtectionListener.class);
+      if(this.displayProtectionListener != null) {
+        this.displayProtectionListener.unregister();
+        this.displayProtectionListener = null;
+      }
     }
   }
 
   private void registerShopLock() {
 
-    Util.unregisterListenerClazz(javaPlugin, LockListener.class);
     final boolean useShopLock = getConfig().getBoolean("shop.lock");
     if(useShopLock) {
 
-      new LockListener(this).register();
+      if(this.shopLockListener == null) {
+        this.shopLockListener = new LockListener(this);
+        this.shopLockListener.register();
+      }
+    } else if(this.shopLockListener != null) {
+      this.shopLockListener.unregister();
+      this.shopLockListener = null;
     }
   }
 
   private void registerUpdater() {
 
     final boolean updaterEnabled = this.getConfig().getBoolean("updater", true);
-    if(updaterEnabled) {
+    if(updaterEnabled && updateWatcher == null) {
       updateWatcher = new UpdateWatcher();
       updateWatcher.init();
-    } else {
-      if(updateWatcher != null) {
-        updateWatcher.uninit();
-        updateWatcher = null;
-      }
+    } else if(!updaterEnabled && updateWatcher != null) {
+      updateWatcher.uninit();
+      updateWatcher = null;
     }
   }
 
@@ -1145,6 +1162,10 @@ public class QuickShop implements QuickShopAPI, Reloadable {
   public final void onDisable() {
 
     logger.info("QuickShop is finishing remaining work, this may need a while...");
+    if(calendarWatcher != null) {
+      logger.info("Shutting down event calendar watcher...");
+      calendarWatcher.stop();
+    }
     if(sentryErrorReporter != null) {
       logger.info("Shutting down error reporter...");
       sentryErrorReporter.unregister();
@@ -1201,10 +1222,6 @@ public class QuickShop implements QuickShopAPI, Reloadable {
     }
     logger.info("Shutting down scheduled timers...");
     folia.getScheduler().cancelAllTasks();
-    if(calendarWatcher != null) {
-      logger.info("Shutting down event calendar watcher...");
-      calendarWatcher.stop();
-    }
     /* Unload UpdateWatcher */
     if(this.updateWatcher != null) {
       logger.info("Shutting down update watcher...");

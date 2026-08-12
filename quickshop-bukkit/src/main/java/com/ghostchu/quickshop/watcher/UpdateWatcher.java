@@ -80,5 +80,6 @@ public class UpdateWatcher implements Listener {
       return;
     }
     cronTask.cancel();
+    cronTask = null;
   }
 }
