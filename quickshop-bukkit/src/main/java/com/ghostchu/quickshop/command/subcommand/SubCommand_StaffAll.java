@@ -116,7 +116,7 @@ public class SubCommand_StaffAll implements CommandHandler<Player> {
     } else if(parser.getArgs().size() == 2) {
       final String prefix = parser.getArgs().get(0).toLowerCase();
       if("add".equals(prefix) || "del".equals(parser.getArgs().get(0))) {
-        return Util.getPlayerList();
+        return Util.getPlayerList(sender);
       }
     }
     return Collections.emptyList();

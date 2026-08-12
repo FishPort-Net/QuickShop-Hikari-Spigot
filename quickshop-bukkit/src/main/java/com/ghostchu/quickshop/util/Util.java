@@ -70,6 +70,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -79,7 +80,6 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class Util {
 
@@ -854,13 +854,25 @@ public class Util {
    * @return the player names
    */
   @NotNull
-  public static List<String> getPlayerList() {
+  public static List<String> getPlayerList(@NotNull final CommandSender sender) {
 
-    final List<String> tabList = Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
-    if(plugin.getConfig().getBoolean("include-offlineplayer-list")) {
-      tabList.addAll(Arrays.stream(Bukkit.getOfflinePlayers()).map(OfflinePlayer::getName).filter(Objects::nonNull).toList());
+    final LinkedHashSet<String> tabList = new LinkedHashSet<>();
+    final Player viewer = sender instanceof Player? (Player)sender : null;
+    for(final Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+      if(viewer == null || viewer.canSee(onlinePlayer)) {
+        tabList.add(onlinePlayer.getName());
+      }
     }
-    return tabList;
+    if(plugin.getConfig().getBoolean("include-offlineplayer-list")) {
+      for(final OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
+        final String name = offlinePlayer.getName();
+        final Player onlinePlayer = offlinePlayer.getPlayer();
+        if(name != null && (viewer == null || onlinePlayer == null || viewer.canSee(onlinePlayer))) {
+          tabList.add(name);
+        }
+      }
+    }
+    return new ArrayList<>(tabList);
   }
 
   /**
