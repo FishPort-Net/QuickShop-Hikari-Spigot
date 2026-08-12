@@ -175,6 +175,27 @@ public class CommonUtil {
   }
 
   /**
+   * Checks that a character sequence is a non-negative decimal integer that fits in a Java int.
+   */
+  public static boolean isInteger(@Nullable final CharSequence sequence) {
+
+    if(sequence == null || sequence.length() == 0) {
+      return false;
+    }
+    for(int i = 0; i < sequence.length(); i++) {
+      if(!Character.isDigit(sequence.charAt(i))) {
+        return false;
+      }
+    }
+    try {
+      Integer.parseInt(sequence.toString());
+      return true;
+    } catch(final NumberFormatException ignored) {
+      return false;
+    }
+  }
+
+  /**
    * Gets the location of a class inside of a jar file.
    *
    * @param clazz The class to get the location of.

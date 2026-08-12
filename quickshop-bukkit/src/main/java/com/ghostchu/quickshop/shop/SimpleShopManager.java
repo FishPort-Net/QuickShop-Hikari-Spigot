@@ -26,6 +26,7 @@ import com.ghostchu.quickshop.api.shop.ShopType;
 import com.ghostchu.quickshop.api.shop.cache.ShopCacheNamespacedKey;
 import com.ghostchu.quickshop.api.shop.permission.BuiltInShopPermission;
 import com.ghostchu.quickshop.common.util.CalculateUtil;
+import com.ghostchu.quickshop.common.util.CommonUtil;
 import com.ghostchu.quickshop.common.util.RomanNumber;
 import com.ghostchu.quickshop.economy.SimpleBenefit;
 import com.ghostchu.quickshop.economy.SimpleEconomyTransaction;
@@ -48,7 +49,6 @@ import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -1262,7 +1262,7 @@ public class SimpleShopManager extends AbstractShopManager implements ShopManage
       return;
     }
     if(shop.isBuying()) {
-      if(StringUtils.isNumeric(message)) {
+      if(CommonUtil.isInteger(message)) {
         amount = Integer.parseInt(message);
       } else {
         if(message.equalsIgnoreCase(tradeAllKeyword)) {
@@ -1277,7 +1277,7 @@ public class SimpleShopManager extends AbstractShopManager implements ShopManage
       }
       actionBuying(p, new BukkitInventoryWrapper(p.getInventory()), eco, info, shop, amount);
     } else if(shop.isSelling()) {
-      if(StringUtils.isNumeric(message)) {
+      if(CommonUtil.isInteger(message)) {
         amount = Integer.parseInt(message);
       } else {
         if(message.equalsIgnoreCase(tradeAllKeyword)) {

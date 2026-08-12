@@ -4,6 +4,7 @@ import com.ghostchu.quickshop.QuickShop;
 import com.ghostchu.quickshop.api.command.CommandHandler;
 import com.ghostchu.quickshop.api.command.CommandParser;
 import com.ghostchu.quickshop.api.shop.Shop;
+import com.ghostchu.quickshop.common.util.CommonUtil;
 import com.ghostchu.quickshop.util.ChatSheetPrinter;
 import com.ghostchu.quickshop.util.MsgUtil;
 import com.ghostchu.quickshop.util.Util;
@@ -42,9 +43,9 @@ public class SubCommand_List implements CommandHandler<Player> {
       lookupSelf(sender, page);
       return;
     }
-    if(!StringUtils.isNumeric(parser.getArgs().get(0))) {
+    if(!CommonUtil.isInteger(parser.getArgs().get(0))) {
       if(parser.getArgs().size() >= 2) {
-        if(!StringUtils.isNumeric(parser.getArgs().get(1))) {
+        if(!CommonUtil.isInteger(parser.getArgs().get(1))) {
           quickshop.text().of(sender, "not-a-number", parser.getArgs().get(1)).send();
           return;
         }
