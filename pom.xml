@@ -17,6 +17,8 @@
         <developer>QuickShop-Community</developer>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <qs.relocation>com.ghostchu.quickshop.shade</qs.relocation>
+        <shade.createSourcesJar>true</shade.createSourcesJar>
+        <shade.createTestSourcesJar>true</shade.createTestSourcesJar>
         <!-- common lib versions -->
         <depend.commons.lang3>3.17.0</depend.commons.lang3>
         <depend.adventure-api>4.16.0</depend.adventure-api>
@@ -36,6 +38,7 @@
         <depend.adventure-platform-viaversion>4.3.4</depend.adventure-platform-viaversion>
         <depend.adventure-text-serializer-bungeecord>4.3.4</depend.adventure-text-serializer-bungeecord>
         <depend.easy>0.4.7</depend.easy>
+        <depend.mysql-connector>8.4.0</depend.mysql-connector>
         <depend.examination-api>1.3.0</depend.examination-api>
         <depend.examination-string>1.3.0</depend.examination-string>
         <depend.nbtapi>2.15.0</depend.nbtapi>
@@ -175,9 +178,10 @@
                                 <finalName>${project.name}-${project.version}</finalName>
                                 <!--<outputDirectory>C:\Releases\QS\build-artifacts</outputDirectory>-->
                                 <createDependencyReducedPom>true</createDependencyReducedPom>
+                                <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>
                                 <minimizeJar>false</minimizeJar>
-                                <createSourcesJar>true</createSourcesJar>
-                                <createTestSourcesJar>true</createTestSourcesJar>
+                                <createSourcesJar>${shade.createSourcesJar}</createSourcesJar>
+                                <createTestSourcesJar>${shade.createTestSourcesJar}</createTestSourcesJar>
                                 <shadeSourcesContent>true</shadeSourcesContent>
                                 <shadedArtifactAttached>true</shadedArtifactAttached>
                                 <artifactSet>
@@ -195,14 +199,32 @@
                                         <include>io.papermc:paperlib:*</include>
                                         <include>org.bstats:*</include>
                                         <include>net.kyori:*</include>
-                                        <include>com.alessiodp.libby:libby-bukkit:*</include>
-                                        <include>com.alessiodp.libby:libby-core:*</include>
-                                        <include>com.ghostchu.lib.unofficial.com.alessiodp.libby:libby-bukkit:*</include>
-                                        <include>com.ghostchu.lib.unofficial.com.alessiodp.libby:libby-core:*</include>
+                                        <include>org.apache.commons:*</include>
+                                        <include>commons-codec:*</include>
+                                        <include>commons-io:*</include>
+                                        <include>commons-lang:*</include>
+                                        <include>com.google.code.gson:*</include>
+                                        <include>com.google.guava:*</include>
+                                        <include>com.google.errorprone:*</include>
+                                        <include>com.google.j2objc:*</include>
+                                        <include>org.checkerframework:*</include>
+                                        <include>com.rollbar:*</include>
+                                        <include>cc.carm.lib:*</include>
+                                        <include>com.h2database:*</include>
+                                        <include>com.konghq:*</include>
+                                        <include>org.apache.httpcomponents:*</include>
+                                        <include>org.apache.httpcomponents.client5:*</include>
+                                        <include>org.apache.httpcomponents.core5:*</include>
+                                        <include>net.sourceforge.csvjdbc:*</include>
+                                        <include>org.dom4j:*</include>
+                                        <include>com.vdurmont:*</include>
+                                        <include>com.ghostchu.crowdin:*</include>
+                                        <include>com.mysql:*</include>
+                                        <include>com.google.protobuf:*</include>
                                         <include>io.vertx:vertx-core:*</include>
                                         <include>io.vertx:vertx-web:*</include>
                                         <include>org.eclipse.aether:*:*</include>
-                                        <include>org.slf4j:slf4j-jdk14:*</include>
+                                        <include>org.slf4j:*</include>
                                     </includes>
                                 </artifactSet>
                                 <relocations>
@@ -236,14 +258,76 @@
                                         <shadedPattern>${qs.relocation}.de.themoep.minedown.</shadedPattern>
                                     </relocation>
                                     <relocation>
-                                        <pattern>com.alessiodp.libby.</pattern>
-                                        <shadedPattern>${qs.relocation}.com.alessiodp.libby.</shadedPattern>
+                                        <pattern>net.kyori</pattern>
+                                        <shadedPattern>${qs.relocation}.net.kyori</shadedPattern>
                                     </relocation>
                                     <relocation>
-                                        <pattern>com.ghostchu.lib.unofficial.com.alessiodp.libby.</pattern>
-                                        <shadedPattern>
-                                            ${qs.relocation}.com.ghostchu.lib.unofficial.com.alessiodp.libby.
-                                        </shadedPattern>
+                                        <pattern>org.apache.commons</pattern>
+                                        <shadedPattern>${qs.relocation}.org.apache.commons</shadedPattern>
+                                    </relocation>
+                                    <relocation>
+                                        <pattern>org.apache.http</pattern>
+                                        <shadedPattern>${qs.relocation}.org.apache.http</shadedPattern>
+                                    </relocation>
+                                    <relocation>
+                                        <pattern>org.apache.hc</pattern>
+                                        <shadedPattern>${qs.relocation}.org.apache.hc</shadedPattern>
+                                    </relocation>
+                                    <relocation>
+                                        <pattern>org.slf4j</pattern>
+                                        <shadedPattern>${qs.relocation}.org.slf4j</shadedPattern>
+                                    </relocation>
+                                    <relocation>
+                                        <pattern>com.google.gson</pattern>
+                                        <shadedPattern>${qs.relocation}.com.google.gson</shadedPattern>
+                                    </relocation>
+                                    <relocation>
+                                        <pattern>com.google.common</pattern>
+                                        <shadedPattern>${qs.relocation}.com.google.common</shadedPattern>
+                                    </relocation>
+                                    <relocation>
+                                        <pattern>com.google.thirdparty</pattern>
+                                        <shadedPattern>${qs.relocation}.com.google.thirdparty</shadedPattern>
+                                    </relocation>
+                                    <relocation>
+                                        <pattern>com.google.protobuf</pattern>
+                                        <shadedPattern>${qs.relocation}.com.google.protobuf</shadedPattern>
+                                    </relocation>
+                                    <relocation>
+                                        <pattern>com.rollbar</pattern>
+                                        <shadedPattern>${qs.relocation}.com.rollbar</shadedPattern>
+                                    </relocation>
+                                    <relocation>
+                                        <pattern>cc.carm.lib</pattern>
+                                        <shadedPattern>${qs.relocation}.cc.carm.lib</shadedPattern>
+                                    </relocation>
+                                    <relocation>
+                                        <pattern>org.h2</pattern>
+                                        <shadedPattern>${qs.relocation}.org.h2</shadedPattern>
+                                    </relocation>
+                                    <relocation>
+                                        <pattern>kong.unirest</pattern>
+                                        <shadedPattern>${qs.relocation}.kong.unirest</shadedPattern>
+                                    </relocation>
+                                    <relocation>
+                                        <pattern>org.relique.jdbc</pattern>
+                                        <shadedPattern>${qs.relocation}.org.relique.jdbc</shadedPattern>
+                                    </relocation>
+                                    <relocation>
+                                        <pattern>org.dom4j</pattern>
+                                        <shadedPattern>${qs.relocation}.org.dom4j</shadedPattern>
+                                    </relocation>
+                                    <relocation>
+                                        <pattern>com.vdurmont.semver4j</pattern>
+                                        <shadedPattern>${qs.relocation}.com.vdurmont.semver4j</shadedPattern>
+                                    </relocation>
+                                    <relocation>
+                                        <pattern>com.ghostchu.crowdin</pattern>
+                                        <shadedPattern>${qs.relocation}.com.ghostchu.crowdin</shadedPattern>
+                                    </relocation>
+                                    <relocation>
+                                        <pattern>com.mysql</pattern>
+                                        <shadedPattern>${qs.relocation}.com.mysql</shadedPattern>
                                     </relocation>
                                     <relocation>
                                         <pattern>com.mohistmc.</pattern>
@@ -255,6 +339,7 @@
                                     </relocation>
                                 </relocations>
                                 <transformers>
+                                    <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                                     <transformer
                                             implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                         <mainClass>com.ghostchu.quickshop.bootstrap.Bootstrap</mainClass>
@@ -443,13 +528,6 @@
         <module>platform/quickshop-platform-spigot-v1_20_R1</module>
         <module>platform/quickshop-platform-spigot-v1_20_R2</module>
         <module>platform/quickshop-platform-spigot-v1_20_R3</module>
-        <module>platform/quickshop-platform-spigot-v1_20_R4</module>
-        <module>platform/quickshop-platform-spigot-v1_21_R1</module>
-        <module>platform/quickshop-platform-spigot-v1_21_R2</module>
-        <module>platform/quickshop-platform-spigot-v1_21_R3</module>
-        <module>platform/quickshop-platform-spigot-v1_21_R4</module>
-        <module>platform/quickshop-platform-spigot-v1_21_R5</module>
-        <module>platform/quickshop-platform-paper</module>
         <module>quickshop-bukkit</module>
         <module>compatibility/common</module>
 
@@ -493,5 +571,23 @@
         <module>compatibility/worldguard</module>
 
     </modules>
+
+    <profiles>
+        <profile>
+            <id>modern-platforms</id>
+            <activation>
+                <jdk>[21,)</jdk>
+            </activation>
+            <modules>
+                <module>platform/quickshop-platform-spigot-v1_20_R4</module>
+                <module>platform/quickshop-platform-spigot-v1_21_R1</module>
+                <module>platform/quickshop-platform-spigot-v1_21_R2</module>
+                <module>platform/quickshop-platform-spigot-v1_21_R3</module>
+                <module>platform/quickshop-platform-spigot-v1_21_R4</module>
+                <module>platform/quickshop-platform-spigot-v1_21_R5</module>
+                <module>platform/quickshop-platform-paper</module>
+            </modules>
+        </profile>
+    </profiles>
 
 </project>

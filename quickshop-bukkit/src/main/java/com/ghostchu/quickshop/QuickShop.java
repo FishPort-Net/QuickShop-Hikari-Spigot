@@ -1104,6 +1104,9 @@ public class QuickShop implements QuickShopAPI, Reloadable {
         final String port = dbCfg.getString("port");
         final String database = dbCfg.getString("database");
         final boolean useSSL = dbCfg.getBoolean("usessl");
+        final String driverClassName = com.mysql.cj.jdbc.Driver.class.getName();
+        Log.debug("Setting up MySQL driver class name to: " + driverClassName);
+        config.setDriverClassName(driverClassName);
         config.setJdbcUrl("jdbc:mysql://" + host + ":" + port + "/" + database + "?useSSL=" + useSSL);
         config.setUsername(user);
         config.setPassword(pass);
