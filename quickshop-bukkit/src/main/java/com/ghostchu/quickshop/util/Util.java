@@ -163,6 +163,7 @@ public class Util {
     }
 
     final ItemStack stack = item.clone();
+    stack.setAmount(Math.min(stack.getAmount(), getItemMaxStackSize(stack.getType())));
     if(stack.getType().isAir()) {
       Log.debug("Invalid trade item: air");
       return false; // Air cannot be used for trade

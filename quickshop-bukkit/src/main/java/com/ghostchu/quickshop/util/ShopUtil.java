@@ -273,7 +273,7 @@ public class ShopUtil {
         if(all) {
           arg = buyingShopAllCalc(eco, shop, p);
         } else {
-          arg = shop.getShopStackingAmount();
+          arg = 1;
         }
         if(arg == 0) {
           return true;
@@ -298,7 +298,7 @@ public class ShopUtil {
     if(all) {
       arg = sellingShopAllCalc(eco, shop, p);
     } else {
-      arg = shop.getShopStackingAmount();
+      arg = 1;
     }
 
     if(arg == 0) {

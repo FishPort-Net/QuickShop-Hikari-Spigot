@@ -56,6 +56,7 @@ public class SubCommand_Create implements CommandHandler<Player> {
           if(amount < 1) {
             amount = 1;
           }
+          amount = Math.min(amount, Util.getItemMaxStackSize(material));
           item = new ItemStack(material, amount);
         } catch(final NumberFormatException e) {
           item = new ItemStack(material, 1);
