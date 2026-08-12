@@ -45,6 +45,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -134,6 +135,19 @@ public class MainPage {
         }
 
         final Component shopType = QuickShop.getInstance().text().of("shop-type." + shop.getShopType().name().toLowerCase(Locale.ROOT)).forLocale();
+
+        final Map<Long, Component> shopHeaders = new HashMap<>(shops.size());
+        for(final Shop historyShop : shops) {
+          final Component header;
+          if(historyShop.getShopName() != null) {
+            header = QuickShop.getInstance().text().of(player, "history.shop.header-icon-shop-name", historyShop.getShopName()).forLocale();
+          } else {
+            final String historyWorld = historyShop.getLocation().getWorld() == null? "World" : historyShop.getLocation().getWorld().getName();
+            header = QuickShop.getInstance().text().of(player, "history.shop.header-icon-shop-empty-name", historyWorld,
+                                                       historyShop.getLocation().getBlockX(), historyShop.getLocation().getBlockY(), historyShop.getLocation().getBlockZ()).forLocale();
+          }
+          shopHeaders.put(historyShop.getShopId(), header);
+        }
 
         if(shops.size() == 1) {
 
@@ -251,7 +265,7 @@ public class MainPage {
           }
 
           final List<Component> lore = getList(id, "history.shop.log-icon-description-with-store-name",
-                                               shopName,
+                                               shopHeaders.getOrDefault(record.shopId(), shopName),
                                                userName,
                                                itemName, record.amount(),
                                                record.money(),
