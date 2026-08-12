@@ -44,8 +44,8 @@ public class SimplePriceLimiter implements Reloadable, PriceLimiter, SubPasteIte
   private final QuickShop plugin;
   private final Map<String, RuleSet> rules = new LinkedHashMap<>();
   private boolean wholeNumberOnly = false;
-  private double undefinedMin = 0.0d;
-  private double undefinedMax = Double.MAX_VALUE;
+  private double undefinedMin = -1;
+  private double undefinedMax = -1;
 
   public SimplePriceLimiter(@NotNull final QuickShop plugin) {
 
@@ -75,8 +75,8 @@ public class SimplePriceLimiter implements Reloadable, PriceLimiter, SubPasteIte
         plugin.logger().warn("Failed to save migrated  price-restriction.yml.yml to plugin folder!", e);
       }
     }
-    this.undefinedMax = configuration.getDouble("undefined.max", 99999999999999999999999999999.99d);
-    this.undefinedMin = configuration.getDouble("undefined.min", 0.0d);
+    this.undefinedMax = configuration.getDouble("undefined.max", -1);
+    this.undefinedMin = configuration.getDouble("undefined.min", -1);
     this.wholeNumberOnly = configuration.getBoolean("whole-number-only", false);
     if(!configuration.getBoolean("enable", false)) {
       return;
@@ -185,6 +185,7 @@ public class SimplePriceLimiter implements Reloadable, PriceLimiter, SubPasteIte
     double minPrice = 0;
     double maxPrice = 0;
     boolean hasMaxPrice = false;
+    boolean hasMinPrice = false;
     final List<ItemStack> flattenedItems = ItemContainerUtil.flattenContents(itemStack, true, false);
 
     for(final RuleSet rule : rules.values()) {
@@ -201,6 +202,7 @@ public class SimplePriceLimiter implements Reloadable, PriceLimiter, SubPasteIte
       }
 
       if(rule.hasMinPrice()) {
+        hasMinPrice = true;
         minPrice += rule.getMin() * itemTally;
       }
       if(rule.hasMaxPrice()) {
@@ -209,14 +211,11 @@ public class SimplePriceLimiter implements Reloadable, PriceLimiter, SubPasteIte
       }
     }
 
-    if(price < minPrice || (hasMaxPrice && price > maxPrice)) {
-      return new SimplePriceLimiterCheckResult(PriceLimiterStatus.PRICE_RESTRICTED, minPrice, maxPrice);
-    }
-    if(undefinedMin != -1 && price < undefinedMin) {
-      return new SimplePriceLimiterCheckResult(PriceLimiterStatus.PRICE_RESTRICTED, undefinedMin, undefinedMax);
-    }
-    if(undefinedMax != -1 && price > undefinedMax) {
-      return new SimplePriceLimiterCheckResult(PriceLimiterStatus.PRICE_RESTRICTED, undefinedMin, undefinedMax);
+    if((hasMinPrice && price < minPrice) || (hasMaxPrice && price > maxPrice)
+       || (undefinedMin >= 0 && price < undefinedMin) || (undefinedMax >= 0 && price > undefinedMax)) {
+      return new SimplePriceLimiterCheckResult(PriceLimiterStatus.PRICE_RESTRICTED,
+                                               hasMinPrice? minPrice : undefinedMin,
+                                               hasMaxPrice? maxPrice : undefinedMax);
     }
     return new SimplePriceLimiterCheckResult(PriceLimiterStatus.PASS, undefinedMin, undefinedMax);
   }
@@ -253,6 +252,7 @@ public class SimplePriceLimiter implements Reloadable, PriceLimiter, SubPasteIte
     double minPrice = 0;
     double maxPrice = 0;
     boolean hasMaxPrice = false;
+    boolean hasMinPrice = false;
     final List<ItemStack> flattenedItems = ItemContainerUtil.flattenContents(itemStack, true, false);
 
     for(final RuleSet rule : rules.values()) {
@@ -269,6 +269,7 @@ public class SimplePriceLimiter implements Reloadable, PriceLimiter, SubPasteIte
       }
 
       if(rule.hasMinPrice()) {
+        hasMinPrice = true;
         minPrice += rule.getMin() * itemTally;
       }
       if(rule.hasMaxPrice()) {
@@ -277,14 +278,11 @@ public class SimplePriceLimiter implements Reloadable, PriceLimiter, SubPasteIte
       }
     }
 
-    if(price < minPrice || (hasMaxPrice && price > maxPrice)) {
-      return new SimplePriceLimiterCheckResult(PriceLimiterStatus.PRICE_RESTRICTED, minPrice, maxPrice);
-    }
-    if(undefinedMin != -1 && price < undefinedMin) {
-      return new SimplePriceLimiterCheckResult(PriceLimiterStatus.PRICE_RESTRICTED, undefinedMin, undefinedMax);
-    }
-    if(undefinedMax != -1 && price > undefinedMax) {
-      return new SimplePriceLimiterCheckResult(PriceLimiterStatus.PRICE_RESTRICTED, undefinedMin, undefinedMax);
+    if((hasMinPrice && price < minPrice) || (hasMaxPrice && price > maxPrice)
+       || (undefinedMin >= 0 && price < undefinedMin) || (undefinedMax >= 0 && price > undefinedMax)) {
+      return new SimplePriceLimiterCheckResult(PriceLimiterStatus.PRICE_RESTRICTED,
+                                               hasMinPrice? minPrice : undefinedMin,
+                                               hasMaxPrice? maxPrice : undefinedMax);
     }
     return new SimplePriceLimiterCheckResult(PriceLimiterStatus.PASS, undefinedMin, undefinedMax);
   }

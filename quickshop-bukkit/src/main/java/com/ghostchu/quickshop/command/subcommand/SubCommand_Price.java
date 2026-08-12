@@ -45,6 +45,11 @@ public class SubCommand_Price implements CommandHandler<Player> {
       return;
     }
 
+    if(!ShopUtil.isValidPrice(price)) {
+      plugin.text().of(sender, "digits-reach-the-limit", 32).send();
+      return;
+    }
+
     final double priceDouble = price.doubleValue();
     // No number input
     if(Double.isInfinite(priceDouble) || Double.isNaN(priceDouble)) {

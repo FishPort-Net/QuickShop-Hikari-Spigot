@@ -38,6 +38,7 @@ import com.ghostchu.quickshop.util.ExpiringSet;
 import com.ghostchu.quickshop.util.MsgUtil;
 import com.ghostchu.quickshop.util.PackageUtil;
 import com.ghostchu.quickshop.util.PotionCompat;
+import com.ghostchu.quickshop.util.ShopUtil;
 import com.ghostchu.quickshop.util.Util;
 import com.ghostchu.quickshop.util.holder.Result;
 import com.ghostchu.quickshop.util.logger.Log;
@@ -119,7 +120,6 @@ public class SimpleShopManager extends AbstractShopManager implements ShopManage
   private boolean autoSign;
   private int maximumDigitsLimit;
   private boolean allowNoSpaceForSign;
-  private boolean useDecFormat;
   private double shopCreateCost;
   private boolean useShopLock;
   private double globalTax;
@@ -173,7 +173,6 @@ public class SimpleShopManager extends AbstractShopManager implements ShopManage
     this.autoSign = plugin.getConfig().getBoolean("shop.auto-sign");
     this.maximumDigitsLimit = plugin.getConfig().getInt("maximum-digits-in-price", -1);
     this.allowNoSpaceForSign = plugin.getConfig().getBoolean("shop.allow-shop-without-space-for-sign");
-    this.useDecFormat = plugin.getConfig().getBoolean("use-decimal-format");
     this.shopCreateCost = plugin.getConfig().getDouble("shop.cost");
     this.useShopLock = plugin.getConfig().getBoolean("shop.lock");
     this.globalTax = plugin.getConfig().getDouble("tax");
@@ -614,14 +613,33 @@ public class SimpleShopManager extends AbstractShopManager implements ShopManage
     }
 
     // Price limit checking
+    if(!Double.isFinite(shop.getPrice())) {
+      plugin.text().of(p, "not-a-number", shop.getPrice()).send();
+      return;
+    }
+    if(!ShopUtil.isValidPrice(BigDecimal.valueOf(shop.getPrice()))) {
+      plugin.text().of(p, "digits-reach-the-limit", Component.text(32)).send();
+      return;
+    }
     final PriceLimiterCheckResult priceCheckResult = this.priceLimiter.check(p, shop.getItem(), plugin.getCurrency(), shop.getPrice());
+    final double min = priceCheckResult.getMin();
+    final double max = priceCheckResult.getMax();
+    final String minFormatted = min >= 0? format(min, shop) : Double.toString(min);
+    final String maxFormatted = max >= 0? format(max, shop) : Double.toString(max);
     switch(priceCheckResult.getStatus()) {
       case REACHED_PRICE_MIN_LIMIT ->
-              plugin.text().of(p, "price-too-cheap", Component.text((useDecFormat)? MsgUtil.decimalFormat(priceCheckResult.getMax()) : Double.toString(priceCheckResult.getMin()))).send();
+              plugin.text().of(p, "price-too-cheap", minFormatted).send();
       case REACHED_PRICE_MAX_LIMIT ->
-              plugin.text().of(p, "price-too-high", Component.text((useDecFormat)? MsgUtil.decimalFormat(priceCheckResult.getMax()) : Double.toString(priceCheckResult.getMin()))).send();
-      case PRICE_RESTRICTED ->
-              plugin.text().of(p, "restricted-prices", Util.getItemStackName(shop.getItem()), Component.text(priceCheckResult.getMin()), Component.text(priceCheckResult.getMax())).send();
+              plugin.text().of(p, "price-too-high", maxFormatted).send();
+      case PRICE_RESTRICTED -> {
+        if(min >= 0 && max >= 0) {
+          plugin.text().of(p, "restricted-prices", Util.getItemStackName(shop.getItem()), minFormatted, maxFormatted).send();
+        } else if(min >= 0) {
+          plugin.text().of(p, "restricted-price-min", Util.getItemStackName(shop.getItem()), minFormatted).send();
+        } else {
+          plugin.text().of(p, "restricted-price-max", Util.getItemStackName(shop.getItem()), maxFormatted).send();
+        }
+      }
       case NOT_VALID -> plugin.text().of(p, "not-a-number", shop.getPrice()).send();
       case NOT_A_WHOLE_NUMBER -> plugin.text().of(p, "not-a-integer", shop.getPrice()).send();
       case PASS -> {
@@ -887,7 +905,7 @@ public class SimpleShopManager extends AbstractShopManager implements ShopManage
         Log.debug("ShopInfoPanelEvent cancelled by some plugin");
         return;
       }
-      final Location shopLoc = shop.bukkitLocation();
+      final Location shopLoc = shop.getLocation();
       final String infoKey = p.getUniqueId() + "|" + shopLoc.getWorld().getName() + ":" + shopLoc.getBlockX() + "," + shopLoc.getBlockY() + "," + shopLoc.getBlockZ();
       final boolean throttled = infoRateLimit.contains(infoKey);
       // Always (re)add so every click slides the expiry forward: a player spam-clicking the

@@ -48,6 +48,7 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -118,8 +119,6 @@ public class ShopUtil {
       return;
     }
 
-    final boolean format = plugin.getConfig().getBoolean("use-decimal-format");
-
     double fee = 0;
 
     if(plugin.isPriceChangeRequiresFee()) {
@@ -140,21 +139,38 @@ public class ShopUtil {
       return;
     }
 
+    if(!isValidPrice(BigDecimal.valueOf(price))) {
+      plugin.text().of(user, "digits-reach-the-limit", Component.text(32)).send();
+      return;
+    }
+
     final PriceLimiterCheckResult checkResult = limiter.check(user, shop.getItem(), plugin.getCurrency(), price);
+    final double min = checkResult.getMin();
+    final double max = checkResult.getMax();
+    final String minFormatted = min >= 0? plugin.getShopManager().format(min, shop) : Double.toString(min);
+    final String maxFormatted = max >= 0? plugin.getShopManager().format(max, shop) : Double.toString(max);
 
     switch(checkResult.getStatus()) {
       case PRICE_RESTRICTED -> {
-        plugin.text().of(user.getUniqueId(), "restricted-prices", Util.getItemStackName(shop.getItem()),
-                         Component.text(checkResult.getMin()),
-                         Component.text(checkResult.getMax())).send();
+        if(min >= 0 && max >= 0) {
+          plugin.text().of(user, "restricted-prices", Util.getItemStackName(shop.getItem()), minFormatted, maxFormatted).send();
+        } else if(min >= 0) {
+          plugin.text().of(user, "restricted-price-min", Util.getItemStackName(shop.getItem()), minFormatted).send();
+        } else {
+          plugin.text().of(user, "restricted-price-max", Util.getItemStackName(shop.getItem()), maxFormatted).send();
+        }
         return;
       }
       case REACHED_PRICE_MIN_LIMIT -> {
-        plugin.text().of(user, "price-too-cheap", (format)? MsgUtil.decimalFormat(checkResult.getMin()) : Double.toString(checkResult.getMin())).send();
+        plugin.text().of(user, "price-too-cheap", minFormatted).send();
         return;
       }
       case REACHED_PRICE_MAX_LIMIT -> {
-        plugin.text().of(user, "price-too-high", (format)? MsgUtil.decimalFormat(checkResult.getMax()) : Double.toString(checkResult.getMax())).send();
+        plugin.text().of(user, "price-too-high", maxFormatted).send();
+        return;
+      }
+      case NOT_VALID -> {
+        plugin.text().of(user, "not-a-number", price).send();
         return;
       }
       case NOT_A_WHOLE_NUMBER -> {
@@ -204,6 +220,17 @@ public class ShopUtil {
 
     event = event.clone(Phase.POST);
     event.callEvent();
+  }
+
+  /**
+   * Checks whether a price fits the database's DECIMAL(32,2) column.
+   */
+  public static boolean isValidPrice(@NotNull final BigDecimal price) {
+
+    final BigDecimal normalized = price.stripTrailingZeros();
+    final int scale = Math.max(normalized.scale(), 0);
+    final int integerDigits = Math.max(normalized.precision() - normalized.scale(), 0);
+    return scale <= 2 && integerDigits <= 30;
   }
 
   public static boolean sellToShop(@NotNull final Player p, @Nullable final Shop shop, final boolean direct, final boolean all) {
