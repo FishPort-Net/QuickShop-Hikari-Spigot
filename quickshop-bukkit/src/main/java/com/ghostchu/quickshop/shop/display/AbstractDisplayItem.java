@@ -105,7 +105,7 @@ public abstract class AbstractDisplayItem implements Reloadable {
     if(iMeta == null) {
       return false;
     }
-    return iMeta.getPersistentDataContainer().has(DISPLAY_MARK_NAMESPACE);
+    return iMeta.getPersistentDataContainer().getKeys().contains(DISPLAY_MARK_NAMESPACE);
   }
 
   /**

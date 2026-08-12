@@ -3,6 +3,7 @@ package com.ghostchu.quickshop.util.matcher.item;
 import com.ghostchu.quickshop.QuickShop;
 import com.ghostchu.quickshop.api.shop.ItemMatcher;
 import com.ghostchu.quickshop.common.util.CommonUtil;
+import com.ghostchu.quickshop.util.PotionCompat;
 import com.ghostchu.quickshop.util.logger.Log;
 import com.ghostchu.simplereloadlib.ReloadResult;
 import com.ghostchu.simplereloadlib.ReloadStatus;
@@ -303,15 +304,11 @@ public class QuickShopItemMatcherImpl implements ItemMatcher, Reloadable {
           if(plugin.getGameVersion().isNewPotionAPI()) {
             final List<PotionEffect> effects1 = new ArrayList<>();
             final List<PotionEffect> effects2 = new ArrayList<>();
-            if(potion1.getBasePotionType() != null) {
-              effects1.addAll(potion1.getBasePotionType().getPotionEffects());
-            }
+            effects1.addAll(PotionCompat.getBasePotionEffects(potion1));
             if(potion1.hasCustomEffects()) {
               effects1.addAll(potion1.getCustomEffects());
             }
-            if(potion2.getBasePotionType() != null) {
-              effects2.addAll(potion2.getBasePotionType().getPotionEffects());
-            }
+            effects2.addAll(PotionCompat.getBasePotionEffects(potion2));
             if(potion2.hasCustomEffects()) {
               effects2.addAll(potion2.getCustomEffects());
             }

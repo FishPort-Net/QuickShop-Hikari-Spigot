@@ -35,6 +35,7 @@ import com.ghostchu.quickshop.shop.inventory.BukkitInventoryWrapperManager;
 import com.ghostchu.quickshop.util.ChatSheetPrinter;
 import com.ghostchu.quickshop.util.MsgUtil;
 import com.ghostchu.quickshop.util.PackageUtil;
+import com.ghostchu.quickshop.util.PotionCompat;
 import com.ghostchu.quickshop.util.Util;
 import com.ghostchu.quickshop.util.holder.Result;
 import com.ghostchu.quickshop.util.logger.Log;
@@ -959,9 +960,7 @@ public class SimpleShopManager extends AbstractShopManager implements ShopManage
         if(plugin.getGameVersion().isNewPotionAPI()) {
           if(items.hasItemMeta() && (items.getItemMeta() instanceof final PotionMeta potionMeta)) {
             final List<PotionEffect> effects = new ArrayList<>();
-            if(potionMeta.getBasePotionType() != null) {
-              effects.addAll(potionMeta.getBasePotionType().getPotionEffects());
-            }
+            effects.addAll(PotionCompat.getBasePotionEffects(potionMeta));
             if(potionMeta.hasCustomEffects()) {
               effects.addAll(potionMeta.getCustomEffects());
             }

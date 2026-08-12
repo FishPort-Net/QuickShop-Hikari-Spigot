@@ -706,9 +706,10 @@ public class Util {
     boolean itemName = false;
 
     try {
-      itemName = Objects.requireNonNull(itemStack.getItemMeta()).hasItemName();
-    } catch(final NoSuchMethodError ignore) {
-      //outdated
+      final ItemMeta itemMeta = Objects.requireNonNull(itemStack.getItemMeta());
+      itemName = (boolean)itemMeta.getClass().getMethod("hasItemName").invoke(itemMeta);
+    } catch(final ReflectiveOperationException | LinkageError ignore) {
+      // Item names were added after the oldest supported Spigot API.
     }
 
     if(Objects.requireNonNull(itemStack.getItemMeta()).hasDisplayName() || itemName) {

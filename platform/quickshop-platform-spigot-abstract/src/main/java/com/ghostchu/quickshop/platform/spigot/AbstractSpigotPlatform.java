@@ -81,11 +81,13 @@ public abstract class AbstractSpigotPlatform implements Platform {
     }
 
     try {
-      if(meta.hasItemName()) {
-        return LegacyComponentSerializer.legacySection().deserialize(meta.getItemName());
+      final boolean hasItemName = (boolean)meta.getClass().getMethod("hasItemName").invoke(meta);
+      if(hasItemName) {
+        final String itemName = (String)meta.getClass().getMethod("getItemName").invoke(meta);
+        return LegacyComponentSerializer.legacySection().deserialize(itemName);
       }
-    } catch(final NoSuchMethodError ignore) {
-      //old version
+    } catch(final ReflectiveOperationException | LinkageError ignore) {
+      // Item names were added after the oldest supported Spigot API.
     }
 
     return Component.empty();

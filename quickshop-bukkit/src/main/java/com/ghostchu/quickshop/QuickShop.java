@@ -115,13 +115,11 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.tcoded.folialib.FoliaLib;
 import com.vdurmont.semver4j.Semver;
-import io.papermc.lib.PaperLib;
 import lombok.Getter;
 import lombok.Setter;
 import net.tnemc.item.AbstractItemStack;
 import net.tnemc.item.bukkit.BukkitHelper;
 import net.tnemc.item.bukkit.BukkitItemStack;
-import net.tnemc.item.paper.PaperItemStack;
 import net.tnemc.item.providers.HelperMethods;
 import net.tnemc.menu.bukkit.BukkitMenuHandler;
 import net.tnemc.menu.bukkit.BukkitPlayer;
@@ -131,16 +129,6 @@ import net.tnemc.menu.bukkit.listener.BukkitInventoryCloseListener;
 import net.tnemc.menu.core.MenuHandler;
 import net.tnemc.menu.core.compatibility.MenuPlayer;
 import net.tnemc.menu.core.manager.MenuManager;
-import net.tnemc.menu.folia.FoliaMenuHandler;
-import net.tnemc.menu.folia.FoliaPlayer;
-import net.tnemc.menu.folia.listener.FoliaChatListener;
-import net.tnemc.menu.folia.listener.FoliaInventoryClickListener;
-import net.tnemc.menu.folia.listener.FoliaInventoryCloseListener;
-import net.tnemc.menu.paper.PaperMenuHandler;
-import net.tnemc.menu.paper.PaperPlayer;
-import net.tnemc.menu.paper.listener.PaperChatListener;
-import net.tnemc.menu.paper.listener.PaperInventoryClickListener;
-import net.tnemc.menu.paper.listener.PaperInventoryCloseListener;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -728,25 +716,10 @@ public class QuickShop implements QuickShopAPI, Reloadable {
 
     this.folia = new FoliaLib(javaPlugin);
 
-    if(this.folia.isFolia()) {
-
-      Bukkit.getPluginManager().registerEvents(new FoliaChatListener(javaPlugin), javaPlugin);
-      Bukkit.getPluginManager().registerEvents(new FoliaInventoryClickListener(javaPlugin), javaPlugin);
-      Bukkit.getPluginManager().registerEvents(new FoliaInventoryCloseListener(javaPlugin), javaPlugin);
-      this.menuHandler = new FoliaMenuHandler(javaPlugin, false);
-    } else if(this.folia.isPaper()) {
-
-      Bukkit.getPluginManager().registerEvents(new PaperChatListener(javaPlugin), javaPlugin);
-      Bukkit.getPluginManager().registerEvents(new PaperInventoryClickListener(javaPlugin), javaPlugin);
-      Bukkit.getPluginManager().registerEvents(new PaperInventoryCloseListener(javaPlugin), javaPlugin);
-      this.menuHandler = new PaperMenuHandler(javaPlugin, false);
-    } else {
-
-      Bukkit.getPluginManager().registerEvents(new BukkitChatListener(javaPlugin), javaPlugin);
-      Bukkit.getPluginManager().registerEvents(new BukkitInventoryClickListener(javaPlugin), javaPlugin);
-      Bukkit.getPluginManager().registerEvents(new BukkitInventoryCloseListener(javaPlugin), javaPlugin);
-      this.menuHandler = new BukkitMenuHandler(javaPlugin, false);
-    }
+    Bukkit.getPluginManager().registerEvents(new BukkitChatListener(javaPlugin), javaPlugin);
+    Bukkit.getPluginManager().registerEvents(new BukkitInventoryClickListener(javaPlugin), javaPlugin);
+    Bukkit.getPluginManager().registerEvents(new BukkitInventoryCloseListener(javaPlugin), javaPlugin);
+    this.menuHandler = new BukkitMenuHandler(javaPlugin, false);
 
     MenuManager.instance().addMenu(new ShopHistoryMenu());
     MenuManager.instance().addMenu(new ShopKeeperMenu());
@@ -1272,9 +1245,6 @@ public class QuickShop implements QuickShopAPI, Reloadable {
 
   public AbstractItemStack<?> stack() {
 
-    if(PaperLib.isPaper()) {
-      return new PaperItemStack();
-    }
     return new BukkitItemStack();
   }
 
@@ -1290,13 +1260,7 @@ public class QuickShop implements QuickShopAPI, Reloadable {
 
   public MenuPlayer createMenuPlayer(final OfflinePlayer player) {
 
-    if(this.folia.isFolia()) {
-      return new FoliaPlayer(player, this.javaPlugin);
-    } else if(this.folia.isPaper()) {
-      return new PaperPlayer(player, this.javaPlugin);
-    } else {
-      return new BukkitPlayer(player, this.javaPlugin);
-    }
+    return new BukkitPlayer(player, this.javaPlugin);
   }
 
   /**
@@ -1324,7 +1288,7 @@ public class QuickShop implements QuickShopAPI, Reloadable {
   public String getMainCommand() {
 
     final List<String> customCommands = getConfig().getStringList("custom-commands");
-    return customCommands.isEmpty()? "quickshop" : customCommands.getFirst();
+    return customCommands.isEmpty()? "quickshop" : customCommands.get(0);
   }
 
   public String getCommandPrefix(final String commandLabel) {

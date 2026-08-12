@@ -91,7 +91,7 @@ public class PacketFactoryv1_21 implements PacketFactory<PacketContainer> {
             .write(3, 0);
 
     //Entity Type
-    fakeItemPacket.getEntityTypeModifier().write(0, EntityType.ITEM);
+    fakeItemPacket.getEntityTypeModifier().write(0, EntityType.valueOf("ITEM"));
 
     //UUID
     fakeItemPacket.getUUIDs().write(0, identifier);

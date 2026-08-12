@@ -79,7 +79,7 @@ public class PacketFactoryv1_21_6 implements PacketFactory<PacketWrapper<?>> {
   @Override
   public PacketWrapper<?> createSpawnPacket(final int id, @NotNull final Location displayLocation) {
 
-    final EntityType type = EntityType.ITEM;
+    final EntityType type = EntityType.valueOf("ITEM");
     final UUID identifier = UUID.nameUUIDFromBytes(("SHOP:" + id).getBytes(StandardCharsets.UTF_8));
 
     return new WrapperPlayServerSpawnEntity(id, identifier, SpigotConversionUtil.fromBukkitEntityType(type),

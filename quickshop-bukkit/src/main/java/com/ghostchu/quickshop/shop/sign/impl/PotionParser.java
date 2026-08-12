@@ -18,6 +18,7 @@ package com.ghostchu.quickshop.shop.sign.impl;
  */
 
 import com.ghostchu.quickshop.shop.sign.SignParser;
+import com.ghostchu.quickshop.util.PotionCompat;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 
@@ -63,9 +64,9 @@ public class PotionParser implements SignParser {
   @Override
   public String parse(final ItemStack item) {
 
-    if(item.getItemMeta() instanceof final PotionMeta potion && potion.hasBasePotionType()) {
+    if(item.getItemMeta() instanceof final PotionMeta potion) {
 
-      return potion.getBasePotionType().name();
+      return PotionCompat.getBasePotionName(potion);
     }
 
     return "Potion";
