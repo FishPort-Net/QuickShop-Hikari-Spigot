@@ -187,17 +187,18 @@ Though it would be nice if you could pull-request your changes into this reposit
 
 ### Compile and Debugging
 
-To compile and debug QuickShop, please do the following steps:
+Use the Gradle wrapper to build the main plugin:
 
-1. Make sure you're using Java 21. You can get the latest Java versions from the [Adoptium project][adoptium].
-2. Compile the main project without a signature by using `mvn install -Pgithub` with the GitHub Profile selected.
-3. Put the compiled jar into your Test-server's `plugins` folder, start the server and begin debugging!
+- Java 17: `./gradlew :quickshop-bukkit:shadowJar` builds the Spigot 1.20
+  R1-R3 distribution used by Java 17 servers such as Ketting 1.20.1.
+- Java 21: the same command builds the full 6.2.0.10-range distribution,
+  adding the modern Spigot NMS modules and Paper adapter. The plugin core stays
+  on Java 17 bytecode, so modern platform classes are loaded only when needed.
 
-To compile the QuickShop and debug it by yourself, please follow these steps:
-
-1. Make sure you're using Java21+ JDK in your PATH.
-2. Compile main-project without signature by using profile: `mvn install -Pgithub` with github profile selected.
-3. Start your server and go on.
+The output is written to `quickshop-bukkit/build/libs/`. Put the resulting
+`QuickShop-Hikari-*.jar` in the test server's `plugins` directory. See
+[`SPIGOT_COMPATIBILITY.md`](SPIGOT_COMPATIBILITY.md) for fork-specific support
+decisions and intentionally omitted Paper/Folia behavior.
 
 ## bStats
 
@@ -208,7 +209,9 @@ You may opt-out by setting `privacy.type.STATISTIC` and `privacy.type.RESEARCH` 
 
 ## License
 
-Quickshop-Hikari is dual licensed under GPLv3 and AGPLv3. New contributions will follow the updated license of AGPLv3.
+The inherited code retains its original GPLv3/AGPLv3 terms. This independently
+maintained fork and its new contributions are distributed under AGPLv3; see
+[`LICENSE`](LICENSE) for the full notice.
 
 [![fossaStatusImageLarge]][fossaStatusLarge]
 
