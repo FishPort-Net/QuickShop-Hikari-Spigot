@@ -568,6 +568,8 @@ protect:
   explode: true
   hopper: true
   hopper-owner-exclude: false
+  dropper: true
+  dropper-owner-exclude: false
   entity: true
 
 # The policy that QuickShop-Hikari will backup the databases
