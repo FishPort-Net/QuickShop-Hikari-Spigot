@@ -1045,7 +1045,7 @@ public class QuickShop implements QuickShopAPI, Reloadable {
 
   private void registerUpdater() {
 
-    final boolean updaterEnabled = this.getConfig().getBoolean("updater", true);
+    final boolean updaterEnabled = this.getConfig().getBoolean("updater", false);
     if(updaterEnabled && updateWatcher == null) {
       updateWatcher = new UpdateWatcher();
       updateWatcher.init();
