@@ -1,5 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.ghostchu.quickshop.buildlogic.GitInfoValueSource
+import com.ghostchu.quickshop.buildlogic.StageSanitizedDependencyJar
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.bundling.Jar
@@ -7,6 +8,12 @@ import org.gradle.api.tasks.bundling.Jar
 plugins {
     id("quickshop.core-conventions")
     id("quickshop.shadow-conventions")
+}
+
+val easySqlHikariForShadow = configurations.create("easySqlHikariForShadow") {
+    isCanBeConsumed = false
+    isCanBeResolved = true
+    isTransitive = false
 }
 
 dependencies {
@@ -56,6 +63,7 @@ dependencies {
         exclude("org.slf4j", "slf4j-api")
     }
     implementation("cc.carm.lib:easysql-hikaricp:0.4.7")
+    easySqlHikariForShadow("cc.carm.lib:easysql-hikaricp:0.4.7")
     implementation("org.apache.commons:commons-compress:1.26.2")
     implementation("com.tcoded:FoliaLib:0.5.1")
 
@@ -104,6 +112,14 @@ val stageProjectOutputsForShadow = tasks.register<Sync>("stageProjectOutputsForS
     }
 }
 
+// EasySQL Hikari 0.4.7 is a fat JAR that embeds SLF4J 1.7. Shadow must not
+// combine those classes with QuickShop's SLF4J 2.0 API and JUL provider.
+val stageEasySqlHikariForShadow = tasks.register<StageSanitizedDependencyJar>("stageEasySqlHikariForShadow") {
+    inputJars.from(easySqlHikariForShadow)
+    excludedPrefixes.set(listOf("org/slf4j/", "META-INF/maven/org.slf4j/"))
+    outputDirectory.set(layout.buildDirectory.dir("shadow/easysql-hikaricp"))
+}
+
 tasks.named<ProcessResources>("processResources") {
     val pluginVersion = project.version.toString()
     filesMatching("plugin.yml") {
@@ -125,6 +141,8 @@ tasks.withType<ShadowJar>().configureEach {
         projectsStagedForShadow.forEach { dependencyProject ->
             exclude(project(dependencyProject.path))
         }
+        exclude(dependency("cc.carm.lib:easysql-hikaricp:.*"))
     }
     from(stageProjectOutputsForShadow)
+    from(stageEasySqlHikariForShadow)
 }
