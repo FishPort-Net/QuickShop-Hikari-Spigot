@@ -132,6 +132,9 @@ permissions:
       quickshop.permission: true
       quickshop.benefit: true
       quickshop.browse: true
+      quickshop.tag: true
+      quickshop.favorite: true
+      quickshop.watch: true
       quickshop.sign: true
       quickshop.history: true
       quickshop.history.owned: true
@@ -200,6 +203,15 @@ permissions:
     default: op
   quickshop.use:
     description: Allows a player to buy/sell using other player's shops.
+    default: true
+  quickshop.tag:
+    description: Allows a player to add and query their private shop tags.
+    default: true
+  quickshop.favorite:
+    description: Allows a player to favorite shops and browse their favorites.
+    default: true
+  quickshop.watch:
+    description: Allows a player to add shops to their watch list.
     default: true
   quickshop.unlimited:
     description: Allows a staff member to use /quickshop unlimited to make a shop infinite.

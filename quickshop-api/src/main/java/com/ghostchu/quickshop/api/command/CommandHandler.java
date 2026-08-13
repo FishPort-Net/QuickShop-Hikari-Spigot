@@ -25,6 +25,20 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface CommandHandler<T extends CommandSender> {
 
+  /** Resolves an optional shop id argument, otherwise the shop the player is looking at. */
+  @Nullable
+  default Shop findShop(final T sender, final CommandParser parser, final int idIndex) {
+
+    if(parser.getArgs().size() > idIndex) {
+      try {
+        return QuickShopAPI.getInstance().getShopManager().getShop(Long.parseLong(parser.getArgs().get(idIndex)));
+      } catch(final NumberFormatException ignored) {
+        // Fall back to the shop in the player's line of sight.
+      }
+    }
+    return getLookingShop(sender);
+  }
+
   /**
    * Getting the player now looking shop
    *

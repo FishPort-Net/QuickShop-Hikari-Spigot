@@ -45,6 +45,8 @@ import com.ghostchu.quickshop.command.subcommand.SubCommand_Staff;
 import com.ghostchu.quickshop.command.subcommand.SubCommand_StaffAll;
 import com.ghostchu.quickshop.command.subcommand.SubCommand_SuggestPrice;
 import com.ghostchu.quickshop.command.subcommand.SubCommand_SuperCreate;
+import com.ghostchu.quickshop.command.subcommand.SubCommand_SystemTag;
+import com.ghostchu.quickshop.command.subcommand.SubCommand_Tag;
 import com.ghostchu.quickshop.command.subcommand.SubCommand_TaxAccount;
 import com.ghostchu.quickshop.command.subcommand.SubCommand_ToggleDisplay;
 import com.ghostchu.quickshop.command.subcommand.SubCommand_ToggleDisplayAll;
@@ -91,6 +93,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
+
+import static com.ghostchu.quickshop.api.shop.tag.TagService.SYS_FAV;
+import static com.ghostchu.quickshop.api.shop.tag.TagService.SYS_WATCH;
 
 @Data
 @SuppressWarnings("unchecked")
@@ -436,6 +441,21 @@ public class SimpleCommandManager implements CommandManager, TabCompleter, Comma
                         .prefix("browse")
                         .permission("quickshop.browse")
                         .executor(new SubCommand_Browse(plugin))
+                        .build());
+    registerCmd(CommandContainer.builder()
+                        .prefix("tag")
+                        .permission("quickshop.tag")
+                        .executor(new SubCommand_Tag(plugin))
+                        .build());
+    registerCmd(CommandContainer.builder()
+                        .prefix("favorite")
+                        .permission("quickshop.favorite")
+                        .executor(new SubCommand_SystemTag(plugin, SYS_FAV, "favorite"))
+                        .build());
+    registerCmd(CommandContainer.builder()
+                        .prefix("watch")
+                        .permission("quickshop.watch")
+                        .executor(new SubCommand_SystemTag(plugin, SYS_WATCH, "watch"))
                         .build());
     registerCmd(CommandContainer.builder()
                         .prefix("sign")

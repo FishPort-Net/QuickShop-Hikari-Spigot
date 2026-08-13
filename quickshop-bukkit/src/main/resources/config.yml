@@ -259,8 +259,9 @@ shop:
 
   #The display type you want use.
   #Old mode, ArmorStand (display-type=1) is Outdated and could not be used
-  #0=Normal Dropped Item
-  #2=Virtual Item (Requires ProtocolLib, fallback to type 0 if ProtocolLib is not installed)
+  #2=Virtual Item (Requires ProtocolLib or PacketEvents)
+  #3=Spigot Display Entities (ItemDisplay, available on the supported 1.20+ servers)
+  #Changing display type requires a server restart.
   display-type: 2
 
   #The preferred protocol to use for virtual item displays.
@@ -280,6 +281,40 @@ shop:
   #Allow displays to show stack effects when stack creation is turned on.
   #It doesn't work under Virtual DisplayItem.
   display-allow-stacks: false
+
+  # Display entity rotation. Only used by display-type 3; chest facing is added automatically.
+  display-rotation:
+    degrees: 0.0
+    x: 0.0
+    y: 1.0
+    z: 0.0
+
+  # Display entity scale. Only used by display-type 3.
+  display-scale:
+    x: 1.25
+    y: 1.25
+    z: 1.25
+
+  # Optional text rendered above display-type 3 entities.
+  text-display:
+    enabled: false
+    range-blocks: 3
+    y-offset: 0.8
+    line-width: 200
+    text-opacity: -1
+    see-through: false
+    shadow:
+      enabled: true
+    scale:
+      x: 0.5
+      y: 0.5
+      z: 0.5
+    # Supported placeholders: item_name, price_alone, amount, price_amount, owner, type, status.
+    lines:
+      - "<green><item_name></green>"
+      - "<gray><owner></gray>"
+      - "<gray><type></gray>"
+      - "<gold><price_amount></gold>"
 
   #The coordinates of the display for shop displays.
   #These are added to the shop's container location

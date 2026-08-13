@@ -4,9 +4,14 @@ import com.ghostchu.quickshop.api.shop.cache.ShopInventoryCountCache;
 
 public class SimpleShopInventoryCountCache implements ShopInventoryCountCache {
 
-  private int stock;
-  private int space;
-  private boolean initialized = false;
+  private volatile int stock;
+  private volatile int space;
+  private volatile boolean initialized;
+
+  public SimpleShopInventoryCountCache() {
+
+    this(-2, -2, false);
+  }
 
   public SimpleShopInventoryCountCache(final int stock, final int space, final boolean initialized) {
 
@@ -47,6 +52,11 @@ public class SimpleShopInventoryCountCache implements ShopInventoryCountCache {
   public void setSpace(final int space) {
 
     this.space = space;
+  }
+
+  public void setInitialized(final boolean initialized) {
+
+    this.initialized = initialized;
   }
 
   /**

@@ -493,11 +493,16 @@ public class SimpleDatabaseHelperV2 implements DatabaseHelper {
   public @NotNull List<ShopRecord> listShops(@Nullable final String worldFilter, final boolean deleteIfCorrupt) {
 
     final List<ShopRecord> shopRecords = new ArrayList<>();
-    final String SQL = "SELECT * FROM " + DataTables.DATA.getName()
+    final String SQL = "SELECT *, " + DataTables.SHOP_MAP.getName() + ".shop AS qs_shop_id, "
+                       + DataTables.EXTERNAL_CACHE.getName() + ".shop AS qs_cached_shop, "
+                       + DataTables.EXTERNAL_CACHE.getName() + ".stock AS qs_cached_stock, "
+                       + DataTables.EXTERNAL_CACHE.getName() + ".space AS qs_cached_space FROM " + DataTables.DATA.getName()
                        + " INNER JOIN " + DataTables.SHOPS.getName()
                        + " ON " + DataTables.DATA.getName() + ".id = " + DataTables.SHOPS.getName() + ".data"
                        + " INNER JOIN " + DataTables.SHOP_MAP.getName()
-                       + " ON " + DataTables.SHOP_MAP.getName() + ".shop = " + DataTables.SHOPS.getName() + ".id";
+                       + " ON " + DataTables.SHOP_MAP.getName() + ".shop = " + DataTables.SHOPS.getName() + ".id"
+                       + " LEFT JOIN " + DataTables.EXTERNAL_CACHE.getName()
+                       + " ON " + DataTables.EXTERNAL_CACHE.getName() + ".shop = " + DataTables.SHOPS.getName() + ".id";
     try(final SQLQuery query = manager.createQuery().withPreparedSQL(SQL).execute()) {
       final ResultSet rs = query.getResultSet();
       while(rs.next()) {
@@ -505,18 +510,39 @@ public class SimpleDatabaseHelperV2 implements DatabaseHelper {
         if(worldFilter != null && !worldFilter.equals(world)) {
           continue;
         }
-        final long shopId = rs.getLong("shop");
+        final long shopId = rs.getLong("qs_shop_id");
         final int x = rs.getInt("x");
         final int y = rs.getInt("y");
         final int z = rs.getInt("z");
         final DataRecord dataRecord = new SimpleDataRecord(plugin.getPlayerFinder(), rs);
         final InfoRecord infoRecord = new ShopInfo(shopId, world, x, y, z);
-        shopRecords.add(new ShopRecord(dataRecord, infoRecord));
+        final boolean cacheInitialized = rs.getObject("qs_cached_shop") != null;
+        final int cachedStock = cacheInitialized? rs.getInt("qs_cached_stock") : -2;
+        final int cachedSpace = cacheInitialized? rs.getInt("qs_cached_space") : -2;
+        shopRecords.add(new ShopRecord(dataRecord, infoRecord, cachedStock, cachedSpace, cacheInitialized));
       }
     } catch(final SQLException e) {
       plugin.logger().error("Failed to list shops", e);
     }
     return shopRecords;
+  }
+
+  @Override
+  public void loadAllTags() {
+
+    try(final SQLQuery query = DataTables.TAGS.createQuery().build().execute()) {
+      final ResultSet set = query.getResultSet();
+      while(set.next()) {
+        try {
+          plugin.tagManager().addTag(set.getLong("shop"), UUID.fromString(set.getString("tagger")),
+                                     set.getString("tag"), false);
+        } catch(final IllegalArgumentException exception) {
+          plugin.logger().warn("Ignoring a shop tag with an invalid player UUID", exception);
+        }
+      }
+    } catch(final SQLException exception) {
+      plugin.logger().error("Failed to load shop tags", exception);
+    }
   }
 
   @Override
@@ -528,7 +554,9 @@ public class SimpleDatabaseHelperV2 implements DatabaseHelper {
             .addCondition("tag", tag)
             .build().execute()) {
       final ResultSet set = query.getResultSet();
-      shopIds.add(set.getLong("shop"));
+      while(set.next()) {
+        shopIds.add(set.getLong("shop"));
+      }
     } catch(final SQLException e) {
       plugin.logger().error("Failed to list shops tagged by " + tagger + " with tag " + tag, e);
     }
@@ -543,7 +571,9 @@ public class SimpleDatabaseHelperV2 implements DatabaseHelper {
             .addCondition("tagger", tagger.toString())
             .build().execute()) {
       final ResultSet set = query.getResultSet();
-      tags.add(set.getString("tag"));
+      while(set.next()) {
+        tags.add(set.getString("tag"));
+      }
     } catch(final SQLException e) {
       plugin.logger().error("Failed to list tags by " + tagger, e);
     }
@@ -565,6 +595,22 @@ public class SimpleDatabaseHelperV2 implements DatabaseHelper {
     return DataTables.TAGS.createDelete()
             .addCondition("tagger", tagger.toString())
             .addCondition("shop", shopId)
+            .build().executeFuture(i->i);
+  }
+
+  @Override
+  public CompletableFuture<@Nullable Integer> removeAllShopTags(@NotNull final Long shopId) {
+
+    return DataTables.TAGS.createDelete()
+            .addCondition("shop", shopId)
+            .build().executeFuture(i->i);
+  }
+
+  @Override
+  public CompletableFuture<@Nullable Integer> removeAllTagsBy(@NotNull final UUID tagger) {
+
+    return DataTables.TAGS.createDelete()
+            .addCondition("tagger", tagger.toString())
             .build().executeFuture(i->i);
   }
 
@@ -787,7 +833,6 @@ public class SimpleDatabaseHelperV2 implements DatabaseHelper {
   public CompletableFuture<@NotNull ShopInventoryCountCache> queryInventoryCache(final long shopId) {
 
     return CompletableFuture.supplyAsync(()->{
-      ShopInventoryCountCache cache = new SimpleShopInventoryCountCache(-2, -2, false);
       try(final SQLQuery query = DataTables.EXTERNAL_CACHE.createQuery()
               .selectColumns("stock", "space")
               .addCondition("shop", shopId)
@@ -795,12 +840,12 @@ public class SimpleDatabaseHelperV2 implements DatabaseHelper {
               .build().execute()) {
         final ResultSet set = query.getResultSet();
         if(set.next()) {
-          cache = new SimpleShopInventoryCountCache(set.getInt("stock"), set.getInt("space"), true);
+          return new SimpleShopInventoryCountCache(set.getInt("stock"), set.getInt("space"), true);
         }
       } catch(final SQLException exception) {
         plugin.logger().warn("Cannot handle the inventory cache lookup for shop {}", shopId, exception);
       }
-      return cache;
+      return new SimpleShopInventoryCountCache();
     });
   }
 

@@ -259,6 +259,9 @@ public class PlayerListener extends AbstractQSListener {
       final long delay = PackageUtil.parsePackageProperly("flushTransactionDelay").asLong(60);
       QuickShop.folia().getScheduler().runLaterAsync(()->MsgUtil.flush(e.getPlayer()), delay);
     }
+    if(plugin.getDisplayEntityItemManager() != null) {
+      plugin.getDisplayEntityItemManager().addPlayer(e.getPlayer());
+    }
   }
 
   @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -319,6 +322,12 @@ public class PlayerListener extends AbstractQSListener {
   @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
   public void onMove(final PlayerMoveEvent e) {
 
+    if(plugin.getDisplayEntityItemManager() != null && e.getTo() != null
+       && (e.getFrom().getWorld() != e.getTo().getWorld()
+           || (e.getFrom().getBlockX() >> 4) != (e.getTo().getBlockX() >> 4)
+           || (e.getFrom().getBlockZ() >> 4) != (e.getTo().getBlockZ() >> 4))) {
+      plugin.getDisplayEntityItemManager().addPlayer(e.getPlayer());
+    }
     final Info info = plugin.getShopManager().getInteractiveManager().get(e.getPlayer().getUniqueId());
     if(info == null) {
       return;

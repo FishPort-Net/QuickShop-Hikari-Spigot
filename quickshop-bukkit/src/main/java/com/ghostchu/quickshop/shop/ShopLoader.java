@@ -12,6 +12,7 @@ import com.ghostchu.quickshop.common.util.CommonUtil;
 import com.ghostchu.quickshop.common.util.JsonUtil;
 import com.ghostchu.quickshop.common.util.Timer;
 import com.ghostchu.quickshop.economy.SimpleBenefit;
+import com.ghostchu.quickshop.shop.cache.SimpleShopInventoryCountCache;
 import com.ghostchu.quickshop.util.PackageUtil;
 import com.ghostchu.quickshop.util.Util;
 import com.ghostchu.quickshop.util.logger.Log;
@@ -118,10 +119,9 @@ public class ShopLoader implements SubPasteItem {
   private CompletableFuture<Void> loadShopFromShopRecord(final String worldName, final ShopRecord shopRecord, final boolean deleteCorruptShops, final List<Shop> shopsLoadInNextTick, final AtomicInteger successCounter, final AtomicInteger chunkNotLoaded) {
 
     return CompletableFuture.supplyAsync(()->{
-      final InfoRecord infoRecord = shopRecord.getInfoRecord();
-      final DataRecord dataRecord = shopRecord.getDataRecord();
       final Timer singleShopLoadingTimer = new Timer(true);
-      final ShopLoadResult result = loadSingleShop(infoRecord, dataRecord, worldName, shopsLoadInNextTick);
+      final ShopLoadResult result = loadSingleShop(shopRecord, worldName, shopsLoadInNextTick);
+      final InfoRecord infoRecord = shopRecord.getInfoRecord();
       switch(result) {
         case LOADED -> successCounter.incrementAndGet();
         case LOAD_AFTER_CHUNK_LOADED -> chunkNotLoaded.incrementAndGet();
@@ -141,7 +141,9 @@ public class ShopLoader implements SubPasteItem {
   }
 
 
-  private ShopLoadResult loadSingleShop(final InfoRecord infoRecord, final DataRecord dataRecord, @Nullable final String worldName, @NotNull final List<Shop> shopsLoadInNextTick) {
+  private ShopLoadResult loadSingleShop(final ShopRecord shopRecord, @Nullable final String worldName, @NotNull final List<Shop> shopsLoadInNextTick) {
+    final InfoRecord infoRecord = shopRecord.getInfoRecord();
+    final DataRecord dataRecord = shopRecord.getDataRecord();
     // World check
     if(worldName != null) {
       if(!worldName.equals(infoRecord.getWorld())) {
@@ -171,6 +173,10 @@ public class ShopLoader implements SubPasteItem {
     final Shop shop;
     final DataRawDatabaseInfo rawInfo = new DataRawDatabaseInfo(dataRecord);
     final Location location = new Location(Bukkit.getWorld(infoRecord.getWorld()), x, y, z);
+    final SimpleShopInventoryCountCache inventoryCountCache = new SimpleShopInventoryCountCache(
+            shopRecord.getCachedStock(),
+            shopRecord.getCachedSpace(),
+            shopRecord.isInventoryCacheInitialized());
 
     final ItemStack stack = (rawInfo.getNewItem() == null)? rawInfo.getItem() : rawInfo.getNewItem();
     try {
@@ -190,7 +196,8 @@ public class ShopLoader implements SubPasteItem {
                                rawInfo.getInvSymbolLink(),
                                rawInfo.getName(),
                                rawInfo.getPermissions(),
-                               rawInfo.getBenefits());
+                               rawInfo.getBenefits(),
+                               inventoryCountCache);
     } catch(final Exception e) {
       if(e instanceof IllegalStateException) {
         plugin.logger().warn("Failed to load the shop, skipping...", e);

@@ -195,11 +195,29 @@ public interface Shop {
   int getRemainingSpace();
 
   /**
+   * Gets remaining space without requiring callers to touch a Bukkit inventory off-thread.
+   * Implementations may return a cached value.
+   */
+  default CompletableFuture<Integer> getRemainingSpaceAsync() {
+
+    return CompletableFuture.completedFuture(getRemainingSpace());
+  }
+
+  /**
    * Get shop remaining stock.
    *
    * @return Remaining stock.
    */
   int getRemainingStock();
+
+  /**
+   * Gets remaining stock without requiring callers to touch a Bukkit inventory off-thread.
+   * Implementations may return a cached value.
+   */
+  default CompletableFuture<Integer> getRemainingStockAsync() {
+
+    return CompletableFuture.completedFuture(getRemainingStock());
+  }
 
   /**
    * WARNING: This UUID will changed after plugin reload, shop reload or server restart DO NOT USE

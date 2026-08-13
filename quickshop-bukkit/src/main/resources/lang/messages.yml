@@ -887,10 +887,19 @@ tag-cleared: <green>Successfully cleared all tags from this shop!
 tag-shops-cleared: <green>Successfully cleared <aqua>#{0}</aqua> from all your tagged
   shops!
 tag-query: '<green>This shop have <yellow>{0}</yellow> tags:'
-tag-query-listing: <yellow> - <aqua>#{0}
+tag-query-listing: <yellow> - <aqua>{0}
 tag-query-no-tag: <red>This shop have no tags.
 tag-query-shops: '<green>This tag contains <yellow>{0}</yellow> shops:'
 tag-query-shops-listing: <yellow> - <aqua>{0}
+tag-invalid: <red>Invalid tag. Use up to 32 letters, numbers, underscores, or hyphens.
+favorite-added: <green>Added this shop to your favorites.
+favorite-removed: <green>Removed this shop from your favorites.
+favorite-unable: <red>Unable to update this favorite.
+favorite-none: <yellow>You have no favorite shops.
+watch-added: <green>Added this shop to your watch list.
+watch-removed: <green>Removed this shop from your watch list.
+watch-unable: <red>Unable to update this watch entry.
+watch-none: <yellow>Your watch list is empty.
 batch-operations-based-on-tags-no-failure: <green>Successfully batch processed <yellow>{0}</yellow>
   shops.
 batch-operations-based-on-tags-have-failure: <yellow>Total {0} shops in batch processing
@@ -1834,7 +1843,8 @@ gui:
       - "<green>Location: </green><yellow>{1}</yellow>"
       - "<green>Type: </green><yellow>{2}</yellow>"
       - "<green>Price: </green><yellow>{3}</yellow>"
-      - "<green>Stock: </green><yellow>{4}</yellow>"
+      - "<green>Available: </green><yellow>{4}</yellow>"
+      - "<yellow>Click to open this shop.</yellow>"
   keeper:
     title: "Shop Keeper"
     change-icon:
@@ -1913,4 +1923,5 @@ about:
   kofi-thanks: "<gold>Special thanks to those who support QuickShop on Ko-fi :)</gold>"
 history-command-leave-blank: "<Leave blank for seeing store>"
 browse-command-leave-blank: "<Leave blank for seeing all stores in server>"
+browse-no-results: <yellow>No shops matched this market query.
 shop-information-not-shown-due-an-internal-error: "<red>An internal error occurred. The store information panel may be displayed incompletely, please contact the server administrator."

@@ -42,6 +42,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.ghostchu.quickshop.menu.ShopBrowseMenu.SHOPS_DATA;
+import static com.ghostchu.quickshop.menu.ShopKeeperMenu.SHOP_DATA_ID;
 import static com.ghostchu.quickshop.menu.shared.QuickShopPage.get;
 import static com.ghostchu.quickshop.menu.shared.QuickShopPage.getList;
 
@@ -93,7 +94,7 @@ public class MainPage {
         final int offset = 9;
         final int page = (Integer)viewer.get().dataOrDefault(staffPageID, 1);
         final int items = (menuRows - 2) * offset;
-        final int start = ((page - 1) * offset);
+        final int start = ((page - 1) * items);
 
         final List<Shop> shops = (ArrayList<Shop>)shopsData.get();
 
@@ -156,9 +157,11 @@ public class MainPage {
                                 location,
                                 shop.getShopType(),
                                 eco.format(shop.getPrice(), shop.getLocation().getWorld(), shop.getCurrency()),
-                                shop.getRemainingStock()));
+                                shop.isBuying()? shop.getRemainingSpace() : shop.getRemainingStock()));
 
-          playerPage.addIcon(id, new IconBuilder(stack).withSlot(offset + (i - start)).build());
+          playerPage.addIcon(id, new IconBuilder(stack)
+                  .withActions(new DataAction(SHOP_DATA_ID, shop.getShopId()), new SwitchPageAction("qs:trade", 1))
+                  .withSlot(offset + (i - start)).build());
 
           i++;
         }

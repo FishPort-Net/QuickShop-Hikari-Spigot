@@ -11,6 +11,7 @@ import com.ghostchu.quickshop.api.shop.ShopControlPanelManager;
 import com.ghostchu.quickshop.api.shop.ShopItemBlackList;
 import com.ghostchu.quickshop.api.shop.ShopManager;
 import com.ghostchu.quickshop.api.shop.interaction.InteractionManager;
+import com.ghostchu.quickshop.api.shop.tag.TagManager;
 import com.vdurmont.semver4j.Semver;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -118,6 +119,9 @@ public interface QuickShopAPI {
    * @return The text maanger
    */
   TextManager getTextManager();
+
+  /** Gets the player-specific shop tag, favorite, and watch index. */
+  TagManager tagManager();
 
   /**
    * Getting QuickShop current stacking item support status

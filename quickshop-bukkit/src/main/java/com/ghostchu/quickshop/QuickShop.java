@@ -27,6 +27,7 @@ import com.ghostchu.quickshop.api.shop.ShopControlPanelManager;
 import com.ghostchu.quickshop.api.shop.ShopItemBlackList;
 import com.ghostchu.quickshop.api.shop.ShopManager;
 import com.ghostchu.quickshop.api.shop.display.DisplayType;
+import com.ghostchu.quickshop.api.shop.tag.TagManager;
 import com.ghostchu.quickshop.command.QuickShopCommand;
 import com.ghostchu.quickshop.command.SimpleCommandManager;
 import com.ghostchu.quickshop.common.util.CommonUtil;
@@ -72,10 +73,12 @@ import com.ghostchu.quickshop.shop.SimpleShopPermissionManager;
 import com.ghostchu.quickshop.shop.controlpanel.SimpleShopControlPanel;
 import com.ghostchu.quickshop.shop.controlpanel.SimpleShopControlPanelManager;
 import com.ghostchu.quickshop.shop.display.AbstractDisplayItem;
+import com.ghostchu.quickshop.shop.display.display.DisplayEntityItemManager;
 import com.ghostchu.quickshop.shop.display.virtual.VirtualDisplayItemManager;
 import com.ghostchu.quickshop.shop.interaction.QuickShopInteractionManager;
 import com.ghostchu.quickshop.shop.inventory.BukkitInventoryWrapperManager;
 import com.ghostchu.quickshop.shop.sign.SignHooker;
+import com.ghostchu.quickshop.shop.tag.QuickShopTagManager;
 import com.ghostchu.quickshop.util.FastPlayerFinder;
 import com.ghostchu.quickshop.util.ItemMarker;
 import com.ghostchu.quickshop.util.MsgUtil;
@@ -203,6 +206,7 @@ public class QuickShop implements QuickShopAPI, Reloadable {
   private final Platform platform;
   @Getter
   private final EconomyLoader economyLoader = new EconomyLoader(this);
+  private final QuickShopTagManager tagManager;
   @Getter
   private final PasteManager pasteManager = new PasteManager();
   protected MenuHandler menuHandler;
@@ -325,6 +329,9 @@ public class QuickShop implements QuickShopAPI, Reloadable {
   @Nullable
   @Getter
   private VirtualDisplayItemManager virtualDisplayItemManager;
+  @Nullable
+  @Getter
+  private DisplayEntityItemManager displayEntityItemManager;
   @Getter
   private PrivacyController privacyController;
   @Getter
@@ -340,6 +347,7 @@ public class QuickShop implements QuickShopAPI, Reloadable {
     this.logger = logger;
     this.platform = platform;
     this.helperMethods = new BukkitHelper();
+    this.tagManager = new QuickShopTagManager(this);
   }
 
   /**
@@ -519,9 +527,7 @@ public class QuickShop implements QuickShopAPI, Reloadable {
     // Load quick variables
     this.display = this.getConfig().getBoolean("shop.display-items");
     final int type = getConfig().getInt("shop.display-type");
-    if(type != 2 && type != 900) {
-      this.invalidProvider = true;
-    }
+    this.invalidProvider = type != 2 && type != 3 && type != 900;
 
     this.priceChangeRequiresFee = this.getConfig().getBoolean("shop.price-change-requires-fee");
     this.displayItemCheckTicks = this.getConfig().getInt("shop.display-items-check-ticks");
@@ -633,6 +639,12 @@ public class QuickShop implements QuickShopAPI, Reloadable {
   public TextManager getTextManager() {
 
     return this.textManager;
+  }
+
+  @Override
+  public TagManager tagManager() {
+
+    return tagManager;
   }
 
   @Override
@@ -787,6 +799,8 @@ public class QuickShop implements QuickShopAPI, Reloadable {
     /* Load all shops. */
     shopLoader = new ShopLoader(this);
     shopLoader.loadShops();
+    logger.info("Loading shop tags...");
+    tagManager.loadAllFromDB();
     QuickExecutor.getCommonExecutor().submit(this::bakeShopsOwnerCache);
     logger.info("Registering listeners...");
     this.interactionManager = new QuickShopInteractionManager(this);
@@ -854,6 +868,11 @@ public class QuickShop implements QuickShopAPI, Reloadable {
   private void loadVirtualDisplayItem() {
 
     if(!invalidProvider && this.display) {
+      if(AbstractDisplayItem.getNowUsing() == DisplayType.DISPLAY_ENTITY) {
+        logger.info("Using Spigot display entities (ItemDisplay/TextDisplay).");
+        displayEntityItemManager = new DisplayEntityItemManager();
+        return;
+      }
       //VirtualItem support
       if(AbstractDisplayItem.getNowUsing() == DisplayType.VIRTUALITEM) {
         logger.info("Using Virtual Displays. Attempting to initialize packet factory...");

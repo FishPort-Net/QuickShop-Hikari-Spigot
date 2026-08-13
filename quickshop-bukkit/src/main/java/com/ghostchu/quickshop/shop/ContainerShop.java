@@ -37,6 +37,7 @@ import com.ghostchu.quickshop.common.util.CommonUtil;
 import com.ghostchu.quickshop.common.util.JsonUtil;
 import com.ghostchu.quickshop.database.bean.SimpleDataRecord;
 import com.ghostchu.quickshop.obj.QUserImpl;
+import com.ghostchu.quickshop.shop.cache.SimpleShopInventoryCountCache;
 import com.ghostchu.quickshop.shop.datatype.ShopSignPersistentDataType;
 import com.ghostchu.quickshop.shop.display.AbstractDisplayItem;
 import com.ghostchu.quickshop.util.MsgUtil;
@@ -138,6 +139,9 @@ public class ContainerShop implements Shop, Reloadable {
 
   @NotNull
   private Benefit benefit;
+  @NotNull
+  @EqualsAndHashCode.Exclude
+  private final SimpleShopInventoryCountCache inventoryCountCache;
 
 //    ContainerShop(@NotNull ContainerShop s) {
 //        Util.ensureThread(false);
@@ -199,11 +203,37 @@ public class ContainerShop implements Shop, Reloadable {
           @NotNull final Map<UUID, String> playerGroup,
           @NotNull final Benefit shopBenefit) {
 
+    this(plugin, shopId, location, price, item, owner, unlimited, type, extra, currency,
+         disableDisplay, taxAccount, inventoryWrapperProvider, symbolLink, shopName, playerGroup,
+         shopBenefit, new SimpleShopInventoryCountCache());
+  }
+
+  public ContainerShop(
+          @NotNull final QuickShop plugin,
+          final long shopId,
+          @NotNull final Location location,
+          final double price,
+          @NotNull final ItemStack item,
+          @NotNull final QUser owner,
+          final boolean unlimited,
+          @NotNull final ShopType type,
+          @Nullable final YamlConfiguration extra,
+          @Nullable final String currency,
+          final boolean disableDisplay,
+          @Nullable final QUser taxAccount,
+          @NotNull final String inventoryWrapperProvider,
+          @NotNull final String symbolLink,
+          @Nullable final String shopName,
+          @NotNull final Map<UUID, String> playerGroup,
+          @NotNull final Benefit shopBenefit,
+          @NotNull final SimpleShopInventoryCountCache inventoryCountCache) {
+
     this.shopId = shopId;
     this.shopName = shopName;
     this.location = location;
     this.price = price;
     this.benefit = shopBenefit;
+    this.inventoryCountCache = inventoryCountCache;
 
 
     // Upgrade the shop moderator
@@ -376,6 +406,9 @@ public class ContainerShop implements Shop, Reloadable {
             if(plugin.getVirtualDisplayItemManager() != null) {
               this.displayItem = plugin.getVirtualDisplayItemManager().createVirtualDisplayItem(this);
             }
+          } else if(AbstractDisplayItem.getNowUsing() == DisplayType.DISPLAY_ENTITY
+                    && plugin.getDisplayEntityItemManager() != null) {
+            this.displayItem = plugin.getDisplayEntityItemManager().create(this);
           }
         }
 
@@ -677,9 +710,22 @@ public class ContainerShop implements Shop, Reloadable {
       Log.debug("Space count is: " + space);
       return space;
     } else {
-
-      return plugin.getShopManager().queryShopInventoryCacheInDatabase(this).join().getSpace();
+      return inventoryCountCache.getSpace();
     }
+  }
+
+  @Override
+  public CompletableFuture<Integer> getRemainingSpaceAsync() {
+
+    if(unlimited || Bukkit.isPrimaryThread()) {
+      return CompletableFuture.completedFuture(getRemainingSpace());
+    }
+    if(inventoryCountCache.getSpace() >= 0) {
+      return CompletableFuture.completedFuture(inventoryCountCache.getSpace());
+    }
+    final CompletableFuture<Integer> result = new CompletableFuture<>();
+    Bukkit.getScheduler().runTask(plugin.getJavaPlugin(), ()->result.complete(getRemainingSpace()));
+    return result;
   }
 
   /**
@@ -702,8 +748,27 @@ public class ContainerShop implements Shop, Reloadable {
       new ShopInventoryCalculateEvent(this, -1, stock).callEvent();
       return stock;
     } else {
-      return plugin.getShopManager().queryShopInventoryCacheInDatabase(this).join().getStock();
+      return inventoryCountCache.getStock();
     }
+  }
+
+  @Override
+  public CompletableFuture<Integer> getRemainingStockAsync() {
+
+    if(unlimited || Bukkit.isPrimaryThread()) {
+      return CompletableFuture.completedFuture(getRemainingStock());
+    }
+    if(inventoryCountCache.getStock() >= 0) {
+      return CompletableFuture.completedFuture(inventoryCountCache.getStock());
+    }
+    final CompletableFuture<Integer> result = new CompletableFuture<>();
+    Bukkit.getScheduler().runTask(plugin.getJavaPlugin(), ()->result.complete(getRemainingStock()));
+    return result;
+  }
+
+  public @NotNull SimpleShopInventoryCountCache getInventoryCountCache() {
+
+    return inventoryCountCache;
   }
 
   /**

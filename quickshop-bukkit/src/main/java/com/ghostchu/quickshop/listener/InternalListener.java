@@ -9,9 +9,10 @@ import com.ghostchu.quickshop.api.event.management.ShopCreateEvent;
 import com.ghostchu.quickshop.api.event.management.ShopDeleteEvent;
 import com.ghostchu.quickshop.api.event.settings.type.ShopPriceEvent;
 import com.ghostchu.quickshop.api.serialize.BlockPos;
-import com.ghostchu.quickshop.api.shop.Shop;
 import com.ghostchu.quickshop.common.util.CommonUtil;
 import com.ghostchu.quickshop.obj.QUserImpl;
+import com.ghostchu.quickshop.shop.ContainerShop;
+import com.ghostchu.quickshop.shop.cache.SimpleShopInventoryCountCache;
 import com.ghostchu.quickshop.util.Util;
 import com.ghostchu.quickshop.util.logger.Log;
 import com.ghostchu.quickshop.util.logging.container.PlayerEconomyPreCheckLog;
@@ -21,8 +22,6 @@ import com.ghostchu.quickshop.util.logging.container.ShopPurchaseLog;
 import com.ghostchu.quickshop.util.logging.container.ShopRemoveLog;
 import com.ghostchu.simplereloadlib.ReloadResult;
 import com.ghostchu.simplereloadlib.ReloadStatus;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -30,18 +29,11 @@ import org.bukkit.event.EventPriority;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 
 public class InternalListener extends AbstractQSListener {
 
   private final QuickShop plugin;
-  private final Cache<Shop, SpaceCache> countUpdateCache = CacheBuilder
-          .newBuilder()
-          .weakKeys()
-          .expireAfterAccess(5, TimeUnit.MINUTES)
-          .maximumSize(100)
-          .build();
   private boolean loggingBalance;
   private boolean loggingAction;
 
@@ -108,6 +100,7 @@ public class InternalListener extends AbstractQSListener {
     if(loggingAction) {
       plugin.logEvent(new ShopRemoveLog(QUserImpl.createFullFilled(CommonUtil.getNilUniqueId(), "SYSTEM", false), "Shop removed", event.shop().get().saveToInfoStorage()));
     }
+    plugin.tagManager().removeAllShopTags(event.shop().get().getShopId());
   }
 
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -116,12 +109,19 @@ public class InternalListener extends AbstractQSListener {
     if(event.getShop().getShopId() < 1) {
       return;
     }
-    final SpaceCache count = countUpdateCache.getIfPresent(event.getShop());
-    if(count != null && count.getSpace() == event.getSpace() && count.getStock() == event.getStock()) {
+    if(!(event.getShop() instanceof final ContainerShop shop)) {
       return;
     }
-    countUpdateCache.put(event.getShop(), new SpaceCache(event.getSpace(), event.getStock()));
-    plugin.getDatabaseHelper().updateExternalInventoryProfileCache(event.getShop().getShopId(), event.getSpace(), event.getStock())
+    final SimpleShopInventoryCountCache count = shop.getInventoryCountCache();
+    final int updatedSpace = event.getSpace() >= 0? event.getSpace() : count.getSpace();
+    final int updatedStock = event.getStock() >= 0? event.getStock() : count.getStock();
+    if(count.getSpace() == updatedSpace && count.getStock() == updatedStock) {
+      return;
+    }
+    count.setSpace(updatedSpace);
+    count.setStock(updatedStock);
+    count.setInitialized(true);
+    plugin.getDatabaseHelper().updateExternalInventoryProfileCache(event.getShop().getShopId(), updatedSpace, updatedStock)
             .exceptionally(err->{
               Log.debug("Error updating external inventory profile cache for shop " + event.getShop().getShopId() + ": " + err.getMessage());
               return 0;
@@ -175,25 +175,4 @@ public class InternalListener extends AbstractQSListener {
     }
   }
 
-  static class SpaceCache {
-
-    private final int stock;
-    private final int space;
-
-    public SpaceCache(final int stock, final int space) {
-
-      this.stock = stock;
-      this.space = space;
-    }
-
-    public int getSpace() {
-
-      return space;
-    }
-
-    public int getStock() {
-
-      return stock;
-    }
-  }
 }

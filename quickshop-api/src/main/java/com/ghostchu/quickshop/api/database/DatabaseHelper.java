@@ -125,6 +125,8 @@ public interface DatabaseHelper {
   @NotNull
   List<ShopRecord> listShops(@Nullable String worldFilter, boolean deleteIfCorrupt);
 
+  void loadAllTags();
+
   @NotNull
   List<Long> listShopsTaggedBy(@NotNull UUID tagger, @NotNull String tag);
 
@@ -134,6 +136,10 @@ public interface DatabaseHelper {
   CompletableFuture<@Nullable Integer> removeShopTag(@NotNull UUID tagger, @NotNull Long shopId, @NotNull String tag);
 
   CompletableFuture<@Nullable Integer> removeShopAllTag(@NotNull UUID tagger, @NotNull Long shopId);
+
+  CompletableFuture<@Nullable Integer> removeAllShopTags(@NotNull Long shopId);
+
+  CompletableFuture<@Nullable Integer> removeAllTagsBy(@NotNull UUID tagger);
 
   CompletableFuture<@Nullable Integer> removeTagFromShops(@NotNull UUID tagger, @NotNull String tag);
 
