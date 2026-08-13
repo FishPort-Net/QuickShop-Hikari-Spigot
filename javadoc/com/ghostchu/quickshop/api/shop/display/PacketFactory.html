@@ -73,7 +73,7 @@ loadScripts(document, 'script');</script>
 </div>
 <section class="class-description" id="class-description">
 <hr>
-<div class="type-signature"><span class="modifiers">public interface </span><span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/shop/display/PacketFactory.html#line-33">PacketFactory</a>&lt;T&gt;</span></div>
+<div class="type-signature"><span class="modifiers">public interface </span><span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/shop/display/PacketFactory.html#line-35">PacketFactory</a>&lt;T&gt;</span></div>
 <div class="block">A generic class representing a PacketFactory that can create packets of type T. This class can be
  extended to provide specific implementations for creating packets based on different versions or
  criteria.</div>
@@ -91,7 +91,7 @@ loadScripts(document, 'script');</script>
 <section class="method-summary" id="method-summary">
 <h2>Method Summary</h2>
 <div id="method-summary-table">
-<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab3" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab3', 3)" class="table-tab">Abstract Methods</button></div>
+<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab3" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab3', 3)" class="table-tab">Abstract Methods</button><button id="method-summary-table-tab5" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab5', 3)" class="table-tab">Default Methods</button></div>
 <div id="method-summary-table.tabpanel" role="tabpanel" aria-labelledby="method-summary-table-tab0">
 <div class="summary-table three-column-summary">
 <div class="table-header col-first">Modifier and Type</div>
@@ -135,14 +135,20 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Sends the specified packet to the given player.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#unregisterSendChunk()" class="member-name-link">unregisterSendChunk</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Unregisters the method to listen to the packet sending chunk data.</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#sendPacketBundle(org.bukkit.entity.Player,java.util.List)" class="member-name-link">sendPacketBundle</a><wbr>(@NotNull org.bukkit.entity.Player&nbsp;player,
+ @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="PacketFactory.html" title="type parameter in PacketFactory">T</a>&gt;&nbsp;packets)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">Sends a group of packets to the given player as one logical operation.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#unregisterUnloadChunk()" class="member-name-link">unregisterUnloadChunk</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#unregisterSendChunk()" class="member-name-link">unregisterSendChunk</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Unregisters the method to listen to the packet sending chunk data.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#unregisterUnloadChunk()" class="member-name-link">unregisterUnloadChunk</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Unregisters the method to listen to the packet sending the unloading of a chunk.</div>
 </div>
 </div>
@@ -162,7 +168,7 @@ loadScripts(document, 'script');</script>
 <li>
 <section class="detail" id="createSpawnPacket(int,org.bukkit.Location)">
 <h3>createSpawnPacket</h3>
-<div class="member-signature"><span class="return-type"><a href="PacketFactory.html" title="type parameter in PacketFactory">T</a></span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/shop/display/PacketFactory.html#line-43">createSpawnPacket</a></span><wbr><span class="parameters">(int&nbsp;id,
+<div class="member-signature"><span class="return-type"><a href="PacketFactory.html" title="type parameter in PacketFactory">T</a></span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/shop/display/PacketFactory.html#line-45">createSpawnPacket</a></span><wbr><span class="parameters">(int&nbsp;id,
  @NotNull
  @NotNull org.bukkit.Location&nbsp;displayLocation)</span></div>
 <div class="block">Creates a spawn packet for the specified ID and display location.</div>
@@ -178,7 +184,7 @@ loadScripts(document, 'script');</script>
 <li>
 <section class="detail" id="createMetaDataPacket(int,org.bukkit.inventory.ItemStack)">
 <h3>createMetaDataPacket</h3>
-<div class="member-signature"><span class="return-type"><a href="PacketFactory.html" title="type parameter in PacketFactory">T</a></span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/shop/display/PacketFactory.html#line-53">createMetaDataPacket</a></span><wbr><span class="parameters">(int&nbsp;id,
+<div class="member-signature"><span class="return-type"><a href="PacketFactory.html" title="type parameter in PacketFactory">T</a></span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/shop/display/PacketFactory.html#line-55">createMetaDataPacket</a></span><wbr><span class="parameters">(int&nbsp;id,
  @NotNull
  @NotNull org.bukkit.inventory.ItemStack&nbsp;itemStack)</span></div>
 <div class="block">Creates a metadata packet with the specified ID and ItemStack.</div>
@@ -194,7 +200,7 @@ loadScripts(document, 'script');</script>
 <li>
 <section class="detail" id="createVelocityPacket(int)">
 <h3>createVelocityPacket</h3>
-<div class="member-signature"><span class="return-type"><a href="PacketFactory.html" title="type parameter in PacketFactory">T</a></span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/shop/display/PacketFactory.html#line-62">createVelocityPacket</a></span><wbr><span class="parameters">(int&nbsp;id)</span></div>
+<div class="member-signature"><span class="return-type"><a href="PacketFactory.html" title="type parameter in PacketFactory">T</a></span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/shop/display/PacketFactory.html#line-64">createVelocityPacket</a></span><wbr><span class="parameters">(int&nbsp;id)</span></div>
 <div class="block">Creates a velocity packet with the specified ID.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -207,7 +213,7 @@ loadScripts(document, 'script');</script>
 <li>
 <section class="detail" id="createDestroyPacket(int)">
 <h3>createDestroyPacket</h3>
-<div class="member-signature"><span class="return-type"><a href="PacketFactory.html" title="type parameter in PacketFactory">T</a></span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/shop/display/PacketFactory.html#line-71">createDestroyPacket</a></span><wbr><span class="parameters">(int&nbsp;id)</span></div>
+<div class="member-signature"><span class="return-type"><a href="PacketFactory.html" title="type parameter in PacketFactory">T</a></span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/shop/display/PacketFactory.html#line-73">createDestroyPacket</a></span><wbr><span class="parameters">(int&nbsp;id)</span></div>
 <div class="block">Creates a destroy packet for the given ID.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -220,7 +226,7 @@ loadScripts(document, 'script');</script>
 <li>
 <section class="detail" id="sendPacket(org.bukkit.entity.Player,T)">
 <h3 id="sendPacket(org.bukkit.entity.Player,java.lang.Object)">sendPacket</h3>
-<div class="member-signature"><span class="return-type">boolean</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/shop/display/PacketFactory.html#line-81">sendPacket</a></span><wbr><span class="parameters">(@NotNull
+<div class="member-signature"><span class="return-type">boolean</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/shop/display/PacketFactory.html#line-83">sendPacket</a></span><wbr><span class="parameters">(@NotNull
  @NotNull org.bukkit.entity.Player&nbsp;player,
  @NotNull
  <a href="PacketFactory.html" title="type parameter in PacketFactory">T</a>&nbsp;packet)</span></div>
@@ -235,30 +241,51 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
+<section class="detail" id="sendPacketBundle(org.bukkit.entity.Player,java.util.List)">
+<h3>sendPacketBundle</h3>
+<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/shop/display/PacketFactory.html#line-97">sendPacketBundle</a></span><wbr><span class="parameters">(@NotNull
+ @NotNull org.bukkit.entity.Player&nbsp;player,
+ @NotNull
+ @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="PacketFactory.html" title="type parameter in PacketFactory">T</a>&gt;&nbsp;packets)</span></div>
+<div class="block">Sends a group of packets to the given player as one logical operation.
+
+ <p>Implementations backed by a protocol library that supports packet bundles should override
+ this method so the client cannot tick between packets. The default implementation preserves
+ compatibility with third-party packet factories by sending the packets in order.</p></div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>player</code> - the player to receive the packets, cannot be null</dd>
+<dd><code>packets</code> - the ordered packets to send, cannot be null</dd>
+<dt>Returns:</dt>
+<dd>true if all packets were successfully sent, false otherwise</dd>
+</dl>
+</section>
+</li>
+<li>
 <section class="detail" id="registerSendChunk()">
 <h3>registerSendChunk</h3>
-<div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/shop/display/PacketFactory.html#line-86">registerSendChunk</a></span>()</div>
+<div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/shop/display/PacketFactory.html#line-110">registerSendChunk</a></span>()</div>
 <div class="block">Registers the method to listen to the packet sending chunk data.</div>
 </section>
 </li>
 <li>
 <section class="detail" id="unregisterSendChunk()">
 <h3>unregisterSendChunk</h3>
-<div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/shop/display/PacketFactory.html#line-91">unregisterSendChunk</a></span>()</div>
+<div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/shop/display/PacketFactory.html#line-115">unregisterSendChunk</a></span>()</div>
 <div class="block">Unregisters the method to listen to the packet sending chunk data.</div>
 </section>
 </li>
 <li>
 <section class="detail" id="registerUnloadChunk()">
 <h3>registerUnloadChunk</h3>
-<div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/shop/display/PacketFactory.html#line-96">registerUnloadChunk</a></span>()</div>
+<div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/shop/display/PacketFactory.html#line-120">registerUnloadChunk</a></span>()</div>
 <div class="block">Registers the method to listen to the packet sending the unloading of a chunk.</div>
 </section>
 </li>
 <li>
 <section class="detail" id="unregisterUnloadChunk()">
 <h3>unregisterUnloadChunk</h3>
-<div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/shop/display/PacketFactory.html#line-101">unregisterUnloadChunk</a></span>()</div>
+<div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/shop/display/PacketFactory.html#line-125">unregisterUnloadChunk</a></span>()</div>
 <div class="block">Unregisters the method to listen to the packet sending the unloading of a chunk.</div>
 </section>
 </li>
