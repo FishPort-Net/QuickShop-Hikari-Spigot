@@ -32,7 +32,6 @@ import com.ghostchu.quickshop.economy.SimpleBenefit;
 import com.ghostchu.quickshop.economy.SimpleEconomyTransaction;
 import com.ghostchu.quickshop.obj.QUserImpl;
 import com.ghostchu.quickshop.shop.inventory.BukkitInventoryWrapper;
-import com.ghostchu.quickshop.shop.inventory.BukkitInventoryWrapperManager;
 import com.ghostchu.quickshop.util.ChatSheetPrinter;
 import com.ghostchu.quickshop.util.ExpiringSet;
 import com.ghostchu.quickshop.util.MsgUtil;
@@ -65,7 +64,6 @@ import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.WallSign;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -370,20 +368,21 @@ public class SimpleShopManager extends AbstractShopManager implements ShopManage
       return;
     }
 
-    final BlockState state = info.getLocation().getBlock().getState();
-    if(state instanceof final InventoryHolder holder) {
+    final InventoryWrapper inventory = plugin.getInventoryWrapperRegistry().resolve(info.getLocation().getBlock());
+    if(inventory != null) {
       // Create the basic shop
-      final String symbolLink;
-      final InventoryWrapperManager manager = plugin.getInventoryWrapperManager();
-      if(manager instanceof final BukkitInventoryWrapperManager bukkitInventoryWrapperManager) {
-        symbolLink = bukkitInventoryWrapperManager.mklink(info.getLocation());
-      } else {
-        symbolLink = manager.mklink(new BukkitInventoryWrapper((holder).getInventory()));
+      final InventoryWrapperManager manager = inventory.getWrapperManager();
+      final String provider = plugin.getInventoryWrapperRegistry().find(manager);
+      if(provider == null) {
+        Log.debug("Inventory wrapper manager " + manager.getClass().getName() + " is not registered");
+        plugin.text().of(p, "invalid-container").send();
+        return;
       }
+      final String symbolLink = manager.mklink(inventory);
       final ContainerShop shop = new ContainerShop(plugin, -1, info.getLocation(),
                                                    priceDouble, info.getItem(), createQUser, false,
                                                    ShopType.SELLING, new YamlConfiguration(), null, !plugin.getConfig().getBoolean("shop.display-default", true),
-                                                   null, plugin.getJavaPlugin().getName(),
+                                                   null, provider,
                                                    symbolLink,
                                                    null, Collections.emptyMap(), new SimpleBenefit());
       createShop(shop, info.getSignBlock(), info.isBypassed());
