@@ -14,50 +14,81 @@
 <pre><span class="source-line-no">001</span><span id="line-1">package com.ghostchu.quickshop.api.inventory;</span>
 <span class="source-line-no">002</span><span id="line-2"></span>
 <span class="source-line-no">003</span><span id="line-3">import com.google.common.collect.MapMaker;</span>
-<span class="source-line-no">004</span><span id="line-4">import org.bukkit.plugin.Plugin;</span>
-<span class="source-line-no">005</span><span id="line-5">import org.jetbrains.annotations.NotNull;</span>
-<span class="source-line-no">006</span><span id="line-6">import org.jetbrains.annotations.Nullable;</span>
-<span class="source-line-no">007</span><span id="line-7"></span>
-<span class="source-line-no">008</span><span id="line-8">import java.util.Map;</span>
-<span class="source-line-no">009</span><span id="line-9"></span>
-<span class="source-line-no">010</span><span id="line-10">public class InventoryWrapperRegistry {</span>
-<span class="source-line-no">011</span><span id="line-11"></span>
-<span class="source-line-no">012</span><span id="line-12">  private final Map&lt;String, InventoryWrapperManager&gt; registry = new MapMaker().makeMap();</span>
-<span class="source-line-no">013</span><span id="line-13"></span>
-<span class="source-line-no">014</span><span id="line-14">  @Nullable</span>
-<span class="source-line-no">015</span><span id="line-15">  public String find(final InventoryWrapperManager manager) {</span>
-<span class="source-line-no">016</span><span id="line-16"></span>
-<span class="source-line-no">017</span><span id="line-17">    for(final Map.Entry&lt;String, InventoryWrapperManager&gt; entry : registry.entrySet()) {</span>
-<span class="source-line-no">018</span><span id="line-18">      if(entry.getValue() == manager || entry.getValue().equals(manager)) {</span>
-<span class="source-line-no">019</span><span id="line-19">        return entry.getKey();</span>
-<span class="source-line-no">020</span><span id="line-20">      }</span>
-<span class="source-line-no">021</span><span id="line-21">    }</span>
-<span class="source-line-no">022</span><span id="line-22">    return null;</span>
-<span class="source-line-no">023</span><span id="line-23">  }</span>
-<span class="source-line-no">024</span><span id="line-24"></span>
-<span class="source-line-no">025</span><span id="line-25">  @Nullable</span>
-<span class="source-line-no">026</span><span id="line-26">  public InventoryWrapperManager get(final String pluginName) {</span>
-<span class="source-line-no">027</span><span id="line-27"></span>
-<span class="source-line-no">028</span><span id="line-28">    return registry.get(pluginName);</span>
-<span class="source-line-no">029</span><span id="line-29">  }</span>
-<span class="source-line-no">030</span><span id="line-30"></span>
-<span class="source-line-no">031</span><span id="line-31">  public void register(@NotNull final Plugin plugin, @NotNull final InventoryWrapperManager manager) {</span>
-<span class="source-line-no">032</span><span id="line-32"></span>
-<span class="source-line-no">033</span><span id="line-33">    if(registry.containsKey(plugin.getName())) {</span>
-<span class="source-line-no">034</span><span id="line-34">      plugin.getLogger().warning("Nag Author: Plugin " + plugin.getName() + " already have a registered InventoryWrapperManager: "</span>
-<span class="source-line-no">035</span><span id="line-35">                                 + registry.get(plugin.getName()).getClass().getName() +</span>
-<span class="source-line-no">036</span><span id="line-36">                                 " but trying register another new manager: " + manager.getClass().getName() +</span>
-<span class="source-line-no">037</span><span id="line-37">                                 ". This may cause unexpected behavior! Replacing with new instance...");</span>
-<span class="source-line-no">038</span><span id="line-38">    }</span>
-<span class="source-line-no">039</span><span id="line-39">    registry.put(plugin.getName(), manager);</span>
-<span class="source-line-no">040</span><span id="line-40">  }</span>
-<span class="source-line-no">041</span><span id="line-41"></span>
-<span class="source-line-no">042</span><span id="line-42">  public void unregister(@NotNull final Plugin plugin) {</span>
-<span class="source-line-no">043</span><span id="line-43"></span>
-<span class="source-line-no">044</span><span id="line-44">    registry.remove(plugin.getName());</span>
-<span class="source-line-no">045</span><span id="line-45">  }</span>
+<span class="source-line-no">004</span><span id="line-4">import org.bukkit.block.Block;</span>
+<span class="source-line-no">005</span><span id="line-5">import org.bukkit.plugin.Plugin;</span>
+<span class="source-line-no">006</span><span id="line-6">import org.jetbrains.annotations.NotNull;</span>
+<span class="source-line-no">007</span><span id="line-7">import org.jetbrains.annotations.Nullable;</span>
+<span class="source-line-no">008</span><span id="line-8"></span>
+<span class="source-line-no">009</span><span id="line-9">import java.util.List;</span>
+<span class="source-line-no">010</span><span id="line-10">import java.util.Map;</span>
+<span class="source-line-no">011</span><span id="line-11">import java.util.concurrent.CopyOnWriteArrayList;</span>
+<span class="source-line-no">012</span><span id="line-12"></span>
+<span class="source-line-no">013</span><span id="line-13">public class InventoryWrapperRegistry {</span>
+<span class="source-line-no">014</span><span id="line-14"></span>
+<span class="source-line-no">015</span><span id="line-15">  private final Map&lt;String, InventoryWrapperManager&gt; registry = new MapMaker().makeMap();</span>
+<span class="source-line-no">016</span><span id="line-16">  private final List&lt;String&gt; registrationOrder = new CopyOnWriteArrayList&lt;&gt;();</span>
+<span class="source-line-no">017</span><span id="line-17"></span>
+<span class="source-line-no">018</span><span id="line-18">  @Nullable</span>
+<span class="source-line-no">019</span><span id="line-19">  public String find(final InventoryWrapperManager manager) {</span>
+<span class="source-line-no">020</span><span id="line-20"></span>
+<span class="source-line-no">021</span><span id="line-21">    for(final Map.Entry&lt;String, InventoryWrapperManager&gt; entry : registry.entrySet()) {</span>
+<span class="source-line-no">022</span><span id="line-22">      if(entry.getValue() == manager || entry.getValue().equals(manager)) {</span>
+<span class="source-line-no">023</span><span id="line-23">        return entry.getKey();</span>
+<span class="source-line-no">024</span><span id="line-24">      }</span>
+<span class="source-line-no">025</span><span id="line-25">    }</span>
+<span class="source-line-no">026</span><span id="line-26">    return null;</span>
+<span class="source-line-no">027</span><span id="line-27">  }</span>
+<span class="source-line-no">028</span><span id="line-28"></span>
+<span class="source-line-no">029</span><span id="line-29">  @Nullable</span>
+<span class="source-line-no">030</span><span id="line-30">  public InventoryWrapperManager get(final String pluginName) {</span>
+<span class="source-line-no">031</span><span id="line-31"></span>
+<span class="source-line-no">032</span><span id="line-32">    return registry.get(pluginName);</span>
+<span class="source-line-no">033</span><span id="line-33">  }</span>
+<span class="source-line-no">034</span><span id="line-34"></span>
+<span class="source-line-no">035</span><span id="line-35">  /**</span>
+<span class="source-line-no">036</span><span id="line-36">   * Resolves a block inventory using registered block inventory providers. Providers are queried in</span>
+<span class="source-line-no">037</span><span id="line-37">   * registration order, which keeps QuickShop's built-in Bukkit inventory handling as the primary</span>
+<span class="source-line-no">038</span><span id="line-38">   * path and compatibility providers as fallbacks.</span>
+<span class="source-line-no">039</span><span id="line-39">   *</span>
+<span class="source-line-no">040</span><span id="line-40">   * @param block block to inspect</span>
+<span class="source-line-no">041</span><span id="line-41">   *</span>
+<span class="source-line-no">042</span><span id="line-42">   * @return a live inventory wrapper, or {@code null} when no provider supports the block</span>
+<span class="source-line-no">043</span><span id="line-43">   */</span>
+<span class="source-line-no">044</span><span id="line-44">  @Nullable</span>
+<span class="source-line-no">045</span><span id="line-45">  public InventoryWrapper resolve(@NotNull final Block block) {</span>
 <span class="source-line-no">046</span><span id="line-46"></span>
-<span class="source-line-no">047</span><span id="line-47">}</span>
+<span class="source-line-no">047</span><span id="line-47">    for(final String providerName : registrationOrder) {</span>
+<span class="source-line-no">048</span><span id="line-48">      final InventoryWrapperManager manager = registry.get(providerName);</span>
+<span class="source-line-no">049</span><span id="line-49">      if(manager instanceof final BlockInventoryWrapperManager blockManager) {</span>
+<span class="source-line-no">050</span><span id="line-50">        final InventoryWrapper wrapper = blockManager.resolve(block);</span>
+<span class="source-line-no">051</span><span id="line-51">        if(wrapper != null) {</span>
+<span class="source-line-no">052</span><span id="line-52">          return wrapper;</span>
+<span class="source-line-no">053</span><span id="line-53">        }</span>
+<span class="source-line-no">054</span><span id="line-54">      }</span>
+<span class="source-line-no">055</span><span id="line-55">    }</span>
+<span class="source-line-no">056</span><span id="line-56">    return null;</span>
+<span class="source-line-no">057</span><span id="line-57">  }</span>
+<span class="source-line-no">058</span><span id="line-58"></span>
+<span class="source-line-no">059</span><span id="line-59">  public void register(@NotNull final Plugin plugin, @NotNull final InventoryWrapperManager manager) {</span>
+<span class="source-line-no">060</span><span id="line-60"></span>
+<span class="source-line-no">061</span><span id="line-61">    if(registry.containsKey(plugin.getName())) {</span>
+<span class="source-line-no">062</span><span id="line-62">      plugin.getLogger().warning("Nag Author: Plugin " + plugin.getName() + " already have a registered InventoryWrapperManager: "</span>
+<span class="source-line-no">063</span><span id="line-63">                                 + registry.get(plugin.getName()).getClass().getName() +</span>
+<span class="source-line-no">064</span><span id="line-64">                                 " but trying register another new manager: " + manager.getClass().getName() +</span>
+<span class="source-line-no">065</span><span id="line-65">                                 ". This may cause unexpected behavior! Replacing with new instance...");</span>
+<span class="source-line-no">066</span><span id="line-66">    } else {</span>
+<span class="source-line-no">067</span><span id="line-67">      registrationOrder.add(plugin.getName());</span>
+<span class="source-line-no">068</span><span id="line-68">    }</span>
+<span class="source-line-no">069</span><span id="line-69">    registry.put(plugin.getName(), manager);</span>
+<span class="source-line-no">070</span><span id="line-70">  }</span>
+<span class="source-line-no">071</span><span id="line-71"></span>
+<span class="source-line-no">072</span><span id="line-72">  public void unregister(@NotNull final Plugin plugin) {</span>
+<span class="source-line-no">073</span><span id="line-73"></span>
+<span class="source-line-no">074</span><span id="line-74">    registry.remove(plugin.getName());</span>
+<span class="source-line-no">075</span><span id="line-75">    registrationOrder.remove(plugin.getName());</span>
+<span class="source-line-no">076</span><span id="line-76">  }</span>
+<span class="source-line-no">077</span><span id="line-77"></span>
+<span class="source-line-no">078</span><span id="line-78">}</span>
 
 
 
