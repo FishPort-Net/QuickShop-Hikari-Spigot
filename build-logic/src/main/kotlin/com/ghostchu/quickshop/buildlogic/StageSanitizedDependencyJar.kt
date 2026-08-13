@@ -24,11 +24,18 @@ abstract class StageSanitizedDependencyJar : DefaultTask() {
     @get:Input
     abstract val excludedPrefixes: ListProperty<String>
 
+    @get:Input
+    abstract val includedPrefixes: ListProperty<String>
+
     @get:OutputDirectory
     abstract val outputDirectory: DirectoryProperty
 
     @get:Inject
     abstract val fileSystemOperations: FileSystemOperations
+
+    init {
+        includedPrefixes.convention(emptyList())
+    }
 
     @TaskAction
     fun stage() {
@@ -38,9 +45,11 @@ abstract class StageSanitizedDependencyJar : DefaultTask() {
         Files.createDirectories(outputRoot)
 
         ZipInputStream(input.inputStream().buffered()).use { zin ->
+            val included = includedPrefixes.get()
             var entry = zin.nextEntry
             while (entry != null) {
-                if (excludedPrefixes.get().none(entry.name::startsWith)) {
+                if ((included.isEmpty() || included.any(entry.name::startsWith))
+                    && excludedPrefixes.get().none(entry.name::startsWith)) {
                     val relativePath = outputRoot.fileSystem.getPath(entry.name).normalize()
                     require(!relativePath.isAbsolute && !relativePath.startsWith("..")) {
                         "Unsafe ZIP entry in ${input.name}: ${entry.name}"
