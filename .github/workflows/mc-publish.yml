@@ -7,9 +7,6 @@ name: mc-publish
 
 on:
   workflow_dispatch:
-  release:
-    types:
-      - published
 jobs:
   build:
     runs-on: ubuntu-latest

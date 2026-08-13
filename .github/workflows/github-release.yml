@@ -1,0 +1,44 @@
+name: GitHub Release
+
+on:
+  push:
+    tags:
+      - '6.2.0.10-spigot.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: temurin
+          cache: gradle
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build dual-compatibility Spigot JAR
+        run: ./gradlew :quickshop-bukkit:shadowJar --no-configuration-cache
+
+      - name: Generate checksum
+        run: sha256sum quickshop-bukkit/build/libs/QuickShop-Hikari-${{ github.ref_name }}.jar > quickshop-bukkit/build/libs/QuickShop-Hikari-${{ github.ref_name }}.jar.sha256
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "${{ github.ref_name }}"
+          quickshop-bukkit/build/libs/QuickShop-Hikari-${{ github.ref_name }}.jar
+          quickshop-bukkit/build/libs/QuickShop-Hikari-${{ github.ref_name }}.jar.sha256
+          --verify-tag
+          --title "QuickShop-Hikari-Spigot ${{ github.ref_name }}"
+          --notes-file ".changelog/${{ github.ref_name }}.md"
