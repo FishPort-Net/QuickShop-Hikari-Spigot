@@ -89,7 +89,6 @@ public class VirtualDisplayItem<T> extends AbstractDisplayItem implements Reload
       this.destroyPacket = null;
     }
 
-    load();
   }
 
   @Override
@@ -218,7 +217,7 @@ public class VirtualDisplayItem<T> extends AbstractDisplayItem implements Reload
     Util.ensureThread(false);
     //some time shop can be loaded when world isn't loaded
     chunkLocation = SimpleShopChunk.fromLocation(shop.getLocation());
-    manager.put(chunkLocation, this);
+    manager.put(chunkLocation, entityID, this);
     //Let nearby player can saw fake item
     final List<Player> onlinePlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
     onlinePlayers.removeIf(p->!p.getWorld().equals(shop.getLocation().getWorld()));
@@ -239,19 +238,38 @@ public class VirtualDisplayItem<T> extends AbstractDisplayItem implements Reload
 
   public void sendSpawnPacket(@NotNull final Player player) {
 
+    final T packet = prepareSpawnPacket();
+    if(packet != null) {
+
+      this.packetFactory.sendPacket(player, packet);
+    }
+  }
+
+  @Nullable
+  private T prepareSpawnPacket() {
+
     final PacketHandlerSendSpawnEvent<T> event = new PacketHandlerSendSpawnEvent<>(manager.packetHandler(),
                                                                                    this.packetFactory,
                                                                                    spawnPacket);
     if(event.callCancellableEvent()) {
 
       Log.debug("Canceled the sending of the spawn packet: " + shop.getShopId());
-    } else {
-
-      this.packetFactory.sendPacket(player, event.spawnPacket());
+      return null;
     }
+    return event.spawnPacket();
   }
 
   public void sendMetaPacket(@NotNull final Player player) {
+
+    final T packet = prepareMetaPacket();
+    if(packet != null) {
+
+      this.packetFactory.sendPacket(player, packet);
+    }
+  }
+
+  @Nullable
+  private T prepareMetaPacket() {
 
     final PacketHandlerSendMetaEvent<T> event = new PacketHandlerSendMetaEvent<>(manager.packetHandler(),
                                                                                  this.packetFactory,
@@ -259,13 +277,22 @@ public class VirtualDisplayItem<T> extends AbstractDisplayItem implements Reload
     if(event.callCancellableEvent()) {
 
       Log.debug("Canceled the sending of the meta packet: " + shop.getShopId());
-    } else {
-
-      this.packetFactory.sendPacket(player, event.metaPacket());
+      return null;
     }
+    return event.metaPacket();
   }
 
   public void sendDestroyPacket(@NotNull final Player player) {
+
+    final T packet = prepareDestroyPacket();
+    if(packet != null) {
+
+      this.packetFactory.sendPacket(player, packet);
+    }
+  }
+
+  @Nullable
+  private T prepareDestroyPacket() {
 
     final PacketHandlerSendDestroyEvent<T> event = new PacketHandlerSendDestroyEvent<>(manager.packetHandler(),
                                                                                        this.packetFactory,
@@ -273,20 +300,36 @@ public class VirtualDisplayItem<T> extends AbstractDisplayItem implements Reload
     if(event.callCancellableEvent()) {
 
       Log.debug("Canceled the sending of the destroy packet: " + shop.getShopId());
-    } else {
-
-      this.packetFactory.sendPacket(player, event.destroyPacket());
+      return null;
     }
+    return event.destroyPacket();
   }
 
   public void sendFakeItem(@NotNull final Player player) {
 
-    this.sendDestroyPacket(player);
-    this.sendSpawnPacket(player);
-    this.sendMetaPacket(player);
+    final List<T> packets = new ArrayList<>(4);
+    final T preparedDestroyPacket = prepareDestroyPacket();
+    final T preparedSpawnPacket = prepareSpawnPacket();
+    final T preparedMetaPacket = prepareMetaPacket();
+    if(preparedDestroyPacket != null) {
+
+      packets.add(preparedDestroyPacket);
+    }
+    if(preparedSpawnPacket != null) {
+
+      packets.add(preparedSpawnPacket);
+    }
+    if(preparedMetaPacket != null) {
+
+      packets.add(preparedMetaPacket);
+    }
     if(velocityPacket != null) {
 
-      this.packetFactory.sendPacket(player, velocityPacket);
+      packets.add(velocityPacket);
+    }
+    if(!packets.isEmpty()) {
+
+      this.packetFactory.sendPacketBundle(player, packets);
     }
   }
 
@@ -309,7 +352,7 @@ public class VirtualDisplayItem<T> extends AbstractDisplayItem implements Reload
   private void unload() {
 
     packetSenders.clear();
-    manager.remove(chunkLocation, this);
+    manager.remove(chunkLocation, entityID, this);
   }
 
   @NotNull

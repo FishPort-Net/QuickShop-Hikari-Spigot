@@ -22,6 +22,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 /**
  * A generic class representing a PacketFactory that can create packets of type T. This class can be
  * extended to provide specific implementations for creating packets based on different versions or
@@ -79,6 +81,28 @@ public interface PacketFactory<T> {
    * @return true if the packet was successfully sent, false otherwise
    */
   boolean sendPacket(@NotNull Player player, @NotNull T packet);
+
+  /**
+   * Sends a group of packets to the given player as one logical operation.
+   *
+   * <p>Implementations backed by a protocol library that supports packet bundles should override
+   * this method so the client cannot tick between packets. The default implementation preserves
+   * compatibility with third-party packet factories by sending the packets in order.</p>
+   *
+   * @param player  the player to receive the packets, cannot be null
+   * @param packets the ordered packets to send, cannot be null
+   *
+   * @return true if all packets were successfully sent, false otherwise
+   */
+  default boolean sendPacketBundle(@NotNull final Player player, @NotNull final List<T> packets) {
+
+    boolean sent = true;
+    for(final T packet : packets) {
+
+      sent &= sendPacket(player, packet);
+    }
+    return sent;
+  }
 
   /**
    * Registers the method to listen to the packet sending chunk data.

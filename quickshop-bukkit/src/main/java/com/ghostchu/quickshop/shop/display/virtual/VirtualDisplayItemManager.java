@@ -32,10 +32,7 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -48,7 +45,7 @@ public class VirtualDisplayItemManager {
   public final Map<Long, Integer> shopEntities = new ConcurrentHashMap<>();
   protected final Map<String, PacketHandler<?>> packetHandlers = new LinkedHashMap<>();
   @Getter
-  private final Map<ShopChunk, List<VirtualDisplayItem<?>>> chunksMapping = new ConcurrentHashMap<>();
+  private final Map<ShopChunk, ConcurrentHashMap<Integer, VirtualDisplayItem<?>>> chunksMapping = new ConcurrentHashMap<>();
   private final QuickShop plugin;
   private final AtomicInteger entityIdCounter;
   private PacketHandler<?> packetHandler;
@@ -132,22 +129,17 @@ public class VirtualDisplayItemManager {
     }
   }
 
-  public void put(@NotNull final ShopChunk key, @NotNull final VirtualDisplayItem<?> value) {
+  public void put(@NotNull final ShopChunk key, final int entityId, @NotNull final VirtualDisplayItem<?> value) {
 
-    //Thread-safe was ensured by ONLY USE Map method to do something
-    final List<VirtualDisplayItem<?>> virtualDisplayItems = new ArrayList<>(Collections.singletonList(value));
-    chunksMapping.merge(key, virtualDisplayItems, (mapOldVal, mapNewVal)->{
-
-      mapOldVal.addAll(mapNewVal);
-      return mapOldVal;
-    });
+    chunksMapping.computeIfAbsent(key, ignored -> new ConcurrentHashMap<>()).put(entityId, value);
   }
 
-  public void remove(@NotNull final ShopChunk key, @NotNull final VirtualDisplayItem value) {
+  public void remove(@NotNull final ShopChunk key, final int entityId, @NotNull final VirtualDisplayItem<?> value) {
 
     chunksMapping.computeIfPresent(key, (mapOldKey, mapOldVal)->{
-      mapOldVal.remove(value);
-      return mapOldVal;
+
+      mapOldVal.remove(entityId, value);
+      return mapOldVal.isEmpty() ? null : mapOldVal;
     });
   }
 
