@@ -262,11 +262,14 @@ val stageJaxenForShadow = tasks.register<StageSanitizedDependencyJar>("stageJaxe
 
 tasks.named<ProcessResources>("processResources") {
     val pluginVersion = project.version.toString()
+    val gitInfo = providers.of(GitInfoValueSource::class) {}
+    inputs.property("pluginVersion", pluginVersion)
+    inputs.property("gitInfo", gitInfo)
+
     filesMatching("plugin.yml") {
         expand(mapOf("project" to mapOf("version" to pluginVersion)))
     }
 
-    val gitInfo = providers.of(GitInfoValueSource::class) {}
     filesMatching("BUILDINFO") {
         filter { line ->
             val tokens = gitInfo.get() + mapOf("git.build.version" to pluginVersion)
