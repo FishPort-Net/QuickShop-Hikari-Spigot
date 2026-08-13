@@ -30,6 +30,7 @@ import com.ghostchu.quickshop.common.util.CommonUtil;
 import com.ghostchu.quickshop.common.util.RomanNumber;
 import com.ghostchu.quickshop.economy.SimpleBenefit;
 import com.ghostchu.quickshop.economy.SimpleEconomyTransaction;
+import com.ghostchu.quickshop.economy.ShopOwnerMoneyPolicy;
 import com.ghostchu.quickshop.obj.QUserImpl;
 import com.ghostchu.quickshop.shop.inventory.BukkitInventoryWrapper;
 import com.ghostchu.quickshop.util.ChatSheetPrinter;
@@ -122,7 +123,6 @@ public class SimpleShopManager extends AbstractShopManager implements ShopManage
   private boolean useShopLock;
   private double globalTax;
   private boolean showTax;
-  private boolean payUnlimitedShopOwner;
   private String tradeAllKeyword;
   private boolean disableCreativePurchase;
   private boolean sendStockMessageToStaff;
@@ -177,7 +177,6 @@ public class SimpleShopManager extends AbstractShopManager implements ShopManage
     this.useShopLock = plugin.getConfig().getBoolean("shop.lock");
     this.globalTax = plugin.getConfig().getDouble("tax");
     this.showTax = plugin.getConfig().getBoolean("show-tax");
-    this.payUnlimitedShopOwner = plugin.getConfig().getBoolean("shop.pay-unlimited-shop-owners");
     this.tradeAllKeyword = plugin.getConfig().getString("shop.word-for-trade-all-items", "all");
     this.disableCreativePurchase = plugin.getConfig().getBoolean("shop.disable-creative-mode-trading");
     this.sendStockMessageToStaff = plugin.getConfig().getBoolean("shop.sending-stock-message-to-staffs");
@@ -253,13 +252,14 @@ public class SimpleShopManager extends AbstractShopManager implements ShopManage
     if(shop.isUnlimited() && plugin.getConfig().getBoolean("tax-free-for-unlimited-shop", false)) {
       builder.taxModifier(0.0d);
     }
-    if(!shop.isUnlimited() || (plugin.getConfig().getBoolean("shop.pay-unlimited-shop-owners") && shop.isUnlimited())) {
+    if(ShopOwnerMoneyPolicy.shouldTakeFromOwner(shop)) {
       transaction = builder.from(shop.getOwner()).build();
     } else {
       transaction = builder.from(null).build();
     }
     if(!transaction.checkBalance()) {
-      plugin.text().of(buyer, "the-owner-cant-afford-to-buy-from-you", format(total, shop.getLocation().getWorld(), shop.getCurrency()), format(eco.getBalance(shop.getOwner(), shop.getLocation().getWorld(), shop.getCurrency()), shop.getLocation().getWorld(), shop.getCurrency())).send();
+      final double ownerBalance = eco.getBalance(shop.getOwner(), shop.getLocation().getWorld(), shop.getCurrency());
+      ShopOwnerMoneyPolicy.sendInsufficientFundsMessage(buyer, shop, total, ownerBalance);
       return false;
     }
     if(!transaction.failSafeCommit()) {
@@ -465,7 +465,7 @@ public class SimpleShopManager extends AbstractShopManager implements ShopManage
     if(shop.isUnlimited() && plugin.getConfig().getBoolean("tax-free-for-unlimited-shop", false)) {
       builder.taxModifier(0.0d);
     }
-    if(!shop.isUnlimited() || (plugin.getConfig().getBoolean("shop.pay-unlimited-shop-owners") && shop.isUnlimited())) {
+    if(ShopOwnerMoneyPolicy.shouldPayOwner(shop)) {
       transaction = builder.to(shop.getOwner()).build();
     } else {
       transaction = builder.to(null).build();
@@ -1130,7 +1130,10 @@ public class SimpleShopManager extends AbstractShopManager implements ShopManage
     final int shopHaveSpaces = Util.countSpace(shop.getInventory(), shop);
     final int invHaveItems = Util.countItems(new BukkitInventoryWrapper(p.getInventory()), shop);
     // Check if shop owner has enough money
-    final double ownerBalance = eco.getBalance(shop.getOwner(), shop.getLocation().getWorld(), shop.getCurrency());
+    final boolean takeFromOwner = ShopOwnerMoneyPolicy.shouldTakeFromOwner(shop);
+    final double ownerBalance = takeFromOwner
+            ? eco.getBalance(shop.getOwner(), shop.getLocation().getWorld(), shop.getCurrency())
+            : Double.POSITIVE_INFINITY;
     final int ownerCanAfford;
     if(shop.getPrice() != 0) {
       ownerCanAfford = (int)(ownerBalance / shop.getPrice());
@@ -1142,10 +1145,8 @@ public class SimpleShopManager extends AbstractShopManager implements ShopManage
       amount = Math.min(amount, ownerCanAfford);
     } else {
       amount = Util.countItems(new BukkitInventoryWrapper(p.getInventory()), shop);
-      // even if the shop is unlimited, the config option pay-unlimited-shop-owners is set to
-      // true,
-      // the unlimited shop owner should have enough money.
-      if(payUnlimitedShopOwner) {
+      // Unlimited shops only need owner funds when their money policy withdraws from the owner.
+      if(takeFromOwner) {
         amount = Math.min(amount, ownerCanAfford);
       }
     }
@@ -1155,10 +1156,9 @@ public class SimpleShopManager extends AbstractShopManager implements ShopManage
         plugin.text().of(p, "shop-has-no-space", Component.text(shopHaveSpaces), Util.getItemStackName(shop.getItem())).send();
         return 0;
       }
-      if(ownerCanAfford == 0 && (!shop.isUnlimited() || payUnlimitedShopOwner)) {
-        // when typed 'all' but the shop owner doesn't have enough money to buy at least 1
-        // item (and shop isn't unlimited or pay-unlimited is true)
-        plugin.text().of(p, "the-owner-cant-afford-to-buy-from-you", plugin.getShopManager().format(shop.getPrice(), shop.getLocation().getWorld(), shop.getCurrency()), plugin.getShopManager().format(ownerBalance, shop.getLocation().getWorld(), shop.getCurrency())).send();
+      if(ownerCanAfford == 0 && takeFromOwner) {
+        // The shop owner cannot afford to buy at least one trade unit.
+        ShopOwnerMoneyPolicy.sendInsufficientFundsMessage(p, shop, shop.getPrice(), ownerBalance);
         return 0;
       }
       // when typed 'all' but player doesn't have any items to sell

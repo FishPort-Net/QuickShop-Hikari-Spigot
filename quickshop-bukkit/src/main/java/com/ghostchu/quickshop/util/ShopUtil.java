@@ -32,6 +32,7 @@ import com.ghostchu.quickshop.api.shop.ShopAction;
 import com.ghostchu.quickshop.api.shop.ShopManager;
 import com.ghostchu.quickshop.api.shop.permission.BuiltInShopPermission;
 import com.ghostchu.quickshop.economy.SimpleEconomyTransaction;
+import com.ghostchu.quickshop.economy.ShopOwnerMoneyPolicy;
 import com.ghostchu.quickshop.obj.QUserImpl;
 import com.ghostchu.quickshop.shop.SimpleInfo;
 import com.ghostchu.quickshop.shop.inventory.BukkitInventoryWrapper;
@@ -262,8 +263,17 @@ public class ShopUtil {
     final double price = shop.getPrice();
     final Inventory playerInventory = p.getInventory();
     final String tradeAllWord = QuickShop.getInstance().getConfig().getString("shop.word-for-trade-all-items", "all");
-    final double ownerBalance = eco.getBalance(shop.getOwner(), shop.getLocation().getWorld(), shop.getCurrency());
+    final boolean takeFromOwner = ShopOwnerMoneyPolicy.shouldTakeFromOwner(shop);
+    final double ownerBalance = takeFromOwner
+            ? eco.getBalance(shop.getOwner(), shop.getLocation().getWorld(), shop.getCurrency())
+            : Double.POSITIVE_INFINITY;
     final int items = getPlayerCanSell(shop, ownerBalance, price, new BukkitInventoryWrapper(playerInventory));
+    if(price > 0.0d
+       && takeFromOwner
+       && ownerBalance < price) {
+      ShopOwnerMoneyPolicy.sendInsufficientFundsMessage(p, shop, price, ownerBalance);
+      return true;
+    }
     final ShopManager.InteractiveManager actions = QuickShop.getInstance().getShopManager().getInteractiveManager();
     if(shop.playerAuthorize(p.getUniqueId(), BuiltInShopPermission.PURCHASE)
        || QuickShop.getInstance().perm().hasPermission(p, "quickshop.other.use")) {
@@ -370,10 +380,8 @@ public class ShopUtil {
       items = Math.min(items, shop.getRemainingSpace());
       // Amount check player selling item total cost and the shop owner's balance
       items = Math.min(items, ownerCanAfford);
-    } else if(QuickShop.getInstance().getConfig().getBoolean("shop.pay-unlimited-shop-owners")) {
-      // even if the shop is unlimited, the config option pay-unlimited-shop-owners is set to
-      // true,
-      // the unlimited shop owner should have enough money.
+    } else if(ShopOwnerMoneyPolicy.shouldTakeFromOwner(shop)) {
+      // Unlimited shops only need owner funds when their money policy withdraws from the owner.
       items = Math.min(items, ownerCanAfford);
     }
     if(items < 0) {
@@ -389,9 +397,10 @@ public class ShopUtil {
             Util.countSpace(shop.getInventory(), shop);
     final int invHaveItems = Util.countItems(new BukkitInventoryWrapper(p.getInventory()), shop);
     // Check if shop owner has enough money
-    final double ownerBalance = eco
-            .getBalance(shop.getOwner(), shop.getLocation().getWorld(),
-                        shop.getCurrency());
+    final boolean takeFromOwner = ShopOwnerMoneyPolicy.shouldTakeFromOwner(shop);
+    final double ownerBalance = takeFromOwner
+            ? eco.getBalance(shop.getOwner(), shop.getLocation().getWorld(), shop.getCurrency())
+            : Double.POSITIVE_INFINITY;
     final int ownerCanAfford;
     if(shop.getPrice() != 0) {
       ownerCanAfford = (int)(ownerBalance / shop.getPrice());
@@ -403,10 +412,8 @@ public class ShopUtil {
       amount = Math.min(amount, ownerCanAfford);
     } else {
       amount = invHaveItems;
-      // even if the shop is unlimited, the config option pay-unlimited-shop-owners is set to
-      // true,
-      // the unlimited shop owner should have enough money.
-      if(QuickShop.getInstance().getConfig().getBoolean("shop.pay-unlimited-shop-owners")) {
+      // Unlimited shops only need owner funds when their money policy withdraws from the owner.
+      if(takeFromOwner) {
         amount = Math.min(amount, ownerCanAfford);
       }
     }
@@ -417,16 +424,9 @@ public class ShopUtil {
                                           Util.getItemStackName(shop.getItem())).send();
         return 0;
       }
-      if(ownerCanAfford == 0
-         && (!shop.isUnlimited()
-             || QuickShop.getInstance().getConfig().getBoolean("shop.pay-unlimited-shop-owners"))) {
-        // when typed 'all' but the shop owner doesn't have enough money to buy at least 1
-        // item (and shop isn't unlimited or pay-unlimited is true)
-        QuickShop.getInstance().text().of(p, "the-owner-cant-afford-to-buy-from-you",
-                                          QuickShop.getInstance().getShopManager().format(shop.getPrice(), shop.getLocation().getWorld(),
-                                                                                          shop.getCurrency()),
-                                          QuickShop.getInstance().getShopManager().format(ownerBalance, shop.getLocation().getWorld(),
-                                                                                          shop.getCurrency())).send();
+      if(ownerCanAfford == 0 && takeFromOwner) {
+        // The shop owner cannot afford to buy at least one trade unit.
+        ShopOwnerMoneyPolicy.sendInsufficientFundsMessage(p, shop, shop.getPrice(), ownerBalance);
         return 0;
       }
       // when typed 'all' but player doesn't have any items to sell

@@ -383,6 +383,7 @@ april-rick-and-roll-easter-egg: "<hover:show_text:'Click to open in browser for 
 signs:
   item-right: ''
   out-of-space: Out of Space
+  out-of-funds: Out of Funds
   unlimited: Unlimited
   stack-selling: Selling {0}
   stack-price: '{0} per {1}x {2}'

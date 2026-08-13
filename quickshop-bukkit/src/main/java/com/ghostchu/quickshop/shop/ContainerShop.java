@@ -36,6 +36,7 @@ import com.ghostchu.quickshop.api.shop.permission.BuiltInShopPermissionGroup;
 import com.ghostchu.quickshop.common.util.CommonUtil;
 import com.ghostchu.quickshop.common.util.JsonUtil;
 import com.ghostchu.quickshop.database.bean.SimpleDataRecord;
+import com.ghostchu.quickshop.economy.ShopOwnerMoneyPolicy;
 import com.ghostchu.quickshop.obj.QUserImpl;
 import com.ghostchu.quickshop.shop.cache.SimpleShopInventoryCountCache;
 import com.ghostchu.quickshop.shop.datatype.ShopSignPersistentDataType;
@@ -899,27 +900,35 @@ public class ContainerShop implements Shop, Reloadable {
     final String tradingStringKey;
     final String noRemainingStringKey;
     final int shopRemaining;
+    final boolean ownerOutOfFunds;
 
     switch(shopType) {
       case BUYING -> {
-        shopRemaining = getRemainingSpace();
+        final int remainingSpace = getRemainingSpace();
+        shopRemaining = getVirtualOwnerBuyingRemaining(remainingSpace);
         tradingStringKey = isStackingShop()? "signs.stack-buying" : "signs.buying";
-        noRemainingStringKey = "signs.out-of-space";
+        ownerOutOfFunds = remainingSpace != 0 && shopRemaining == 0;
+        noRemainingStringKey = ownerOutOfFunds
+                ? "signs.out-of-funds"
+                : "signs.out-of-space";
       }
       case SELLING -> {
         shopRemaining = getRemainingStock();
         tradingStringKey = isStackingShop()? "signs.stack-selling" : "signs.selling";
         noRemainingStringKey = "signs.out-of-stock";
+        ownerOutOfFunds = false;
       }
       case FROZEN -> {
         shopRemaining = 0;
         tradingStringKey = "signs.freeze";
         noRemainingStringKey = "signs.freeze";
+        ownerOutOfFunds = false;
       }
       default -> {
         shopRemaining = 0;
         tradingStringKey = "MissingKey for shop type:" + shopType;
         noRemainingStringKey = "MissingKey for shop type:" + shopType;
+        ownerOutOfFunds = false;
       }
     }
     final Component tradingLine = switch(shopRemaining) {
@@ -927,7 +936,12 @@ public class ContainerShop implements Shop, Reloadable {
       case -1 ->
               plugin.text().of(tradingStringKey, plugin.text().of("signs.unlimited").forLocale(locale.getLocale())).forLocale(locale.getLocale());
       //No remaining
-      case 0 -> plugin.text().of(noRemainingStringKey).forLocale(locale.getLocale());
+      case 0 -> {
+        final Component configured = ownerOutOfFunds ? ShopOwnerMoneyPolicy.outOfFundsSign(this) : null;
+        yield configured == null
+                ? plugin.text().of(noRemainingStringKey).forLocale(locale.getLocale())
+                : configured;
+      }
       //Has remaining
       default ->
               plugin.text().of(tradingStringKey, Component.text(shopRemaining)).forLocale(locale.getLocale());
@@ -976,6 +990,20 @@ public class ContainerShop implements Shop, Reloadable {
     event.callEvent();
 
     return event.updated();
+  }
+
+  private int getVirtualOwnerBuyingRemaining(final int remainingSpace) {
+
+    if(getOwner().isRealPlayer()
+       || plugin.getEconomy() == null
+       || getLocation().getWorld() == null) {
+      return remainingSpace;
+    }
+    final int affordable = ShopOwnerMoneyPolicy.ownerAffordableAmount(plugin.getEconomy(), this);
+    if(affordable == Integer.MAX_VALUE) {
+      return remainingSpace;
+    }
+    return remainingSpace < 0 ? affordable : Math.min(remainingSpace, affordable);
   }
 
   /**

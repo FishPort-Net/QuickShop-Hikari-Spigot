@@ -23,6 +23,22 @@ public class ConfigUpdateScript {
     this.plugin = plugin;
   }
 
+  @UpdateScript(version = 1037)
+  public void unlimitedShopOwnerMoneyPolicy() {
+
+    final boolean legacy = getConfig().getBoolean("shop.pay-unlimited-shop-owners", false);
+    if(!getConfig().contains("shop.unlimited-shop-owner-money.defaults.pay-owner", true)) {
+      getConfig().set("shop.unlimited-shop-owner-money.defaults.pay-owner", legacy);
+    }
+    if(!getConfig().contains("shop.unlimited-shop-owner-money.defaults.take-from-owner", true)) {
+      getConfig().set("shop.unlimited-shop-owner-money.defaults.take-from-owner", legacy);
+    }
+    if(!getConfig().contains("shop.unlimited-shop-owner-money.virtual-accounts", true)) {
+      getConfig().set("shop.unlimited-shop-owner-money.virtual-accounts", Collections.emptyMap());
+    }
+    getConfig().set("shop.pay-unlimited-shop-owners", null);
+  }
+
   @UpdateScript(version = 1036)
   public void virtualOwnerDisplayNames() {
 

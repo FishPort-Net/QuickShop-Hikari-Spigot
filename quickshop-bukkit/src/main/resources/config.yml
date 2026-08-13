@@ -1,7 +1,7 @@
 # QuickShop-Hikari Plugin Configuration
 
 #Do not touch this if you don't know what you're doing!
-config-version: 1036
+config-version: 1037
 
 #Set the default language code the plugin should use
 #Set it to default will use your system language.
@@ -268,8 +268,23 @@ shop:
   #sign-dye-color: WHITE
   sign-dye-color: ""
 
-  #Should we pay/take money to/from unlimited shops owners?
-  pay-unlimited-shop-owners: false
+  #Controls money flow for unlimited shops. Limited shops always pay and take money normally.
+  unlimited-shop-owner-money:
+    defaults:
+      #Deposit customer payments into the owner account when an unlimited shop sells items.
+      pay-owner: false
+      #Withdraw purchase payments from the owner account when an unlimited shop buys items.
+      take-from-owner: false
+    #Per-account overrides only apply to virtual owners. Omitted values inherit the defaults above.
+    #The optional messages support MiniMessage. The failure message accepts <price>, <balance>, <account>, and <owner>.
+    #The sign text accepts <account> and <owner>.
+    #Example:
+    #  bank-issue:
+    #    pay-owner: true
+    #    take-from-owner: true
+    #    insufficient-funds-message: '<red><account> cannot afford this purchase. Available balance: <balance>'
+    #    out-of-funds-sign: '<red>Out of Funds'
+    virtual-accounts: { }
 
   #Optional display-name mappings for virtual shop owners.
   #Use the virtual account name without brackets as the key. Values support MiniMessage formatting.
