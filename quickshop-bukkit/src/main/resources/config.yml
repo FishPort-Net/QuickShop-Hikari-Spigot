@@ -90,7 +90,7 @@ force-bukkit-chat-handler: false
 updater: false
 
 #Should QS be allowed to automatically report errors to the author?
-auto-report-errors: true
+auto-report-errors: false
 
 #Should QS use OfflinePlayer list for TabComplete?
 #This might improve player experience, but may cause lag due to searching what can be a long list.
