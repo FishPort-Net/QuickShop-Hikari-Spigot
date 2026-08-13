@@ -1,5 +1,3 @@
-import org.gradle.api.JavaVersion
-
 rootProject.name = "quickshop-hikari-spigot"
 
 pluginManagement {
@@ -105,19 +103,6 @@ include(
     "quickshop-bukkit",
     "compatibility:common",
 )
-
-val modernPlatforms = JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_21)
-if (modernPlatforms) {
-    include(
-        "platform:quickshop-platform-spigot-v1_20_R4",
-        "platform:quickshop-platform-spigot-v1_21_R1",
-        "platform:quickshop-platform-spigot-v1_21_R2",
-        "platform:quickshop-platform-spigot-v1_21_R3",
-        "platform:quickshop-platform-spigot-v1_21_R4",
-        "platform:quickshop-platform-spigot-v1_21_R5",
-        "platform:quickshop-platform-paper",
-    )
-}
 
 listOf(
     "advancedregionmarket", "bentobox", "bungeecord", "bungeecord-geyser",

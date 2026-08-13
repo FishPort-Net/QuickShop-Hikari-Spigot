@@ -1,10 +1,10 @@
 # Spigot compatibility decisions
 
-This fork keeps Spigot support as a hard requirement. Upstream fixes and
-features are adopted when they can remain compatible with the server versions
-already supported by QuickShop-Hikari 6.2.0.10. Paper-only or Folia-only work
-may be skipped when adapting it would add substantial complexity or make the
-Java 17 build unusable.
+This fork publishes one Java 17 JAR for Ketting/Spigot 1.20.x. Upstream fixes
+and features are adopted when they remain compatible with the Java-17-era
+server versions supported by QuickShop-Hikari 6.2.0.10. Paper, Folia, Java 21,
+Spigot 1.20.5+, and Minecraft 1.21 platform implementations are not included
+in the release artifact.
 
 ## Removed or replaced behavior
 
@@ -30,8 +30,8 @@ Java 17 build unusable.
 - The WorldEdit compatibility module compiles against the stable 7.2.18 API
   instead of the Java 21-only 7.3.11 artifact, retaining Java 17 bytecode while
   using APIs that remain available in later WorldEdit releases.
-- Java 17 builds include the 1.20 R1-R3 Spigot platform modules. Java 21 builds
-  additionally include the 1.20 R4 and 1.21 R1-R5 modules from 6.2.0.10.
+- Release builds include only the Java 17-compatible Spigot 1.20 R1-R3
+  platform modules.
 
 Add future skipped or removed upstream functionality to this file, including
 the reason and the fallback seen by users.

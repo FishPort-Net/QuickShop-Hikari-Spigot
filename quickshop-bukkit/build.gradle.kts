@@ -1,21 +1,12 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.ghostchu.quickshop.buildlogic.GitInfoValueSource
 import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.api.attributes.java.TargetJvmVersion
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.bundling.Jar
 
 plugins {
     id("quickshop.core-conventions")
     id("quickshop.shadow-conventions")
-}
-
-if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_21)) {
-    // The plugin core remains Java 17, but the Java 21 distribution also
-    // embeds the modern NMS adapters whose own bytecode must target Java 21.
-    configurations.named("runtimeClasspath") {
-        attributes.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
-    }
 }
 
 dependencies {
@@ -78,16 +69,6 @@ dependencies {
     runtimeOnly(project(":platform:quickshop-platform-spigot-v1_20_R1"))
     runtimeOnly(project(":platform:quickshop-platform-spigot-v1_20_R2"))
     runtimeOnly(project(":platform:quickshop-platform-spigot-v1_20_R3"))
-
-    if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_21)) {
-        runtimeOnly(project(":platform:quickshop-platform-spigot-v1_20_R4"))
-        runtimeOnly(project(":platform:quickshop-platform-spigot-v1_21_R1"))
-        runtimeOnly(project(":platform:quickshop-platform-spigot-v1_21_R2"))
-        runtimeOnly(project(":platform:quickshop-platform-spigot-v1_21_R3"))
-        runtimeOnly(project(":platform:quickshop-platform-spigot-v1_21_R4"))
-        runtimeOnly(project(":platform:quickshop-platform-spigot-v1_21_R5"))
-        runtimeOnly(project(":platform:quickshop-platform-paper"))
-    }
 }
 
 sourceSets {
@@ -109,9 +90,6 @@ val projectsStagedForShadow = buildList {
     add(project(":quickshop-api"))
     add(project(":platform:quickshop-platform-interface"))
     add(project(":platform:quickshop-platform-spigot-abstract"))
-    if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_21)) {
-        add(project(":platform:quickshop-platform-paper"))
-    }
 }
 
 val stageProjectOutputsForShadow = tasks.register<Sync>("stageProjectOutputsForShadow") {
