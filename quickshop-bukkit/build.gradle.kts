@@ -62,6 +62,14 @@ if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_21)) {
     }
 }
 
+// Core classes must retain the Spigot 1.20.1 ABI even in Java 21 release
+// builds. Compile-only integrations such as EssentialsX otherwise upgrade the
+// API transitively to 1.21, where InventoryView changed from a class to an
+// interface and produces bytecode that cannot run on 1.20.1.
+configurations.named("compileClasspath") {
+    resolutionStrategy.force(libs.spigot.api.legacy.get())
+}
+
 dependencies {
     compileOnly(libs.spigot.api.legacy)
     api(project(":quickshop-api"))
