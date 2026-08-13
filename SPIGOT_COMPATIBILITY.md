@@ -7,7 +7,7 @@ Paper and Folia platform support is not included in the release artifact.
 
 ## Current release support
 
-The `6.2.0.10-spigot.3` release has the following deliberately narrow support
+The `6.2.0.10-spigot.4` release has the following deliberately narrow support
 matrix:
 
 | Area | Supported target |
