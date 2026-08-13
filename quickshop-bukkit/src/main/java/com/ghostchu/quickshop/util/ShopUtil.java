@@ -144,6 +144,13 @@ public class ShopUtil {
       return;
     }
 
+    final int maximumDigitsInPrice = plugin.getConfig().getInt("shop.maximum-digits-in-price", -1);
+    if(maximumDigitsInPrice != -1
+       && Math.max(BigDecimal.valueOf(price).stripTrailingZeros().scale(), 0) > maximumDigitsInPrice) {
+      plugin.text().of(user, "digits-reach-the-limit", Component.text(maximumDigitsInPrice)).send();
+      return;
+    }
+
     final PriceLimiterCheckResult checkResult = limiter.check(user, shop.getItem(), plugin.getCurrency(), price);
     final double min = checkResult.getMin();
     final double max = checkResult.getMax();

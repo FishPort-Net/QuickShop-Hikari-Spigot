@@ -65,6 +65,7 @@ import com.ghostchu.quickshop.registry.builtin.itemexpression.SimpleItemExpressi
 import com.ghostchu.quickshop.registry.builtin.itemexpression.handlers.SimpleEnchantmentExpressionHandler;
 import com.ghostchu.quickshop.registry.builtin.itemexpression.handlers.SimpleItemReferenceExpressionHandler;
 import com.ghostchu.quickshop.registry.builtin.itemexpression.handlers.SimpleMaterialExpressionHandler;
+import com.ghostchu.quickshop.registry.builtin.itemexpression.handlers.SimpleWildcardExpressionHandler;
 import com.ghostchu.quickshop.shop.ShopLoader;
 import com.ghostchu.quickshop.shop.ShopPurger;
 import com.ghostchu.quickshop.shop.SimpleShopItemBlackList;
@@ -394,6 +395,8 @@ public class QuickShop implements QuickShopAPI, Reloadable {
     // Reset the BootError status to normal.
     this.bootError = null;
     Util.setPlugin(this);
+    logger.info("Reading the configuration...");
+    initConfiguration();
     logger.info("QuickShop {} - Early boot step - Booting up", javaPlugin.getFork());
     getReloadManager().register(this);
     //BEWARE THESE ONLY RUN ONCE
@@ -402,8 +405,6 @@ public class QuickShop implements QuickShopAPI, Reloadable {
     if(!runtimeCheck(EnvCheckEntry.Stage.ON_LOAD)) {
       return;
     }
-    logger.info("Reading the configuration...");
-    initConfiguration();
     logger.info("Setting up privacy controller...");
     this.privacyController = new PrivacyController(this);
     logger.info("Setting up QuickShop registry....");
@@ -836,6 +837,7 @@ public class QuickShop implements QuickShopAPI, Reloadable {
     itemExpressionRegistry.registerHandlerSafely(new SimpleMaterialExpressionHandler(this));
     itemExpressionRegistry.registerHandlerSafely(new SimpleEnchantmentExpressionHandler(this));
     itemExpressionRegistry.registerHandlerSafely(new SimpleItemReferenceExpressionHandler(this));
+    itemExpressionRegistry.registerHandlerSafely(new SimpleWildcardExpressionHandler(this));
   }
 
   private void loadErrorReporter() {

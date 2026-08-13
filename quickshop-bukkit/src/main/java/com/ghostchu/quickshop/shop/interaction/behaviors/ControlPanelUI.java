@@ -28,6 +28,7 @@ import com.ghostchu.quickshop.menu.ShopKeeperMenu;
 import net.tnemc.menu.core.compatibility.MenuPlayer;
 import net.tnemc.menu.core.manager.MenuManager;
 import net.tnemc.menu.core.viewer.MenuViewer;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -66,6 +67,7 @@ public class ControlPanelUI implements InteractionBehavior {
   public void handle(final @NotNull QuickShopAPI plugin, final @Nullable Shop shop, final @NotNull Player player, final @NotNull PlayerInteractEvent event, final @NotNull InteractionClick clickType, final @Nullable InteractionType interaction) {
 
     if(shop == null) return;
+    if(player.getInventory().getItemInMainHand().getType() == Material.GOLDEN_AXE) return;
 
     final MenuViewer viewer = new MenuViewer(event.getPlayer().getUniqueId());
     viewer.addData(ShopKeeperMenu.SHOP_DATA_ID, shop.getShopId());

@@ -48,6 +48,20 @@ raise platform assumptions, or remove Spigot support.
 - Kept the existing virtual item display as default (`display-type: 2`).
 - No Paper scheduler, Paper components, or Folia region API is used by the new implementation.
 
+### Portable 6.2.0.11 follow-up
+
+- Sources: `510eaf536`, `939c82b42`, `679cbf8ac`, `9977b85ca`, `ca226e061`,
+  `63658fd3a`, `a2487ed26`, `032f15d02`, `b5558733e`, and the portable parts of
+  `6ba895c1e`, `bc19c0efd`, `b4fa5b453`, `c4ce391c7`, `5c7e50d37`, and `1f88cbce1`.
+- Added world whitelists, wildcard blacklist expressions, configurable per-shop-type sign layouts,
+  a shop-limit calculation event, `/qs database save`, and `/qs find` rate limiting.
+- Fixed buy/sell price suggestions, configured decimal-place enforcement, early configuration
+  loading, command description remapping, supertool GUI conflicts, paste report optional-class
+  lookups, display refresh on shop-type changes, and virtual-display packet deadlocks.
+- Crowdin OTA is now a normal configuration option and defaults to disabled for this fork.
+- Packet deadlock avoidance was applied to every retained PacketEvents and ProtocolLib factory,
+  including the 1.20 implementation used by the primary Java 17 target.
+
 ## Deferred for later 1.20.1 work
 
 - Display-entity click hitboxes. Upstream routes `Interaction` entity clicks through the rewritten
@@ -60,14 +74,21 @@ raise platform assumptions, or remove Spigot support.
   are present; GUI controls can be added without changing persistence.
 - `@avoid` filtering and watch-triggered player notifications. The storage/index foundation exists,
   but notification semantics and rate limiting should be specified first.
-- Reusable sign rendering components from `297ff6dfd`. Text-display placeholders were ported; the
-  sign half depends heavily on the 6.3 Shop layout provider and is not required for display type 3.
+- The reusable renderer/provider API from `297ff6dfd`. The user-facing per-shop-type sign layout is
+  ported, but the later 6.3 provider API depends on the rewritten shop type/state model.
+- The remaining startup-argument-to-config conversions from `be13b2f79`. Their runtime behavior is
+  still available through the existing JVM properties; only the requested Crowdin settings were
+  promoted to normal configuration in this pass.
+- The provider-based updater from `19468cc57`; the retained updater remains functional, and the
+  replacement is coupled to the newer configuration model.
 
 ## Not planned for this compatibility line
 
 - Paper/Folia-only schedulers, region ownership APIs, menu implementations, and components.
 - The full `9e476c405` Shop meta/state/trading/tax/metrics rewrite.
 - Java 21-only core bytecode or Minecraft versions beyond the fork's declared support matrix.
+- The 1.21-only data-component matcher from `b9d791c95`; it does not improve the primary 1.20.1
+  target and depends on modern item component APIs.
 - Map-addon cache changes from `1a90087de` unless those addons are restored and verified on Spigot.
 
 Bundled translations remain English fallback plus the administrator override system. Crowdin OTA

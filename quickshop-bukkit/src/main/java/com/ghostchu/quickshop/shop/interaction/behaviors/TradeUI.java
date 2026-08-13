@@ -28,6 +28,7 @@ import com.ghostchu.quickshop.util.Util;
 import net.tnemc.menu.core.compatibility.MenuPlayer;
 import net.tnemc.menu.core.manager.MenuManager;
 import net.tnemc.menu.core.viewer.MenuViewer;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -64,6 +65,8 @@ public class TradeUI implements InteractionBehavior {
    */
   @Override
   public void handle(final @NotNull QuickShopAPI plugin, final @Nullable Shop shop, final @NotNull Player player, final @NotNull PlayerInteractEvent event, final @NotNull InteractionClick clickType, final @Nullable InteractionType interaction) {
+
+    if(player.getInventory().getItemInMainHand().getType() == Material.GOLDEN_AXE) return;
 
     if(shop == null) {
       if(event.getItem() != null && event.getHand() != null && Util.createShop(event.getPlayer(),

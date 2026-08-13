@@ -25,10 +25,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SubCommand_Find implements CommandHandler<Player> {
 
   private final QuickShop plugin;
+  private final Map<UUID, Long> cooldowns = new ConcurrentHashMap<>();
 
   public SubCommand_Find(final QuickShop plugin) {
 
@@ -41,6 +44,17 @@ public class SubCommand_Find implements CommandHandler<Player> {
     if(parser.getArgs().isEmpty()) {
       plugin.text().of(sender, "command.no-type-given").send();
       return;
+    }
+
+    final long cooldownMillis = Math.max(0L, plugin.getConfig().getLong("shop.finding.cooldown", 20L)) * 1000L;
+    final long now = System.currentTimeMillis();
+    if(cooldownMillis > 0L && cooldowns.getOrDefault(sender.getUniqueId(), 0L) > now) {
+      return;
+    }
+    if(cooldownMillis > 0L) {
+      cooldowns.put(sender.getUniqueId(), now + cooldownMillis);
+    } else {
+      cooldowns.remove(sender.getUniqueId());
     }
 
     final Location loc = sender.getLocation();

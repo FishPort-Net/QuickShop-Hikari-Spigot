@@ -54,11 +54,13 @@ public class SubCommand_SuggestPrice implements CommandHandler<Player> {
         }
 
         final List<Double> matchedBuy = plugin.getShopManager().getAllShops().stream()
+                .filter(Shop::isBuying)
                 .filter(s->plugin.getItemMatcher().matches(stack, s.getItem()))
                 .map(Shop::getPrice)
                 .toList();
 
         final List<Double> matchedSell = plugin.getShopManager().getAllShops().stream()
+                .filter(Shop::isSelling)
                 .filter(s->plugin.getItemMatcher().matches(stack, s.getItem()))
                 .map(Shop::getPrice)
                 .toList();

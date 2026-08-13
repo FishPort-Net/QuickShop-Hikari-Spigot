@@ -3,6 +3,7 @@ package com.ghostchu.quickshop.command.subcommand;
 import com.ghostchu.quickshop.QuickShop;
 import com.ghostchu.quickshop.api.command.CommandHandler;
 import com.ghostchu.quickshop.api.command.CommandParser;
+import com.ghostchu.quickshop.api.shop.Shop;
 import com.ghostchu.quickshop.database.DataTables;
 import com.ghostchu.quickshop.database.SimpleDatabaseHelperV2;
 import com.ghostchu.quickshop.util.FastPlayerFinder;
@@ -15,6 +16,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.TimeUnit;
 
 public class SubCommand_Database implements CommandHandler<CommandSender> {
 
@@ -43,6 +47,7 @@ public class SubCommand_Database implements CommandHandler<CommandSender> {
     subParams.remove(0);
     switch(parser.getArgs().get(0)) {
       case "trim" -> handleTrim(sender, subParams);
+      case "save" -> saveShops();
       case "purgelogs" -> purgeLogs(sender, subParams);
       case "purgeplayerscache" -> purgePlayersCache(sender, subParams);
       default -> plugin.text().of(sender, "bad-command-usage-detailed", "trim").send();
@@ -53,7 +58,7 @@ public class SubCommand_Database implements CommandHandler<CommandSender> {
   public @Nullable List<String> onTabComplete(@NotNull final CommandSender sender, @NotNull final String commandLabel, @NotNull final CommandParser parser) {
 
     if(parser.getArgs().size() < 2) {
-      return List.of("trim");
+      return List.of("trim", "save", "purgelogs", "purgeplayerscache");
     }
     return Collections.emptyList();
   }
@@ -73,6 +78,34 @@ public class SubCommand_Database implements CommandHandler<CommandSender> {
               return null;
             });
 
+  }
+
+  private void saveShops() {
+
+    plugin.logger().info("Saving all dirty in-memory shops...");
+    final List<CompletableFuture<Void>> futures = plugin.getShopManager().getAllShops().stream()
+            .filter(Shop::isDirty)
+            .map(Shop::update)
+            .toList();
+    plugin.logger().info("Shops requiring a save: {}", futures.size());
+    try {
+      CompletableFuture.allOf(futures.toArray(CompletableFuture<?>[]::new))
+              .orTimeout(15, TimeUnit.SECONDS)
+              .join();
+    } catch(final CompletionException exception) {
+      plugin.logger().warn("Asynchronous shop saving did not complete; retrying remaining shops synchronously.", exception);
+      for(final Shop shop : plugin.getShopManager().getAllShops()) {
+        if(!shop.isDirty()) {
+          continue;
+        }
+        try {
+          plugin.getDatabaseHelper().updateShop(shop).join();
+          shop.setDirty(false);
+        } catch(final RuntimeException saveException) {
+          plugin.logger().warn("Failed to save shop {} at {}.", shop.getShopId(), shop.getLocation(), saveException);
+        }
+      }
+    }
   }
 //
 //    private void handleStatus(@NotNull CommandSender sender) {

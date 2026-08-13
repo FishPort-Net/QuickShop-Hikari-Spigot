@@ -1,7 +1,7 @@
 # QuickShop-Hikari Plugin Configuration
 
 #Do not touch this if you don't know what you're doing!
-config-version: 1034
+config-version: 1035
 
 #Set the default language code the plugin should use
 #Set it to default will use your system language.
@@ -198,6 +198,25 @@ shop:
     - history
     - remove
 
+  #The four sign sections can be reordered independently for each shop type.
+  #Valid values: header, trading, item, price. Use an empty string for a blank line.
+  layout:
+    BUYING:
+      line1: "header"
+      line2: "trading"
+      line3: "item"
+      line4: "price"
+    FROZEN:
+      line1: "header"
+      line2: "trading"
+      line3: "item"
+      line4: "price"
+    SELLING:
+      line1: "header"
+      line2: "trading"
+      line3: "item"
+      line4: "price"
+
   #The cost to make a shop.
   cost: 10
 
@@ -347,6 +366,8 @@ shop:
     limit: 10
     #Should this ignore the distance?
     global: false
+    #Minimum delay between searches by the same player, in seconds. Set to 0 to disable.
+    cooldown: 20
     #Should non-loaded shops be incuded in the search?
     all: true
     #Should QS exclude out-of-stock/space shops?
@@ -413,7 +434,12 @@ shop:
   #NOTE: Only one effect is shown and is randomly chosen.
   use-effect-for-potion-item: false
 
+  #The list of worlds in which creating new shops is enabled.
+  #When non-empty, it takes priority over blacklist-world.
+  whitelist-world: []
+
   #The list of worlds in which creating new shops is disabled.
+  #Only checked when whitelist-world is empty.
   blacklist-world:
     - disabled_world_name
 
@@ -529,6 +555,10 @@ shop:
 #https://quickshop-community.github.io/QuickShop-Hikari-Documents/docs/modules/item-expression
 blacklist:
   - Bedrock
+
+#When non-empty, only shops in these worlds are loaded from the database.
+#This takes priority over database-loading-blacklist-worlds.
+database-loading-whitelist-worlds: []
 
 database-loading-blacklist-worlds:
   - "the world that shop won't to be loaded"

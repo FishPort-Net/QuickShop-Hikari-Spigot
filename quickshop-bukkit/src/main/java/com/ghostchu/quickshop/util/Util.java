@@ -292,7 +292,28 @@ public class Util {
 
   public static boolean isBlacklistWorld(@NotNull final World world) {
 
+    final List<String> whitelist = plugin.getConfig().getStringList("shop.whitelist-world");
+    if(!whitelist.isEmpty()) {
+      return !whitelist.contains(world.getName());
+    }
     return plugin.getConfig().getStringList("shop.blacklist-world").contains(world.getName());
+  }
+
+  /**
+   * Checks whether shops from a world should be skipped during database loading.
+   * A non-empty whitelist takes priority over the blacklist.
+   *
+   * @param worldName world name to check
+   *
+   * @return true when shops from this world must not be loaded
+   */
+  public static boolean isDatabaseLoadingBlacklisted(@NotNull final String worldName) {
+
+    final List<String> whitelist = plugin.getConfig().getStringList("database-loading-whitelist-worlds");
+    if(!whitelist.isEmpty()) {
+      return !whitelist.contains(worldName);
+    }
+    return plugin.getConfig().getStringList("database-loading-blacklist-worlds").contains(worldName);
   }
 
   /**
@@ -474,7 +495,7 @@ public class Util {
 
         if(exponent > 0) {
 
-          final int digits = QuickShop.getInstance().getConfig().getInt("maximum-digits-in-price", -1);
+          final int digits = QuickShop.getInstance().getConfig().getInt("shop.maximum-digits-in-price", -1);
           final BigDecimal value = baseValue.multiply(BigDecimal.TEN.pow(exponent));
           if(digits == -1) {
             return value;

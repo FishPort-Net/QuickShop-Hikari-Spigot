@@ -23,6 +23,29 @@ public class ConfigUpdateScript {
     this.plugin = plugin;
   }
 
+  @UpdateScript(version = 1035)
+  public void configWorldWhitelists() {
+
+    if(!getConfig().isSet("shop.whitelist-world")) {
+      getConfig().set("shop.whitelist-world", Collections.emptyList());
+    }
+    if(!getConfig().isSet("database-loading-whitelist-worlds")) {
+      getConfig().set("database-loading-whitelist-worlds", Collections.emptyList());
+    }
+    final List<String> defaultLayout = List.of("header", "trading", "item", "price");
+    for(final String shopType : List.of("BUYING", "FROZEN", "SELLING")) {
+      for(int line = 1; line <= 4; line++) {
+        final String path = "shop.layout." + shopType + ".line" + line;
+        if(!getConfig().isSet(path)) {
+          getConfig().set(path, defaultLayout.get(line - 1));
+        }
+      }
+    }
+    if(!getConfig().isSet("shop.finding.cooldown")) {
+      getConfig().set("shop.finding.cooldown", 20);
+    }
+  }
+
   @UpdateScript(version = 1034)
   public void configCrowdinOta() {
 

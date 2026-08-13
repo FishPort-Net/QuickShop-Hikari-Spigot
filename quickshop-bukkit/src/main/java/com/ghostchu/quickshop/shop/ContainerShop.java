@@ -95,6 +95,7 @@ public class ContainerShop implements Shop, Reloadable {
   // We use deprecated method to create a fake quickshop-reremake namespace to trick bukkit to access legacy data.
   private static final NamespacedKey LEGACY_SHOP_NAMESPACED_KEY = new NamespacedKey("quickshop", "shopsign");
   private static final String LEGACY_SHOP_SIGN_RECOGNIZE_PATTERN = "§d§o ";
+  private static final List<String> DEFAULT_SIGN_LAYOUT = List.of("header", "trading", "item", "price");
   @NotNull
   private final Location location;
   @EqualsAndHashCode.Exclude
@@ -878,7 +879,12 @@ public class ContainerShop implements Shop, Reloadable {
     event = event.clone(Phase.POST);
     event.callEvent();
 
-    this.setSignText();
+    if(this.displayItem != null) {
+      this.displayItem.remove(false);
+    }
+    this.displayItem = null;
+    checkDisplay();
+    setSignText();
     setDirty();
   }
 
@@ -886,11 +892,10 @@ public class ContainerShop implements Shop, Reloadable {
   public List<Component> getSignText(@NotNull final ProxiedLocale locale) {
 
     Util.ensureThread(false);
-    final List<Component> lines = new ArrayList<>();
-    //Line 1
+
     final String headerKey = inventoryAvailable()? "signs.header-available" : "signs.header-unavailable";
-    lines.add(plugin.text().of(headerKey, this.ownerName(false, locale)).forLocale(locale.getLocale()));
-    //Line 2
+    final Component headerLine = plugin.text().of(headerKey, this.ownerName(false, locale)).forLocale(locale.getLocale());
+
     final String tradingStringKey;
     final String noRemainingStringKey;
     final int shopRemaining;
@@ -917,7 +922,7 @@ public class ContainerShop implements Shop, Reloadable {
         noRemainingStringKey = "MissingKey for shop type:" + shopType;
       }
     }
-    final Component line2 = switch(shopRemaining) {
+    final Component tradingLine = switch(shopRemaining) {
       //Unlimited
       case -1 ->
               plugin.text().of(tradingStringKey, plugin.text().of("signs.unlimited").forLocale(locale.getLocale())).forLocale(locale.getLocale());
@@ -927,29 +932,45 @@ public class ContainerShop implements Shop, Reloadable {
       default ->
               plugin.text().of(tradingStringKey, Component.text(shopRemaining)).forLocale(locale.getLocale());
     };
-    lines.add(line2);
 
-    //line 3
+    final Component itemLine;
     if(plugin.getConfig().getBoolean("shop.force-use-item-original-name") || !this.getItem().hasItemMeta() || !this.getItem().getItemMeta().hasDisplayName()) {
       final Component left = plugin.text().of("signs.item-left").forLocale(locale.getLocale());
       final Component right = plugin.text().of("signs.item-right").forLocale(locale.getLocale());
       final Component itemName = Util.getItemStackName(getItem());
-      lines.add(left.append(itemName).append(right));
+      itemLine = left.append(itemName).append(right);
     } else {
-      lines.add(plugin.text().of("signs.item-left").forLocale(locale.getLocale()).append(Util.getItemStackName(getItem()).append(plugin.text().of("signs.item-right").forLocale(locale.getLocale()))));
+      itemLine = plugin.text().of("signs.item-left").forLocale(locale.getLocale())
+              .append(Util.getItemStackName(getItem())
+                              .append(plugin.text().of("signs.item-right").forLocale(locale.getLocale())));
     }
 
-    //line 4
-    final Component line4;
+    final Component priceLine;
     if(this.isStackingShop()) {
-      line4 = plugin.text().of("signs.stack-price",
-                               plugin.getShopManager().format(this.getPrice(), this),
-                               item.getAmount(),
-                               Util.getItemStackName(item)).forLocale(locale.getLocale());
+      priceLine = plugin.text().of("signs.stack-price",
+                                   plugin.getShopManager().format(this.getPrice(), this),
+                                   item.getAmount(),
+                                   Util.getItemStackName(item)).forLocale(locale.getLocale());
     } else {
-      line4 = plugin.text().of("signs.price", plugin.getShopManager().format(this.getPrice(), this)).forLocale(locale.getLocale());
+      priceLine = plugin.text().of("signs.price", plugin.getShopManager().format(this.getPrice(), this)).forLocale(locale.getLocale());
     }
-    lines.add(line4);
+
+    final Map<String, Component> sections = Map.of(
+            "header", headerLine,
+            "trading", tradingLine,
+            "item", itemLine,
+            "price", priceLine);
+    final List<Component> lines = new ArrayList<>(4);
+    final String baseNode = "shop.layout." + shopType.name() + ".line";
+    for(int index = 0; index < 4; index++) {
+      final String fallback = DEFAULT_SIGN_LAYOUT.get(index);
+      final String configured = plugin.getConfig().getString(baseNode + (index + 1), fallback);
+      if(configured == null || configured.isBlank()) {
+        lines.add(Component.empty());
+        continue;
+      }
+      lines.add(sections.getOrDefault(configured.toLowerCase(Locale.ROOT), sections.get(fallback)));
+    }
 
     final ShopSignLinesEvent event = new ShopSignLinesEvent(Phase.RETRIEVE, this, lines);
     event.callEvent();

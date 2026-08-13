@@ -219,6 +219,7 @@ public class PacketFactoryv1_20 implements PacketFactory<PacketContainer> {
         //chunk z
         final int z = integerStructureModifier.read(1);
 
+        final List<VirtualDisplayItem<?>> items = new ArrayList<>();
         VirtualDisplayItemManager.instance().getChunksMapping().computeIfPresent(new SimpleShopChunk(player.getWorld().getName(), x, z), (chunkLoc, targetList)->{
           for(final VirtualDisplayItem<?> target : targetList) {
             if(!target.isSpawned()) {
@@ -226,12 +227,15 @@ public class PacketFactoryv1_20 implements PacketFactory<PacketContainer> {
             }
             if(target.isApplicableForPlayer(player)) { // TODO: Refactor with better way
               target.getPacketSenders().add(player.getUniqueId());
-              target.sendDestroyPacket(player);
-              target.sendFakeItem(player);
+              items.add(target);
             }
           }
           return targetList;
         });
+        for(final VirtualDisplayItem<?> target : items) {
+          target.sendDestroyPacket(player);
+          target.sendFakeItem(player);
+        }
       }
     };
 
@@ -272,6 +276,7 @@ public class PacketFactoryv1_20 implements PacketFactory<PacketContainer> {
           final int x = intModifier.read(0);
           final int z = intModifier.read(1);
 
+        final List<VirtualDisplayItem<?>> items = new ArrayList<>();
         VirtualDisplayItemManager.instance().getChunksMapping().computeIfPresent(new SimpleShopChunk(player.getWorld().getName(), x, z), (chunkLoc, targetList)->{
           for(final VirtualDisplayItem<?> target : targetList) {
 
@@ -279,11 +284,14 @@ public class PacketFactoryv1_20 implements PacketFactory<PacketContainer> {
 
               continue;
             }
-            target.sendDestroyPacket(player);
+            items.add(target);
             target.getPacketSenders().remove(player.getUniqueId());
           }
           return targetList;
         });
+        for(final VirtualDisplayItem<?> target : items) {
+          target.sendDestroyPacket(player);
+        }
       }
     };
 
