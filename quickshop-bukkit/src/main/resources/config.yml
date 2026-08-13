@@ -1,7 +1,7 @@
 # QuickShop-Hikari Plugin Configuration
 
 #Do not touch this if you don't know what you're doing!
-config-version: 1033
+config-version: 1034
 
 #Set the default language code the plugin should use
 #Set it to default will use your system language.
@@ -17,6 +17,13 @@ game-language: default
 #https://quickshop-community.github.io/QuickShop-Hikari-Documents/docs/modules/localization
 enabled-languages:
   - '*'
+
+#Use Crowdin OTA to download translation updates at startup?
+#Keep this disabled when translations are maintained through the override system.
+use-crowdin-ota: false
+
+#Crowdin OTA distribution host. Only used when use-crowdin-ota is enabled.
+crowdin-host: "https://crowdinota.hikari.r2.quickshop-powered.top"
 
 #Setting the game language file download channel, like item name, effect translations etc.
 #We will get those files from mojang resources server:

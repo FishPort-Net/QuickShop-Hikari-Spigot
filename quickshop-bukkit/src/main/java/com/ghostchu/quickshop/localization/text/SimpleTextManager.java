@@ -77,6 +77,7 @@ public class SimpleTextManager implements TextManager, Reloadable, SubPasteItem 
   private static final String DEFAULT_LOCALE = "en_us";
   private static final String LOCALE_MAPPING_SYNTAX = "locale";
   private static final String CROWDIN_LANGUAGE_FILE_PATH = "/hikari/crowdin/lang/%locale%/messages.yml";
+  private static final String DEFAULT_CROWDIN_HOST = "https://crowdinota.hikari.r2.quickshop-powered.top";
   public final Set<PostProcessor> postProcessors = new LinkedHashSet<>();
   private final QuickShop plugin;
   // <File <Locale, Section>>
@@ -95,8 +96,11 @@ public class SimpleTextManager implements TextManager, Reloadable, SubPasteItem 
     this.plugin = plugin;
     plugin.getReloadManager().register(this);
     plugin.getPasteManager().register(plugin.getJavaPlugin(), this);
-    this.crowdinHost = PackageUtil.parsePackageProperly("crowdinHost").asString("https://crowdinota.hikari.r2.quickshop-powered.top");
-    if(PackageUtil.parsePackageProperly("enableCrowdinOTA").asBoolean(true)) {
+    this.crowdinHost = PackageUtil.parsePackageProperly("crowdinHost")
+            .asString(plugin.getConfig().getString("crowdin-host", DEFAULT_CROWDIN_HOST));
+    final boolean crowdinEnabled = PackageUtil.parsePackageProperly("enableCrowdinOTA")
+            .asBoolean(plugin.getConfig().getBoolean("use-crowdin-ota", false));
+    if(crowdinEnabled) {
       try {
         plugin.logger().info("Please wait us fetch the translation updates from Crowdin OTA service...");
         this.crowdinOTA = new CrowdinOTA(crowdinHost, new File(Util.getCacheFolder(), "crowdin-ota"), Unirest.primaryInstance());

@@ -70,6 +70,6 @@ raise platform assumptions, or remove Spigot support.
 - Java 21-only core bytecode or Minecraft versions beyond the fork's declared support matrix.
 - Map-addon cache changes from `1a90087de` unless those addons are restored and verified on Spigot.
 
-Bundled translations remain English fallback plus the existing Crowdin OTA/administrator override
-system. Maintainers can provide `overrides/zh_cn/messages.yml`; no new bundled `zh_cn` snapshot is
-tracked by this fork.
+Bundled translations remain English fallback plus the administrator override system. Crowdin OTA
+is disabled by default through `use-crowdin-ota: false`; maintainers can provide
+`overrides/zh_cn/messages.yml`. No new bundled `zh_cn` snapshot is tracked by this fork.

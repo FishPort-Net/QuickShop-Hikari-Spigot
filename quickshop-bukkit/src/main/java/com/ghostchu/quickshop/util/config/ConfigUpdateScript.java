@@ -23,6 +23,17 @@ public class ConfigUpdateScript {
     this.plugin = plugin;
   }
 
+  @UpdateScript(version = 1034)
+  public void configCrowdinOta() {
+
+    if(!getConfig().isSet("use-crowdin-ota")) {
+      getConfig().set("use-crowdin-ota", false);
+    }
+    if(!getConfig().isSet("crowdin-host")) {
+      getConfig().set("crowdin-host", "https://crowdinota.hikari.r2.quickshop-powered.top");
+    }
+  }
+
   @UpdateScript(version = 1033)
   public void configDisplayCoords() {
 
