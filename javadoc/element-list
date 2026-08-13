@@ -17,6 +17,7 @@ com.ghostchu.quickshop.api.event.panel
 com.ghostchu.quickshop.api.event.settings
 com.ghostchu.quickshop.api.event.settings.type
 com.ghostchu.quickshop.api.event.settings.type.benefit
+com.ghostchu.quickshop.api.event.user
 com.ghostchu.quickshop.api.eventmanager
 com.ghostchu.quickshop.api.inventory
 com.ghostchu.quickshop.api.localization.text
