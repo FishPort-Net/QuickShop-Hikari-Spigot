@@ -30,7 +30,8 @@ jobs:
         run: ./gradlew :quickshop-bukkit:shadowJar --no-configuration-cache
 
       - name: Generate plugin checksum
-        run: sha256sum quickshop-bukkit/build/libs/QuickShop-Hikari-${{ github.ref_name }}.jar > quickshop-bukkit/build/libs/QuickShop-Hikari-${{ github.ref_name }}.jar.sha256
+        working-directory: quickshop-bukkit/build/libs
+        run: sha256sum QuickShop-Hikari-${{ github.ref_name }}.jar > QuickShop-Hikari-${{ github.ref_name }}.jar.sha256
 
       - name: Publish GitHub Release
         env:
