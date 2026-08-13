@@ -22,7 +22,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import io.papermc.lib.PaperLib;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -33,8 +32,6 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -437,8 +434,7 @@ public abstract class AbstractShopManager implements ShopManager {
           }
         } else {
           // optimize for performance
-          final BlockState state = PaperLib.getBlockState(currentBlock, false).getState();
-          if(!(state instanceof InventoryHolder)) {
+          if(plugin.getInventoryWrapperRegistry().resolve(currentBlock) == null) {
             return null;
           }
           @Nullable final Block half = Util.getSecondHalf(currentBlock);

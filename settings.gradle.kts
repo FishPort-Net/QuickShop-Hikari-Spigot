@@ -121,7 +121,7 @@ listOf(
     "advancedregionmarket", "bentobox", "bungeecord", "bungeecord-geyser",
     "chestprotect", "clearlag", "dominion", "ecoenchants", "elitemobs", "fabledskyblock",
     "griefprevention", "husktowns", "itemsadder", "lands", "matcherplus",
-    "openinv", "plotsquared", "reforges", "residence", "slimefun", "superiorskyblock",
+    "ketting", "openinv", "plotsquared", "reforges", "residence", "slimefun", "superiorskyblock",
     "towny", "velocity", "voidchest", "worldedit", "worldguard",
 ).forEach { include("compatibility:$it") }
 

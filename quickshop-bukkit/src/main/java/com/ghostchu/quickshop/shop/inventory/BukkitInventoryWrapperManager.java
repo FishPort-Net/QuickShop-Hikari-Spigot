@@ -1,7 +1,7 @@
 package com.ghostchu.quickshop.shop.inventory;
 
+import com.ghostchu.quickshop.api.inventory.BlockInventoryWrapperManager;
 import com.ghostchu.quickshop.api.inventory.InventoryWrapper;
-import com.ghostchu.quickshop.api.inventory.InventoryWrapperManager;
 import com.ghostchu.quickshop.api.serialize.BlockPos;
 import com.ghostchu.quickshop.common.util.CommonUtil;
 import com.ghostchu.quickshop.common.util.JsonUtil;
@@ -16,8 +16,19 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class BukkitInventoryWrapperManager implements InventoryWrapperManager {
+public class BukkitInventoryWrapperManager implements BlockInventoryWrapperManager {
+
+  @Override
+  public @Nullable InventoryWrapper resolve(@NotNull final Block block) {
+
+    final BlockState state = block.getState();
+    if(!(state instanceof final InventoryHolder holder)) {
+      return null;
+    }
+    return new BukkitInventoryWrapper(holder.getInventory());
+  }
 
   @Override
   public @NotNull InventoryWrapper locate(@NotNull final String symbolLink) throws IllegalArgumentException {
@@ -41,7 +52,7 @@ public class BukkitInventoryWrapperManager implements InventoryWrapperManager {
     if(world == null) {
       throw new IllegalArgumentException("Invalid symbol link: Invalid world name.");
     }
-    return new BukkitInventoryWrapper(fromLocation(world, blockPos.getX(), blockPos.getY(), blockPos.getZ()).getInventory());
+    return requireInventory(world.getBlockAt(blockPos.getX(), blockPos.getY(), blockPos.getZ()));
   }
 
   @Deprecated
@@ -56,7 +67,7 @@ public class BukkitInventoryWrapperManager implements InventoryWrapperManager {
         if(world == null) {
           throw new IllegalArgumentException("Invalid symbol link: Invalid world name.");
         }
-        return new BukkitInventoryWrapper(fromLocation(world, blockHolder.getX(), blockHolder.getY(), blockHolder.getZ()).getInventory());
+        return requireInventory(world.getBlockAt(blockHolder.getX(), blockHolder.getY(), blockHolder.getZ()));
       }
       default -> throw new IllegalArgumentException("Invalid symbol link: Invalid holder type.");
     }
@@ -79,6 +90,15 @@ public class BukkitInventoryWrapperManager implements InventoryWrapperManager {
       }
       return holder;
     }
+  }
+
+  private @NotNull InventoryWrapper requireInventory(@NotNull final Block block) {
+
+    final InventoryWrapper wrapper = resolve(block);
+    if(wrapper == null) {
+      throw new IllegalArgumentException("Invalid symbol link: Target block not a Container (map changed/resetted?)");
+    }
+    return wrapper;
   }
 
   @Override
