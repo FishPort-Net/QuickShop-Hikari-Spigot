@@ -29,13 +29,13 @@ import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketListenerCommon;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBundle;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
@@ -188,8 +188,6 @@ public class PacketFactoryv1_21_6 implements PacketFactory<PacketWrapper<?>> {
           return;
         }
 
-        final WrapperPlayServerChunkData chunkData = new WrapperPlayServerChunkData(event);
-
         final Player player = event.getPlayer();
         if(player == null || !player.isOnline()) {
 
@@ -201,8 +199,16 @@ public class PacketFactoryv1_21_6 implements PacketFactory<PacketWrapper<?>> {
           return;
         }
 
-        final int x = chunkData.getColumn().getX();
-        final int z = chunkData.getColumn().getZ();
+        // X and Z are the first two integers in the chunk-data payload. Do not construct
+        // WrapperPlayServerChunkData here: it decodes every section and registry-backed palette,
+        // which is both unnecessary and incompatible with unknown modded registry entries.
+        final Object buffer = ByteBufHelper.duplicate(event.getByteBuf());
+        if(ByteBufHelper.readableBytes(buffer) < Integer.BYTES * 2) {
+
+          return;
+        }
+        final int x = ByteBufHelper.readInt(buffer);
+        final int z = ByteBufHelper.readInt(buffer);
 
         final List<VirtualDisplayItem<?>> items = new ArrayList<>();
         VirtualDisplayItemManager.instance().getChunksMapping().computeIfPresent(new SimpleShopChunk(player.getWorld().getName(), x, z), (chunkLoc, targetList)->{
