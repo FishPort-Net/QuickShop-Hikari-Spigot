@@ -301,8 +301,8 @@ val generateRuntimeLibraryManifest = tasks.register<GenerateRuntimeLibraryManife
     inputJars.from(privateRuntimeArtifacts.artifactFiles)
     coordinatesByFileName.set(runtimeCoordinates)
     excludedModules.set(setOf(
-        // The sanitized EasySQL fat JAR is staged into the plugin below.
-        "cc.carm.lib:easysql-api",
+        // The sanitized EasySQL fat JAR provides the implementation and pool,
+        // while its separate API JAR remains a private runtime dependency.
         "cc.carm.lib:easysql-impl",
         "cc.carm.lib:easysql-hikaricp",
         // TNE publishes fat JARs with mutually duplicated dependencies. Only

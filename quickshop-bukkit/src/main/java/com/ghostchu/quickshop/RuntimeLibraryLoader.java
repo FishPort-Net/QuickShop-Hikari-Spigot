@@ -21,6 +21,7 @@ final class RuntimeLibraryLoader {
 
   private static final String MANIFEST = "quickshop-libraries.properties";
   private static final List<String> REQUIRED_CLASSES = List.of(
+          "com.ghostchu.quickshop.shade.cc.carm.lib.easysql.api.SQLManager",
           "com.ghostchu.quickshop.shade.cc.carm.lib.easysql.hikari.HikariDataSource",
           "com.ghostchu.quickshop.shade.com.google.common.cache.CacheBuilder",
           "com.ghostchu.quickshop.shade.com.mysql.cj.jdbc.Driver",
