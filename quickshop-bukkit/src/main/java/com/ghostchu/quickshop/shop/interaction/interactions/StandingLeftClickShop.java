@@ -53,7 +53,8 @@ public class StandingLeftClickShop implements InteractionType {
   @Override
   public boolean applies(final @NotNull PlayerInteractEvent event, final @NotNull InteractionClick click) {
 
-    return click == InteractionClick.SHOPBLOCK && event.getAction() == Action.LEFT_CLICK_BLOCK
+    return (click == InteractionClick.SHOPBLOCK || click == InteractionClick.CONTAINER)
+           && event.getAction() == Action.LEFT_CLICK_BLOCK
            && !event.getPlayer().isSneaking()
            && event.getPlayer().getInventory().getItemInMainHand().getType() != Material.GOLDEN_AXE;
   }

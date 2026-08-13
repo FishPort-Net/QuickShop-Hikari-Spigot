@@ -260,7 +260,7 @@ public class Util {
                      plugin.perm().hasPermission(player, "quickshop.create.stacks")
                      ? stack.getAmount() : 1).send();
     Log.debug("==== Ending Shop Creation ====");
-    return false;
+    return true;
   }
 
   /**
