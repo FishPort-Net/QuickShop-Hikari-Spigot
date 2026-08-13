@@ -46,6 +46,14 @@ dependencies {
     }
 
     implementation(libs.paperlib)
+    implementation("com.google.guava:guava:31.1-jre") {
+        // These are compile-time annotations only. Keep the runtime bundle to
+        // Guava plus failureaccess, both relocated into QuickShop's namespace.
+        exclude("com.google.code.findbugs", "jsr305")
+        exclude("org.checkerframework", "checker-qual")
+        exclude("com.google.errorprone", "error_prone_annotations")
+        exclude("com.google.j2objc", "j2objc-annotations")
+    }
     implementation("com.h2database:h2:2.1.214")
     implementation("com.mysql:mysql-connector-j:8.4.0")
     implementation("com.konghq:unirest-java:3.14.5")
