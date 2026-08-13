@@ -40,6 +40,7 @@ import com.ghostchu.quickshop.economy.impl.Economy_Vault;
 import com.ghostchu.quickshop.economy.impl.Economy_VaultUnlocked;
 import com.ghostchu.quickshop.listener.BlockListener;
 import com.ghostchu.quickshop.listener.BungeeListener;
+import com.ghostchu.quickshop.listener.CarryOnProtectionListener;
 import com.ghostchu.quickshop.listener.ChatListener;
 import com.ghostchu.quickshop.listener.ChunkListener;
 import com.ghostchu.quickshop.listener.CustomInventoryListener;
@@ -982,6 +983,7 @@ public class QuickShop implements QuickShopAPI, Reloadable {
     new ChunkListener(this).register();
     new CustomInventoryListener(this).register();
     new ShopProtectionListener(this).register();
+    new CarryOnProtectionListener(this).register();
     new PlayerLockClickListener(this).register();
     new MetricListener(this).register();
     new InternalListener(this).register();
