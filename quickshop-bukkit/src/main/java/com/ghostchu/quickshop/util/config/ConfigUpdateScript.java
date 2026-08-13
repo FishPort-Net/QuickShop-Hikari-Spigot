@@ -23,6 +23,14 @@ public class ConfigUpdateScript {
     this.plugin = plugin;
   }
 
+  @UpdateScript(version = 1036)
+  public void virtualOwnerDisplayNames() {
+
+    if(!getConfig().isSet("shop.virtual-owner-display-names")) {
+      getConfig().set("shop.virtual-owner-display-names", Collections.emptyMap());
+    }
+  }
+
   @UpdateScript(version = 1035)
   public void configWorldWhitelists() {
 

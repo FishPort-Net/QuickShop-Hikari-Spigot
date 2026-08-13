@@ -1,7 +1,7 @@
 # QuickShop-Hikari Plugin Configuration
 
 #Do not touch this if you don't know what you're doing!
-config-version: 1035
+config-version: 1036
 
 #Set the default language code the plugin should use
 #Set it to default will use your system language.
@@ -270,6 +270,12 @@ shop:
 
   #Should we pay/take money to/from unlimited shops owners?
   pay-unlimited-shop-owners: false
+
+  #Optional display-name mappings for virtual shop owners.
+  #Use the virtual account name without brackets as the key. Values support MiniMessage formatting.
+  #This only changes how the owner name is displayed; economy transactions still use the original account name.
+  #Example: bank-issue: '<gold>Issue Bank'
+  virtual-owner-display-names: { }
 
   #Should we place display items on the chests?
   #This may cause duped items, especially for modded servers if you're using Real DisplayItem!

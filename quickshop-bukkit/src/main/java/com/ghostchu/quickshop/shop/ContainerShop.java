@@ -1372,6 +1372,15 @@ public class ContainerShop implements Shop, Reloadable {
         name = plugin.text().of("unknown-owner").forLocale(locale.getLocale());
       } else {
         name = Component.text(playerName);
+        if(!getOwner().isRealPlayer()) {
+          final ConfigurationSection mappings = plugin.getConfig().getConfigurationSection("shop.virtual-owner-display-names");
+          if(mappings != null) {
+            final Object mappedName = mappings.getValues(false).get(playerName);
+            if(mappedName instanceof final String mappedNameString && !mappedNameString.isBlank()) {
+              name = plugin.getPlatform().miniMessage().deserialize(mappedNameString);
+            }
+          }
+        }
       }
     }
     if(getOwner().isRealPlayer()) {

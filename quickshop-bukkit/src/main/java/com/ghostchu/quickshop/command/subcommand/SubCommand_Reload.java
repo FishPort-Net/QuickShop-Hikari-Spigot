@@ -3,6 +3,7 @@ package com.ghostchu.quickshop.command.subcommand;
 import com.ghostchu.quickshop.QuickShop;
 import com.ghostchu.quickshop.api.command.CommandHandler;
 import com.ghostchu.quickshop.api.command.CommandParser;
+import com.ghostchu.quickshop.api.shop.Shop;
 import com.ghostchu.simplereloadlib.ReloadResult;
 import com.ghostchu.simplereloadlib.ReloadableContainer;
 import org.bukkit.ChatColor;
@@ -26,6 +27,9 @@ public class SubCommand_Reload implements CommandHandler<CommandSender> {
     plugin.text().of(sender, "command.reloading").send();
     plugin.getJavaPlugin().reloadConfig();
     final Map<ReloadableContainer, ReloadResult> container = plugin.getReloadManager().reload();
+    plugin.getShopManager().getLoadedShops().stream()
+            .filter(shop->!shop.getOwner().isRealPlayer())
+            .forEach(Shop::setSignText);
     sender.sendMessage(ChatColor.GOLD + "Reloaded " + container.size() + " modules.");
   }
 }
