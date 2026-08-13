@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.logging.Level;
 
 public class QuickShopBukkit extends JavaPlugin {
@@ -39,7 +40,7 @@ public class QuickShopBukkit extends JavaPlugin {
     try {
       bootstrapLogger.info("QuickShop-" + getFork() + " - Bootstrap -> Execute the initialization sequence");
       bootstrapLogger.info("Bootloader preparing for startup, please wait...");
-      bootstrapLogger.info("Initializing bundled libraries...");
+      bootstrapLogger.info("Initializing private runtime libraries...");
       loadLibraries();
       bootstrapLogger.info("Initializing platform...");
       loadPlatform();
@@ -94,8 +95,9 @@ public class QuickShopBukkit extends JavaPlugin {
     return "Hikari";
   }
 
-  private void loadLibraries() {
+  private void loadLibraries() throws IOException, ClassNotFoundException {
 
+    new RuntimeLibraryLoader(this).load();
     new UnirestLibLoader(this);
   }
 

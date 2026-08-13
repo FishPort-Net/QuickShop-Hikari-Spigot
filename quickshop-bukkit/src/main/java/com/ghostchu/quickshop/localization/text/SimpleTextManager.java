@@ -33,7 +33,6 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.lang3.LocaleUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -71,6 +70,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.zip.ZipFile;
 
 public class SimpleTextManager implements TextManager, Reloadable, SubPasteItem {
 
@@ -287,10 +287,10 @@ public class SimpleTextManager implements TextManager, Reloadable, SubPasteItem 
       plugin.logger().warn("Failed to load bundled translation", e);
       return new HashMap<>();
     }
-    try(final ZipFile zipFile = new ZipFile(jarFile, "UTF-8")) {
+    try(final ZipFile zipFile = new ZipFile(jarFile, StandardCharsets.UTF_8)) {
       // jar/lang/<region_code>/
       final Map<String, FileConfiguration> availableLang = new HashMap<>();
-      zipFile.getEntries().asIterator().forEachRemaining(entry->{
+      zipFile.entries().asIterator().forEachRemaining(entry->{
         if(entry.isDirectory()) {
           return;
         }
@@ -302,14 +302,12 @@ public class SimpleTextManager implements TextManager, Reloadable, SubPasteItem 
         }
         final String[] split = entry.getName().split("/");
         final String locale = split[split.length - 2];
-        if(zipFile.canReadEntryData(entry)) {
-          try {
-            final YamlConfiguration configuration = new YamlConfiguration();
-            configuration.loadFromString(new String(zipFile.getInputStream(entry).readAllBytes(), StandardCharsets.UTF_8));
-            availableLang.put(locale.toLowerCase(Locale.ROOT).replace("-", "_"), configuration);
-          } catch(final IOException | InvalidConfigurationException e) {
-            plugin.logger().warn("Failed to load bundled translation.", e);
-          }
+        try {
+          final YamlConfiguration configuration = new YamlConfiguration();
+          configuration.loadFromString(new String(zipFile.getInputStream(entry).readAllBytes(), StandardCharsets.UTF_8));
+          availableLang.put(locale.toLowerCase(Locale.ROOT).replace("-", "_"), configuration);
+        } catch(final IOException | InvalidConfigurationException e) {
+          plugin.logger().warn("Failed to load bundled translation.", e);
         }
       });
       return availableLang;

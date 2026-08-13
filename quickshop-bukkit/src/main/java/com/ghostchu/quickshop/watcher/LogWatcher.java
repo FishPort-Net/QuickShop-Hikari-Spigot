@@ -3,8 +3,6 @@ package com.ghostchu.quickshop.watcher;
 import com.ghostchu.quickshop.QuickShop;
 import com.ghostchu.quickshop.util.logger.Log;
 import com.tcoded.folialib.wrapper.task.WrappedTask;
-import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
-import org.apache.commons.compress.compressors.gzip.GzipParameters;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedOutputStream;
@@ -23,6 +21,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.zip.GZIPOutputStream;
 
 public class LogWatcher implements AutoCloseable, Runnable {
 
@@ -55,9 +54,7 @@ public class LogWatcher implements AutoCloseable, Runnable {
             i++;
           } while(Files.exists(targetPath));
           Files.createFile(targetPath);
-          final GzipParameters gzipParameters = new GzipParameters();
-          gzipParameters.setFilename(log.getName());
-          try(final GzipCompressorOutputStream archiveOutputStream = new GzipCompressorOutputStream(new BufferedOutputStream(new FileOutputStream(targetPath.toFile())), gzipParameters)) {
+          try(final GZIPOutputStream archiveOutputStream = new GZIPOutputStream(new BufferedOutputStream(new FileOutputStream(targetPath.toFile())))) {
             Files.copy(log.toPath(), archiveOutputStream);
             archiveOutputStream.finish();
             if(log.delete()) {

@@ -23,6 +23,7 @@ tasks.withType<ShadowJar>().configureEach {
 
     // Every private runtime library is bundled and moved out of the server/plugin namespace.
     relocate("net.tnemc", "com.ghostchu.quickshop.shade.tne")
+    relocate("com.alessiodp.libby", "com.ghostchu.quickshop.shade.com.alessiodp.libby")
     relocate("cc.carm.lib", "com.ghostchu.quickshop.shade.cc.carm.lib")
     relocate("com.zaxxer.hikari", "com.ghostchu.quickshop.shade.com.zaxxer.hikari")
     relocate("com.tcoded", "com.ghostchu.quickshop.shade.com.tcoded")
@@ -66,7 +67,8 @@ tasks.withType<ShadowJar>().configureEach {
 
     exclude(
         "META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA", "META-INF/*.kotlin_module",
-        "META-INF/*.txt", "META-INF/proguard/**", "META-INF/versions/9/**",
+        "META-INF/*.txt", "META-INF/INDEX.LIST", "META-INF/proguard/**",
+        "module-info.class", "META-INF/versions/**/module-info.class", "META-INF/versions/9/**",
         "com/google/errorprone/**", "org/jetbrains/**", "org/intellij/**",
         "javax/xml/namespace/**", "javax/xml/stream/**", "org/w3c/dom/UserDataHandler.class",
         "*License*", "*LICENSE*"
