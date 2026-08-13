@@ -1,4 +1,4 @@
-import com.ghostchu.quickshop.buildlogic.StripEmbeddedJetbrainsAnnotations
+import com.ghostchu.quickshop.buildlogic.SanitizeDependencyJar
 import org.gradle.api.attributes.Attribute
 
 plugins {
@@ -8,14 +8,16 @@ plugins {
 val artifactType = Attribute.of("artifactType", String::class.java)
 
 dependencies {
-    registerTransform(StripEmbeddedJetbrainsAnnotations::class) {
+    registerTransform(SanitizeDependencyJar::class) {
         from.attribute(artifactType, "jar")
-        to.attribute(artifactType, "jar-annotations-stripped")
+        to.attribute(artifactType, "quickshop-sanitized-jar")
     }
 }
 
-configurations.named("compileClasspath") {
-    attributes.attribute(artifactType, "jar-annotations-stripped")
+listOf("compileClasspath", "runtimeClasspath").forEach { configurationName ->
+    configurations.named(configurationName) {
+        attributes.attribute(artifactType, "quickshop-sanitized-jar")
+    }
 }
 
 java {

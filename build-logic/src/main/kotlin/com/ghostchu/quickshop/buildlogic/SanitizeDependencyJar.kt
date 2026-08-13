@@ -10,23 +10,31 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
-abstract class StripEmbeddedJetbrainsAnnotations : TransformAction<TransformParameters.None> {
+abstract class SanitizeDependencyJar : TransformAction<TransformParameters.None> {
 
     @get:InputArtifact
     abstract val inputArtifact: Provider<FileSystemLocation>
 
     override fun transform(outputs: TransformOutputs) {
         val input = inputArtifact.get().asFile
-        if (!input.name.startsWith("boosted-yaml")) {
-            outputs.file(input)
-            return
+        val excludedPrefixes = when {
+            input.name.startsWith("boosted-yaml") -> listOf("org/jetbrains/annotations/")
+            input.name.startsWith("easysql-hikaricp") -> listOf(
+                "org/slf4j/",
+                "META-INF/maven/org.slf4j/",
+            )
+            else -> {
+                outputs.file(input)
+                return
+            }
         }
+
         val output = outputs.file(input.name)
         ZipInputStream(input.inputStream().buffered()).use { zin ->
             ZipOutputStream(output.outputStream().buffered()).use { zout ->
                 var entry: ZipEntry? = zin.nextEntry
                 while (entry != null) {
-                    if (!entry.name.startsWith("org/jetbrains/annotations/")) {
+                    if (excludedPrefixes.none(entry.name::startsWith)) {
                         zout.putNextEntry(ZipEntry(entry.name))
                         zin.copyTo(zout)
                         zout.closeEntry()
