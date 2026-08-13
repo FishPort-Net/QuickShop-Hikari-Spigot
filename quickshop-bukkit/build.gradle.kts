@@ -1,6 +1,9 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.ghostchu.quickshop.buildlogic.GitInfoValueSource
+import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.attributes.java.TargetJvmVersion
+import org.gradle.api.tasks.Sync
+import org.gradle.api.tasks.bundling.Jar
 
 plugins {
     id("quickshop.core-conventions")
@@ -87,6 +90,34 @@ sourceSets {
     }
 }
 
+// Shadow currently receives project dependencies as JAR-backed zip trees. On
+// Java 21, Gradle can expose an empty temporary file for an entry in those
+// trees, causing Shadow's relocator to feed zero bytes to ASM. Expand only the
+// non-remapped project JARs first so relocation reads stable directory files.
+// The version-specific Spigot JARs intentionally remain on runtimeClasspath:
+// their published artifacts are the SpecialSource-remapped outputs.
+val projectsStagedForShadow = buildList {
+    add(project(":quickshop-common"))
+    add(project(":quickshop-api"))
+    add(project(":platform:quickshop-platform-interface"))
+    add(project(":platform:quickshop-platform-spigot-abstract"))
+    if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_21)) {
+        add(project(":platform:quickshop-platform-paper"))
+    }
+}
+
+val stageProjectOutputsForShadow = tasks.register<Sync>("stageProjectOutputsForShadow") {
+    into(layout.buildDirectory.dir("shadow/project-outputs"))
+    includeEmptyDirs = false
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    exclude("META-INF/MANIFEST.MF")
+
+    projectsStagedForShadow.forEach { dependencyProject ->
+        val jarTask = dependencyProject.tasks.named<Jar>("jar")
+        from(jarTask.map { zipTree(it.archiveFile.get().asFile) })
+    }
+}
+
 tasks.named<ProcessResources>("processResources") {
     val pluginVersion = project.version.toString()
     filesMatching("plugin.yml") {
@@ -104,4 +135,10 @@ tasks.named<ProcessResources>("processResources") {
 
 tasks.withType<ShadowJar>().configureEach {
     archiveBaseName.set("QuickShop-Hikari")
+    dependencies {
+        projectsStagedForShadow.forEach { dependencyProject ->
+            exclude(project(dependencyProject.path))
+        }
+    }
+    from(stageProjectOutputsForShadow)
 }
