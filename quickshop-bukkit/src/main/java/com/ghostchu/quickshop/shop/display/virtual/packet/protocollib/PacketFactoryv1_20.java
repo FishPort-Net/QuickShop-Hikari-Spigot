@@ -195,6 +195,15 @@ public class PacketFactoryv1_20 implements PacketFactory<PacketContainer> {
     return true;
   }
 
+  @Override
+  public boolean sendPacketBundle(@NotNull final Player player, @NotNull final List<PacketContainer> packets) {
+
+    final PacketContainer bundle = ProtocolLibHandler.instance().internal().createPacket(PacketType.Play.Server.BUNDLE);
+    bundle.getPacketBundles().write(0, packets);
+    ProtocolLibHandler.instance().internal().sendServerPacket(player, bundle);
+    return true;
+  }
+
   /**
    * Registers the method to listen to the packet sending chunk data.
    */
@@ -221,7 +230,7 @@ public class PacketFactoryv1_20 implements PacketFactory<PacketContainer> {
 
         final List<VirtualDisplayItem<?>> items = new ArrayList<>();
         VirtualDisplayItemManager.instance().getChunksMapping().computeIfPresent(new SimpleShopChunk(player.getWorld().getName(), x, z), (chunkLoc, targetList)->{
-          for(final VirtualDisplayItem<?> target : targetList) {
+          for(final VirtualDisplayItem<?> target : targetList.values()) {
             if(!target.isSpawned()) {
               continue;
             }
@@ -233,7 +242,6 @@ public class PacketFactoryv1_20 implements PacketFactory<PacketContainer> {
           return targetList;
         });
         for(final VirtualDisplayItem<?> target : items) {
-          target.sendDestroyPacket(player);
           target.sendFakeItem(player);
         }
       }
@@ -278,7 +286,7 @@ public class PacketFactoryv1_20 implements PacketFactory<PacketContainer> {
 
         final List<VirtualDisplayItem<?>> items = new ArrayList<>();
         VirtualDisplayItemManager.instance().getChunksMapping().computeIfPresent(new SimpleShopChunk(player.getWorld().getName(), x, z), (chunkLoc, targetList)->{
-          for(final VirtualDisplayItem<?> target : targetList) {
+          for(final VirtualDisplayItem<?> target : targetList.values()) {
 
             if(!target.isSpawned()) {
 

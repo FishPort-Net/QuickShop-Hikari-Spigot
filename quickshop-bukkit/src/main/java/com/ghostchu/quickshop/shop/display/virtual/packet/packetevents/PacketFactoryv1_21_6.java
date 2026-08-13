@@ -34,6 +34,7 @@ import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBundle;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
@@ -154,6 +155,23 @@ public class PacketFactoryv1_21_6 implements PacketFactory<PacketWrapper<?>> {
     return true;
   }
 
+  @Override
+  public boolean sendPacketBundle(@NotNull final Player player, @NotNull final List<PacketWrapper<?>> packets) {
+
+    PacketEvents.getAPI().getPlayerManager().sendPacket(player, new WrapperPlayServerBundle());
+    try {
+
+      for(final PacketWrapper<?> packet : packets) {
+
+        PacketEvents.getAPI().getPlayerManager().sendPacket(player, packet);
+      }
+    } finally {
+
+      PacketEvents.getAPI().getPlayerManager().sendPacket(player, new WrapperPlayServerBundle());
+    }
+    return true;
+  }
+
   /**
    * Registers the method to listen to the packet sending chunk data.
    */
@@ -189,7 +207,7 @@ public class PacketFactoryv1_21_6 implements PacketFactory<PacketWrapper<?>> {
         final List<VirtualDisplayItem<?>> items = new ArrayList<>();
         VirtualDisplayItemManager.instance().getChunksMapping().computeIfPresent(new SimpleShopChunk(player.getWorld().getName(), x, z), (chunkLoc, targetList)->{
 
-          for(final VirtualDisplayItem<?> target : targetList) {
+          for(final VirtualDisplayItem<?> target : targetList.values()) {
             if(!target.isSpawned()) {
 
               continue;
@@ -203,13 +221,12 @@ public class PacketFactoryv1_21_6 implements PacketFactory<PacketWrapper<?>> {
           return targetList;
         });
         for(final VirtualDisplayItem<?> target : items) {
-          target.sendDestroyPacket(player);
           target.sendFakeItem(player);
         }
       }
     };
 
-    PacketEventsHandler.instance().internal().getEventManager().registerListener(sendChunk, PacketListenerPriority.NORMAL);
+    this.chunkSendingPacketAdapter = PacketEventsHandler.instance().internal().getEventManager().registerListener(sendChunk, PacketListenerPriority.NORMAL);
   }
 
   /**
@@ -230,7 +247,7 @@ public class PacketFactoryv1_21_6 implements PacketFactory<PacketWrapper<?>> {
   @Override
   public void registerUnloadChunk() {
 
-    final PacketListener chunkUnlock = new PacketListener() {
+    final PacketListener chunkUnload = new PacketListener() {
 
       @Override
       public void onPacketSend(final PacketSendEvent event) {
@@ -256,7 +273,7 @@ public class PacketFactoryv1_21_6 implements PacketFactory<PacketWrapper<?>> {
 
         final List<VirtualDisplayItem<?>> items = new ArrayList<>();
         VirtualDisplayItemManager.instance().getChunksMapping().computeIfPresent(new SimpleShopChunk(player.getWorld().getName(), x, z), (chunkLoc, targetList)->{
-          for(final VirtualDisplayItem<?> target : targetList) {
+          for(final VirtualDisplayItem<?> target : targetList.values()) {
 
             if(!target.isSpawned()) {
 
@@ -273,7 +290,7 @@ public class PacketFactoryv1_21_6 implements PacketFactory<PacketWrapper<?>> {
       }
     };
 
-    PacketEventsHandler.instance().internal().getEventManager().registerListener(chunkUnlock, PacketListenerPriority.NORMAL);
+    this.chunkUnloadingPacketAdapter = PacketEventsHandler.instance().internal().getEventManager().registerListener(chunkUnload, PacketListenerPriority.NORMAL);
   }
 
   /**
