@@ -130,14 +130,19 @@ public class QuickShopBukkit extends JavaPlugin {
             case "v1_20_R1" -> createSpigotPlatform("com.ghostchu.quickshop.platform.spigot.v1_20_1.Spigot1201Platform");
             case "v1_20_R2" -> createSpigotPlatform("com.ghostchu.quickshop.platform.spigot.v1_20_2.Spigot1202Platform");
             case "v1_20_R3" -> createSpigotPlatform("com.ghostchu.quickshop.platform.spigot.v1_20_3.Spigot1203Platform");
+            case "v1_20_R4" -> createSpigotPlatform("com.ghostchu.quickshop.platform.spigot.v1_20_4.Spigot1205Platform");
+            case "v1_21_R1" -> createSpigotPlatform("com.ghostchu.quickshop.platform.spigot.v1_21_1.Spigot1210Platform");
+            case "v1_21_R2" -> createSpigotPlatform("com.ghostchu.quickshop.platform.spigot.v1_21_3.Spigot1231Platform");
+            case "v1_21_R3" -> createSpigotPlatform("com.ghostchu.quickshop.platform.spigot.v1_21_4.Spigot1214Platform");
+            case "v1_21_R4" -> createSpigotPlatform("com.ghostchu.quickshop.platform.spigot.v1_21_5.Spigot1215Platform");
             default -> {
-              bootstrapLogger.warning("This Java 17 Spigot build does not support server revision " + internalNMSVersion + ".");
+              bootstrapLogger.warning("This Spigot build does not support server revision " + internalNMSVersion + ".");
               Bukkit.getPluginManager().disablePlugin(this);
               throw new IllegalStateException("Unsupported Spigot server revision: " + internalNMSVersion);
             }
           };
         }
-        case 2 -> throw new UnsupportedOperationException("This Java 17 release targets Ketting/Spigot 1.20.x; the Paper platform is not bundled.");
+        case 2 -> throw new UnsupportedOperationException("This release targets Spigot; the Paper platform is not bundled.");
         default -> throw new UnsupportedOperationException("Unsupported server platform");
       }
       try {

@@ -9,7 +9,9 @@ allprojects {
         configurations.all {
             resolutionStrategy {
                 force("org.jetbrains:annotations:26.0.2-1")
-                force("org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT")
+                if (!JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_21)) {
+                    force("org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT")
+                }
             }
         }
     }

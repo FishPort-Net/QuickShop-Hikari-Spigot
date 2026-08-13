@@ -2,6 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.ghostchu.quickshop.buildlogic.GitInfoValueSource
 import com.ghostchu.quickshop.buildlogic.StageSanitizedDependencyJar
 import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.attributes.java.TargetJvmVersion
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.bundling.Jar
 
@@ -14,6 +15,14 @@ val easySqlHikariForShadow = configurations.create("easySqlHikariForShadow") {
     isCanBeConsumed = false
     isCanBeResolved = true
     isTransitive = false
+}
+
+if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_21)) {
+    // Common/plugin code remains Java 17. A Java 21 release build additionally
+    // resolves the modern Spigot adapters that are loaded only by class name.
+    configurations.named("runtimeClasspath") {
+        attributes.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
+    }
 }
 
 dependencies {
@@ -77,6 +86,15 @@ dependencies {
     runtimeOnly(project(":platform:quickshop-platform-spigot-v1_20_R1"))
     runtimeOnly(project(":platform:quickshop-platform-spigot-v1_20_R2"))
     runtimeOnly(project(":platform:quickshop-platform-spigot-v1_20_R3"))
+
+    if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_21)) {
+        runtimeOnly(project(":platform:quickshop-platform-spigot-v1_20_R4"))
+        runtimeOnly(project(":platform:quickshop-platform-spigot-v1_21_R1"))
+        runtimeOnly(project(":platform:quickshop-platform-spigot-v1_21_R2"))
+        runtimeOnly(project(":platform:quickshop-platform-spigot-v1_21_R3"))
+        runtimeOnly(project(":platform:quickshop-platform-spigot-v1_21_R4"))
+        runtimeOnly(project(":platform:quickshop-platform-spigot-v1_21_R5"))
+    }
 }
 
 sourceSets {
