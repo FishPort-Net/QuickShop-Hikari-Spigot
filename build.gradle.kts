@@ -3,7 +3,7 @@ plugins {
 }
 
 allprojects {
-    version = "6.2.0.10-spigot.9"
+    version = "6.2.0.10-spigot.10"
 
     plugins.withId("java") {
         configurations.all {
