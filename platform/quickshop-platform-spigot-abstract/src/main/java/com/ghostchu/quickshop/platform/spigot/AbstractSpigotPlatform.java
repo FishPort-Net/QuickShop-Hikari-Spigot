@@ -4,6 +4,7 @@ import com.ghostchu.quickshop.common.util.QuickSLF4JLogger;
 import com.ghostchu.quickshop.platform.Platform;
 import com.ghostchu.quickshop.platform.Util;
 import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
 import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import de.tr7zw.nbtapi.iface.ReadWriteNBTList;
 import net.kyori.adventure.key.Key;
@@ -184,13 +185,17 @@ public abstract class AbstractSpigotPlatform implements Platform {
 
     final NamespacedKey namespacedKey = stack.getType().getKey();
     final Key key = Key.key(namespacedKey.toString());
-    final ReadWriteNBT nbt = NBT.itemStackToNBT(stack);
+    // A show_item hover event already carries the item id and count separately, so its
+    // BinaryTagHolder must contain only the ItemStack's root tag. itemStackToNBT returns
+    // the complete storage form (id, Count, tag), which would incorrectly nest custom
+    // item data such as BrewLevel under a second "tag" compound on the client.
+    final String nbt = NBT.get(stack, ReadableNBT::toString);
     final BinaryTagHolder holder;
     if(Util.methodExists(BinaryTagHolder.class, "binaryTagHolder")) {
-      holder = BinaryTagHolder.binaryTagHolder(nbt.toString());
+      holder = BinaryTagHolder.binaryTagHolder(nbt);
     } else {
       //noinspection UnstableApiUsage
-      holder = BinaryTagHolder.of(nbt.toString());
+      holder = BinaryTagHolder.of(nbt);
     }
     final HoverEvent he = HoverEvent.showItem(key, stack.getAmount(), holder);
     return oldComponent.hoverEvent(he);
