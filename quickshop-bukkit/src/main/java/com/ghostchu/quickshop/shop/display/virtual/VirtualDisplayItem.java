@@ -31,8 +31,10 @@ import com.ghostchu.quickshop.shop.SimpleShopChunk;
 import com.ghostchu.quickshop.shop.display.AbstractDisplayItem;
 import com.ghostchu.quickshop.util.Util;
 import com.ghostchu.quickshop.util.logger.Log;
+import com.ghostchu.simplereloadlib.ReloadResult;
 import com.ghostchu.simplereloadlib.Reloadable;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -54,8 +56,8 @@ public class VirtualDisplayItem<T> extends AbstractDisplayItem implements Reload
 
   private final VirtualDisplayItemManager manager;
 
-  private final T spawnPacket;
-  private final T metaPacket;
+  private volatile T spawnPacket;
+  private volatile T metaPacket;
   private final T velocityPacket;
   private final T destroyPacket;
 
@@ -77,8 +79,7 @@ public class VirtualDisplayItem<T> extends AbstractDisplayItem implements Reload
 
     if(getDisplayLocation() != null) {
 
-      this.spawnPacket = packetFactory.createSpawnPacket(entityID, getDisplayLocation());
-      this.metaPacket = packetFactory.createMetaDataPacket(entityID, getOriginalItemStack().clone());
+      refreshDisplayPackets();
       this.velocityPacket = packetFactory.createVelocityPacket(entityID);
       this.destroyPacket = packetFactory.createDestroyPacket(entityID);
 
@@ -169,6 +170,21 @@ public class VirtualDisplayItem<T> extends AbstractDisplayItem implements Reload
   public boolean removeDupe() {
 
     return false;
+  }
+
+  @Override
+  public ReloadResult reloadModule() {
+
+    final ReloadResult result = super.reloadModule();
+    if(getDisplayLocation() != null) {
+
+      refreshDisplayPackets();
+      if(isSpawned) {
+
+        sendFakeItemToAll();
+      }
+    }
+    return result;
   }
 
   @Override
@@ -353,6 +369,19 @@ public class VirtualDisplayItem<T> extends AbstractDisplayItem implements Reload
 
     packetSenders.clear();
     manager.remove(chunkLocation, entityID, this);
+  }
+
+  private void refreshDisplayPackets() {
+
+    final Location displayLocation = getDisplayLocation();
+    if(displayLocation == null) {
+
+      this.spawnPacket = null;
+      this.metaPacket = null;
+      return;
+    }
+    this.spawnPacket = packetFactory.createSpawnPacket(entityID, displayLocation);
+    this.metaPacket = packetFactory.createMetaDataPacket(entityID, getOriginalItemStack().clone());
   }
 
   @NotNull
