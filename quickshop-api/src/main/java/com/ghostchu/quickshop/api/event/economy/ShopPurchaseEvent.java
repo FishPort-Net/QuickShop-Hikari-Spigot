@@ -9,22 +9,15 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.math.BigDecimal;
+import java.util.UUID;
+
 /**
  * Calling when purchaser purchased a shop
  */
 public class ShopPurchaseEvent extends AbstractQSEvent implements QSCancellable {
 
-  @NotNull
-  private final Shop shop;
-
-  @NotNull
-  private final QUser purchaser;
-
-  @NotNull
-  private final InventoryWrapper purchaserInventory;
-
-  private final int amount;
-  private double total;
+  private final ShopTransactionContext context;
 
   private boolean cancelled;
   private @Nullable Component cancelReason;
@@ -42,11 +35,24 @@ public class ShopPurchaseEvent extends AbstractQSEvent implements QSCancellable 
    */
   public ShopPurchaseEvent(@NotNull final Shop shop, @NotNull final QUser purchaser, @NotNull final InventoryWrapper purchaserInventory, final int amount, final double total) {
 
-    this.shop = shop;
-    this.purchaser = purchaser;
-    this.purchaserInventory = purchaserInventory;
-    this.amount = amount * shop.getItem().getAmount();
-    this.total = total;
+    this(new ShopTransactionContext(
+            shop,
+            purchaser,
+            purchaserInventory,
+            ShopTransactionDirection.fromShopType(shop.getShopType()),
+            amount,
+            BigDecimal.valueOf(shop.getPrice()),
+            BigDecimal.valueOf(total)));
+  }
+
+  /**
+   * Builds a pre-transaction event around a shared lifecycle context.
+   *
+   * @param context the context that will also be used by the success or failure event
+   */
+  public ShopPurchaseEvent(@NotNull final ShopTransactionContext context) {
+
+    this.context = context;
   }
 
   /**
@@ -56,7 +62,18 @@ public class ShopPurchaseEvent extends AbstractQSEvent implements QSCancellable 
    */
   public int getAmount() {
 
-    return this.amount;
+    return context.getItemAmount();
+  }
+
+  /**
+   * Gets the number of configured shop units requested in this transaction. A shop unit may contain
+   * more than one individual item.
+   *
+   * @return the requested shop unit count
+   */
+  public int getTradeCount() {
+
+    return context.getTradeCount();
   }
 
   @Override
@@ -79,7 +96,7 @@ public class ShopPurchaseEvent extends AbstractQSEvent implements QSCancellable 
    */
   public @NotNull QUser getPurchaser() {
 
-    return this.purchaser;
+    return context.getTrader();
   }
 
   /**
@@ -89,7 +106,7 @@ public class ShopPurchaseEvent extends AbstractQSEvent implements QSCancellable 
    */
   public @NotNull InventoryWrapper getPurchaserInventory() {
 
-    return this.purchaserInventory;
+    return context.getTraderInventory();
   }
 
   /**
@@ -99,7 +116,7 @@ public class ShopPurchaseEvent extends AbstractQSEvent implements QSCancellable 
    */
   public @NotNull Shop getShop() {
 
-    return this.shop;
+    return context.getShop();
   }
 
   /**
@@ -109,7 +126,17 @@ public class ShopPurchaseEvent extends AbstractQSEvent implements QSCancellable 
    */
   public double getTotal() {
 
-    return this.total;
+    return context.getTotalPrice().doubleValue();
+  }
+
+  /**
+   * Gets the effective total price before tax without converting it to a double.
+   *
+   * @return the effective total price
+   */
+  public @NotNull BigDecimal getTotalPrice() {
+
+    return context.getTotalPrice();
   }
 
   /**
@@ -119,7 +146,37 @@ public class ShopPurchaseEvent extends AbstractQSEvent implements QSCancellable 
    */
   public void setTotal(final double total) {
 
-    this.total = total;
+    setTotalPrice(BigDecimal.valueOf(total));
+  }
+
+  /**
+   * Sets the effective total price before tax.
+   *
+   * @param total the new effective total price
+   */
+  public void setTotalPrice(@NotNull final BigDecimal total) {
+
+    context.setTotalPrice(total);
+  }
+
+  /**
+   * Gets the shared lifecycle context.
+   *
+   * @return the transaction context
+   */
+  public @NotNull ShopTransactionContext getContext() {
+
+    return context;
+  }
+
+  /**
+   * Gets the id shared by all lifecycle events for this transaction attempt.
+   *
+   * @return the transaction id
+   */
+  public @NotNull UUID getTransactionId() {
+
+    return context.getTransactionId();
   }
 
   @Override

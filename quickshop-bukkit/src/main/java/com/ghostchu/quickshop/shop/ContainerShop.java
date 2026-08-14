@@ -359,7 +359,7 @@ public class ContainerShop implements Shop, Reloadable {
       if(chestInv == null) {
         plugin.logger().warn("Failed to process buy, reason: {} x{} to shop {}: Inventory null.", item, amount, this);
         Log.debug("Failed to process buy, reason: " + item + " x" + amount + " to shop " + this + ": Inventory null.");
-        return;
+        throw new IllegalStateException("Failed to process shop purchase: inventory is unavailable");
       }
       final SimpleInventoryTransaction transaction = SimpleInventoryTransaction
               .builder()
@@ -1607,7 +1607,7 @@ public class ContainerShop implements Shop, Reloadable {
       final InventoryWrapper chestInv = this.getInventory();
       if(chestInv == null) {
         plugin.logger().warn("Failed to process sell, reason: {} to shop {}: Inventory null.", item, amount);
-        return;
+        throw new IllegalStateException("Failed to process shop sale: inventory is unavailable");
       }
       final SimpleInventoryTransaction transactionTake = SimpleInventoryTransaction
               .builder()
