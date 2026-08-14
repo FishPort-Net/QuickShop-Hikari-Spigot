@@ -266,7 +266,7 @@ public class SimpleShopManager extends AbstractShopManager implements ShopManage
       }
       final SimpleEconomyTransaction transaction;
       final SimpleEconomyTransaction.SimpleEconomyTransactionBuilder builder = SimpleEconomyTransaction.builder().core(eco).amount(total).taxModifier(taxModifier).taxAccount(taxAccount).currency(shop.getCurrency()).world(shop.getLocation().getWorld()).to(buyerQUser);
-      if(shop.isUnlimited() && plugin.getConfig().getBoolean("tax-free-for-unlimited-shop", false)) {
+      if(ShopOwnerMoneyPolicy.isTaxFree(shop)) {
         builder.taxModifier(0.0d);
       }
       if(ShopOwnerMoneyPolicy.shouldTakeFromOwner(shop)) {
@@ -514,7 +514,7 @@ public class SimpleShopManager extends AbstractShopManager implements ShopManage
         }
       }
       final SimpleEconomyTransaction.SimpleEconomyTransactionBuilder builder = SimpleEconomyTransaction.builder().core(eco).from(sellerQUser).amount(total).taxModifier(taxModifier).taxAccount(taxAccount).benefit(shop.getShopBenefit()).world(shop.getLocation().getWorld()).currency(shop.getCurrency());
-      if(shop.isUnlimited() && plugin.getConfig().getBoolean("tax-free-for-unlimited-shop", false)) {
+      if(ShopOwnerMoneyPolicy.isTaxFree(shop)) {
         builder.taxModifier(0.0d);
       }
       if(ShopOwnerMoneyPolicy.shouldPayOwner(shop)) {
