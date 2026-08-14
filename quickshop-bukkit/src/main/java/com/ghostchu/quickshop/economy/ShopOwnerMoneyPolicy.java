@@ -36,6 +36,8 @@ import java.util.Map;
 public final class ShopOwnerMoneyPolicy {
 
   private static final String CONFIG_ROOT = "shop.unlimited-shop-owner-money";
+  private static final String VIRTUAL_ACCOUNTS_ROOT = "shop.virtual-accounts";
+  private static final String ACCOUNT_UNLIMITED_ROOT = "unlimited-shop-money";
   private static final String LEGACY_CONFIG = "shop.pay-unlimited-shop-owners";
 
   private ShopOwnerMoneyPolicy() {
@@ -128,11 +130,14 @@ public final class ShopOwnerMoneyPolicy {
 
     final ConfigurationSection account = virtualAccountSection(config, shop.getOwner());
     if(account != null) {
-      if(account.isSet("pay-owner")) {
-        payOwner = account.getBoolean("pay-owner");
-      }
-      if(account.isSet("take-from-owner")) {
-        takeFromOwner = account.getBoolean("take-from-owner");
+      final ConfigurationSection unlimitedShopMoney = account.getConfigurationSection(ACCOUNT_UNLIMITED_ROOT);
+      if(unlimitedShopMoney != null) {
+        if(unlimitedShopMoney.isSet("pay-owner")) {
+          payOwner = unlimitedShopMoney.getBoolean("pay-owner");
+        }
+        if(unlimitedShopMoney.isSet("take-from-owner")) {
+          takeFromOwner = unlimitedShopMoney.getBoolean("take-from-owner");
+        }
       }
       insufficientFundsMessage = account.getString("insufficient-funds-message");
       outOfFundsSign = account.getString("out-of-funds-sign");
@@ -147,7 +152,7 @@ public final class ShopOwnerMoneyPolicy {
     if(owner.isRealPlayer() || owner.getUsername() == null) {
       return null;
     }
-    final ConfigurationSection accounts = config.getConfigurationSection(CONFIG_ROOT + ".virtual-accounts");
+    final ConfigurationSection accounts = config.getConfigurationSection(VIRTUAL_ACCOUNTS_ROOT);
     if(accounts == null) {
       return null;
     }
