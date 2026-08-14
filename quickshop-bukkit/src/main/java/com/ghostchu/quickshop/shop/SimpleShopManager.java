@@ -9,6 +9,10 @@ import com.ghostchu.quickshop.api.event.display.ItemPreviewComponentPrePopulateE
 import com.ghostchu.quickshop.api.event.economy.ShopPurchaseEvent;
 import com.ghostchu.quickshop.api.event.economy.ShopSuccessPurchaseEvent;
 import com.ghostchu.quickshop.api.event.economy.ShopTaxEvent;
+import com.ghostchu.quickshop.api.event.economy.ShopTransactionContext;
+import com.ghostchu.quickshop.api.event.economy.ShopTransactionDirection;
+import com.ghostchu.quickshop.api.event.economy.ShopTransactionFailedEvent;
+import com.ghostchu.quickshop.api.event.economy.ShopTransactionFailureReason;
 import com.ghostchu.quickshop.api.event.general.ShopInfoPanelEvent;
 import com.ghostchu.quickshop.api.event.management.ShopCreateEvent;
 import com.ghostchu.quickshop.api.event.management.ShopDeleteEvent;
@@ -232,56 +236,82 @@ public class SimpleShopManager extends AbstractShopManager implements ShopManage
     // BUYING MODE  Shop Owner -> Player
     final double taxModifier = getTax(shop, buyerQUser);
     double total = CalculateUtil.multiply(amount, shop.getPrice());
-    final ShopPurchaseEvent e = new ShopPurchaseEvent(shop, buyerQUser, buyerInventory, amount, total);
-    if(Util.fireCancellableEvent(e)) {
-      plugin.text().of(buyer, "plugin-cancelled", e.getCancelReason()).send();
-      return false; // Cancelled
-    } else {
-      total = e.getTotal(); // Allow addon to set it
-    }
-    QUser taxAccount = null;
-    if(shop.getTaxAccount() != null) {
-      taxAccount = shop.getTaxAccount();
-    } else {
-      if(this.cacheTaxAccount != null) {
-        taxAccount = this.cacheTaxAccount;
-      }
-    }
-    final SimpleEconomyTransaction transaction;
-    final SimpleEconomyTransaction.SimpleEconomyTransactionBuilder builder = SimpleEconomyTransaction.builder().core(eco).amount(total).taxModifier(taxModifier).taxAccount(taxAccount).currency(shop.getCurrency()).world(shop.getLocation().getWorld()).to(buyerQUser);
-    if(shop.isUnlimited() && plugin.getConfig().getBoolean("tax-free-for-unlimited-shop", false)) {
-      builder.taxModifier(0.0d);
-    }
-    if(ShopOwnerMoneyPolicy.shouldTakeFromOwner(shop)) {
-      transaction = builder.from(shop.getOwner()).build();
-    } else {
-      transaction = builder.from(null).build();
-    }
-    if(!transaction.checkBalance()) {
-      final double ownerBalance = eco.getBalance(shop.getOwner(), shop.getLocation().getWorld(), shop.getCurrency());
-      ShopOwnerMoneyPolicy.sendInsufficientFundsMessage(buyer, shop, total, ownerBalance);
-      return false;
-    }
-    if(!transaction.failSafeCommit()) {
-      plugin.text().of(buyer, "economy-transaction-failed", transaction.getLastError()).send();
-      plugin.logger().error("EconomyTransaction Failed, last error: {}", transaction.getLastError());
-      plugin.logger().error("Tips: If you see any economy plugin name appears above, please don't ask QuickShop support. Contact with developer of economy plugin. QuickShop didn't process the transaction, we only receive the transaction result from your economy plugin.");
-      return false;
-    }
-
+    final ShopTransactionContext transactionContext = new ShopTransactionContext(
+            shop,
+            buyerQUser,
+            buyerInventory,
+            ShopTransactionDirection.PLAYER_SELL,
+            amount,
+            BigDecimal.valueOf(shop.getPrice()),
+            BigDecimal.valueOf(total));
+    boolean terminalEventEmitted = false;
     try {
-      shop.buy(buyerQUser, buyerInventory, buyer.getLocation(), amount);
-    } catch(final Exception shopError) {
-      plugin.logger().warn("Failed to processing purchase, rolling back...", shopError);
-      transaction.rollback(true);
-      plugin.text().of(buyer, "shop-transaction-failed", shopError.getMessage()).send();
-      return false;
+      final ShopPurchaseEvent e = new ShopPurchaseEvent(transactionContext);
+      if(Util.fireCancellableEvent(e)) {
+        terminalEventEmitted = true;
+        fireShopTransactionFailed(transactionContext, ShopTransactionFailureReason.CANCELLED, null, null);
+        plugin.text().of(buyer, "plugin-cancelled", e.getCancelReason()).send();
+        return false; // Cancelled
+      } else {
+        total = e.getTotal(); // Allow addon to set it
+      }
+
+      QUser taxAccount = null;
+      if(shop.getTaxAccount() != null) {
+        taxAccount = shop.getTaxAccount();
+      } else {
+        if(this.cacheTaxAccount != null) {
+          taxAccount = this.cacheTaxAccount;
+        }
+      }
+      final SimpleEconomyTransaction transaction;
+      final SimpleEconomyTransaction.SimpleEconomyTransactionBuilder builder = SimpleEconomyTransaction.builder().core(eco).amount(total).taxModifier(taxModifier).taxAccount(taxAccount).currency(shop.getCurrency()).world(shop.getLocation().getWorld()).to(buyerQUser);
+      if(shop.isUnlimited() && plugin.getConfig().getBoolean("tax-free-for-unlimited-shop", false)) {
+        builder.taxModifier(0.0d);
+      }
+      if(ShopOwnerMoneyPolicy.shouldTakeFromOwner(shop)) {
+        transaction = builder.from(shop.getOwner()).build();
+      } else {
+        transaction = builder.from(null).build();
+      }
+      if(!transaction.checkBalance()) {
+        terminalEventEmitted = true;
+        fireShopTransactionFailed(transactionContext, ShopTransactionFailureReason.INSUFFICIENT_FUNDS, transaction.getLastError(), null);
+        final double ownerBalance = eco.getBalance(shop.getOwner(), shop.getLocation().getWorld(), shop.getCurrency());
+        ShopOwnerMoneyPolicy.sendInsufficientFundsMessage(buyer, shop, total, ownerBalance);
+        return false;
+      }
+      if(!transaction.failSafeCommit()) {
+        terminalEventEmitted = true;
+        fireShopTransactionFailed(transactionContext, ShopTransactionFailureReason.ECONOMY_TRANSACTION_FAILED, transaction.getLastError(), null);
+        plugin.text().of(buyer, "economy-transaction-failed", transaction.getLastError()).send();
+        plugin.logger().error("EconomyTransaction Failed, last error: {}", transaction.getLastError());
+        plugin.logger().error("Tips: If you see any economy plugin name appears above, please don't ask QuickShop support. Contact with developer of economy plugin. QuickShop didn't process the transaction, we only receive the transaction result from your economy plugin.");
+        return false;
+      }
+
+      try {
+        shop.buy(buyerQUser, buyerInventory, buyer.getLocation(), amount);
+      } catch(final Exception shopError) {
+        plugin.logger().warn("Failed to processing purchase, rolling back...", shopError);
+        transaction.rollback(true);
+        terminalEventEmitted = true;
+        fireShopTransactionFailed(transactionContext, ShopTransactionFailureReason.SHOP_OPERATION_FAILED, shopError.getMessage(), shopError);
+        plugin.text().of(buyer, "shop-transaction-failed", shopError.getMessage()).send();
+        return false;
+      }
+      terminalEventEmitted = true;
+      new ShopSuccessPurchaseEvent(transactionContext, transaction.getTax()).callEvent();
+      sendSellSuccess(buyerQUser, shop, amount, total, transaction.getTax());
+      shop.setSignText(plugin.text().findRelativeLanguages(buyer)); // Update the signs count
+      notifySold(buyerQUser, shop, amount, space);
+      return true;
+    } catch(final RuntimeException unexpectedError) {
+      if(!terminalEventEmitted) {
+        fireShopTransactionFailed(transactionContext, ShopTransactionFailureReason.INTERNAL_ERROR, unexpectedError.getMessage(), unexpectedError);
+      }
+      throw unexpectedError;
     }
-    sendSellSuccess(buyerQUser, shop, amount, total, transaction.getTax());
-    new ShopSuccessPurchaseEvent(shop, buyerQUser, buyerInventory, amount, total, transaction.getTax()).callEvent();
-    shop.setSignText(plugin.text().findRelativeLanguages(buyer)); // Update the signs count
-    notifySold(buyerQUser, shop, amount, space);
-    return true;
   }
 
   private void notifySold(@NotNull final QUser buyerQUser, @NotNull final Shop shop, final int amount, final int space) {
@@ -303,6 +333,15 @@ public class SimpleShopManager extends AbstractShopManager implements ShopManage
       }
       sendStockMessages(shop, sendList);
     });
+  }
+
+  private static void fireShopTransactionFailed(
+          @NotNull final ShopTransactionContext context,
+          @NotNull final ShopTransactionFailureReason reason,
+          @Nullable final String errorMessage,
+          @Nullable final Throwable cause) {
+
+    new ShopTransactionFailedEvent(context, reason, errorMessage, cause).callEvent();
   }
 
   @Override
@@ -443,56 +482,82 @@ public class SimpleShopManager extends AbstractShopManager implements ShopManage
     final double taxModifier = getTax(shop, sellerQUser);
     double total = CalculateUtil.multiply(amount, shop.getPrice());
 
-    final ShopPurchaseEvent e = new ShopPurchaseEvent(shop, sellerQUser, sellerInventory, amount, total);
-    if(Util.fireCancellableEvent(e)) {
-      plugin.text().of(seller, "plugin-cancelled", e.getCancelReason()).send();
-      return false; // Cancelled
-    } else {
-      total = e.getTotal(); // Allow addon to set it
-    }
-    // Money handling
-    // SELLING Player -> Shop Owner
-    final SimpleEconomyTransaction transaction;
-    QUser taxAccount = null;
-    if(shop.getTaxAccount() != null) {
-      taxAccount = shop.getTaxAccount();
-    } else {
-      if(this.cacheTaxAccount != null) {
-        taxAccount = this.cacheTaxAccount;
-      }
-    }
-    final SimpleEconomyTransaction.SimpleEconomyTransactionBuilder builder = SimpleEconomyTransaction.builder().core(eco).from(sellerQUser).amount(total).taxModifier(taxModifier).taxAccount(taxAccount).benefit(shop.getShopBenefit()).world(shop.getLocation().getWorld()).currency(shop.getCurrency());
-    if(shop.isUnlimited() && plugin.getConfig().getBoolean("tax-free-for-unlimited-shop", false)) {
-      builder.taxModifier(0.0d);
-    }
-    if(ShopOwnerMoneyPolicy.shouldPayOwner(shop)) {
-      transaction = builder.to(shop.getOwner()).build();
-    } else {
-      transaction = builder.to(null).build();
-    }
-
-    if(!transaction.checkBalance()) {
-      plugin.text().of(seller, "you-cant-afford-to-buy", format(total, shop.getLocation().getWorld(), shop.getCurrency()), format(eco.getBalance(sellerQUser, shop.getLocation().getWorld(), shop.getCurrency()), shop.getLocation().getWorld(), shop.getCurrency())).send();
-      return false;
-    }
-    if(!transaction.failSafeCommit()) {
-      plugin.text().of(seller, "economy-transaction-failed", transaction.getLastError()).send();
-      plugin.logger().error("EconomyTransaction Failed, last error: {}", transaction.getLastError());
-      return false;
-    }
-
+    final ShopTransactionContext transactionContext = new ShopTransactionContext(
+            shop,
+            sellerQUser,
+            sellerInventory,
+            ShopTransactionDirection.PLAYER_BUY,
+            amount,
+            BigDecimal.valueOf(shop.getPrice()),
+            BigDecimal.valueOf(total));
+    boolean terminalEventEmitted = false;
     try {
-      shop.sell(sellerQUser, sellerInventory, seller.getLocation(), amount);
-    } catch(final Exception shopError) {
-      plugin.logger().warn("Failed to processing purchase, rolling back...", shopError);
-      transaction.rollback(true);
-      plugin.text().of(seller, "shop-transaction-failed", shopError.getMessage()).send();
-      return false;
+      final ShopPurchaseEvent e = new ShopPurchaseEvent(transactionContext);
+      if(Util.fireCancellableEvent(e)) {
+        terminalEventEmitted = true;
+        fireShopTransactionFailed(transactionContext, ShopTransactionFailureReason.CANCELLED, null, null);
+        plugin.text().of(seller, "plugin-cancelled", e.getCancelReason()).send();
+        return false; // Cancelled
+      } else {
+        total = e.getTotal(); // Allow addon to set it
+      }
+
+      // Money handling
+      // SELLING Player -> Shop Owner
+      final SimpleEconomyTransaction transaction;
+      QUser taxAccount = null;
+      if(shop.getTaxAccount() != null) {
+        taxAccount = shop.getTaxAccount();
+      } else {
+        if(this.cacheTaxAccount != null) {
+          taxAccount = this.cacheTaxAccount;
+        }
+      }
+      final SimpleEconomyTransaction.SimpleEconomyTransactionBuilder builder = SimpleEconomyTransaction.builder().core(eco).from(sellerQUser).amount(total).taxModifier(taxModifier).taxAccount(taxAccount).benefit(shop.getShopBenefit()).world(shop.getLocation().getWorld()).currency(shop.getCurrency());
+      if(shop.isUnlimited() && plugin.getConfig().getBoolean("tax-free-for-unlimited-shop", false)) {
+        builder.taxModifier(0.0d);
+      }
+      if(ShopOwnerMoneyPolicy.shouldPayOwner(shop)) {
+        transaction = builder.to(shop.getOwner()).build();
+      } else {
+        transaction = builder.to(null).build();
+      }
+
+      if(!transaction.checkBalance()) {
+        terminalEventEmitted = true;
+        fireShopTransactionFailed(transactionContext, ShopTransactionFailureReason.INSUFFICIENT_FUNDS, transaction.getLastError(), null);
+        plugin.text().of(seller, "you-cant-afford-to-buy", format(total, shop.getLocation().getWorld(), shop.getCurrency()), format(eco.getBalance(sellerQUser, shop.getLocation().getWorld(), shop.getCurrency()), shop.getLocation().getWorld(), shop.getCurrency())).send();
+        return false;
+      }
+      if(!transaction.failSafeCommit()) {
+        terminalEventEmitted = true;
+        fireShopTransactionFailed(transactionContext, ShopTransactionFailureReason.ECONOMY_TRANSACTION_FAILED, transaction.getLastError(), null);
+        plugin.text().of(seller, "economy-transaction-failed", transaction.getLastError()).send();
+        plugin.logger().error("EconomyTransaction Failed, last error: {}", transaction.getLastError());
+        return false;
+      }
+
+      try {
+        shop.sell(sellerQUser, sellerInventory, seller.getLocation(), amount);
+      } catch(final Exception shopError) {
+        plugin.logger().warn("Failed to processing purchase, rolling back...", shopError);
+        transaction.rollback(true);
+        terminalEventEmitted = true;
+        fireShopTransactionFailed(transactionContext, ShopTransactionFailureReason.SHOP_OPERATION_FAILED, shopError.getMessage(), shopError);
+        plugin.text().of(seller, "shop-transaction-failed", shopError.getMessage()).send();
+        return false;
+      }
+      terminalEventEmitted = true;
+      new ShopSuccessPurchaseEvent(transactionContext, transaction.getTax()).callEvent();
+      sendPurchaseSuccess(sellerQUser, shop, amount, total, transaction.getTax());
+      notifyBought(sellerQUser, shop, amount, stock, transaction.getTax(), total);
+      return true;
+    } catch(final RuntimeException unexpectedError) {
+      if(!terminalEventEmitted) {
+        fireShopTransactionFailed(transactionContext, ShopTransactionFailureReason.INTERNAL_ERROR, unexpectedError.getMessage(), unexpectedError);
+      }
+      throw unexpectedError;
     }
-    sendPurchaseSuccess(sellerQUser, shop, amount, total, transaction.getTax());
-    new ShopSuccessPurchaseEvent(shop, sellerQUser, sellerInventory, amount, total, transaction.getTax()).callEvent();
-    notifyBought(sellerQUser, shop, amount, stock, transaction.getTax(), total);
-    return true;
   }
 
 

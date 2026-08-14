@@ -6,26 +6,16 @@ import com.ghostchu.quickshop.api.obj.QUser;
 import com.ghostchu.quickshop.api.shop.Shop;
 import org.jetbrains.annotations.NotNull;
 
+import java.math.BigDecimal;
+import java.util.UUID;
+
 /**
  * Calling when success purchase in shop
  */
 public class ShopSuccessPurchaseEvent extends AbstractQSEvent {
 
-  @NotNull
-  private final Shop shop;
-
-  private final int amount;
-
-  @NotNull
-  private final QUser purchaser;
-
-  @NotNull
-  private final InventoryWrapper purchaserInventory;
-
+  private final ShopTransactionContext context;
   private final double tax;
-
-  private final double
-          total; // Don't use getter, we have important notice need told dev in javadoc.
 
   /**
    * Builds a new shop purchase event Will called when purchase ended
@@ -41,12 +31,26 @@ public class ShopSuccessPurchaseEvent extends AbstractQSEvent {
   public ShopSuccessPurchaseEvent(
           @NotNull final Shop shop, @NotNull final QUser purchaser, @NotNull final InventoryWrapper purchaserInventory, final int amount, final double total, final double tax) {
 
-    this.shop = shop;
-    this.purchaser = purchaser;
-    this.purchaserInventory = purchaserInventory;
-    this.amount = amount * shop.getItem().getAmount();
+    this(new ShopTransactionContext(
+            shop,
+            purchaser,
+            purchaserInventory,
+            ShopTransactionDirection.fromShopType(shop.getShopType()),
+            amount,
+            BigDecimal.valueOf(shop.getPrice()),
+            BigDecimal.valueOf(total)), tax);
+  }
+
+  /**
+   * Builds a success event around the context from the corresponding pre-transaction event.
+   *
+   * @param context the shared transaction context
+   * @param tax     the tax charged by the transaction
+   */
+  public ShopSuccessPurchaseEvent(@NotNull final ShopTransactionContext context, final double tax) {
+
+    this.context = context;
     this.tax = tax;
-    this.total = total;
   }
 
   /**
@@ -56,7 +60,15 @@ public class ShopSuccessPurchaseEvent extends AbstractQSEvent {
    */
   public int getAmount() {
 
-    return this.amount;
+    return context.getItemAmount();
+  }
+
+  /**
+   * @return the number of configured shop units traded
+   */
+  public int getTradeCount() {
+
+    return context.getTradeCount();
   }
 
   /**
@@ -67,7 +79,7 @@ public class ShopSuccessPurchaseEvent extends AbstractQSEvent {
    */
   public double getBalance() {
 
-    return this.total - tax;
+    return context.getTotalPrice().doubleValue() - tax;
   }
 
   /**
@@ -78,7 +90,17 @@ public class ShopSuccessPurchaseEvent extends AbstractQSEvent {
    */
   public double getBalanceWithoutTax() {
 
-    return this.total;
+    return context.getTotalPrice().doubleValue();
+  }
+
+  /**
+   * Gets the effective total price before tax without converting it to a double.
+   *
+   * @return the effective total price
+   */
+  public @NotNull BigDecimal getTotalPrice() {
+
+    return context.getTotalPrice();
   }
 
 
@@ -89,7 +111,7 @@ public class ShopSuccessPurchaseEvent extends AbstractQSEvent {
    */
   public @NotNull QUser getPurchaser() {
 
-    return this.purchaser;
+    return context.getTrader();
   }
 
   /**
@@ -99,7 +121,7 @@ public class ShopSuccessPurchaseEvent extends AbstractQSEvent {
    */
   public @NotNull InventoryWrapper getPurchaserInventory() {
 
-    return this.purchaserInventory;
+    return context.getTraderInventory();
   }
 
   /**
@@ -109,7 +131,7 @@ public class ShopSuccessPurchaseEvent extends AbstractQSEvent {
    */
   public @NotNull Shop getShop() {
 
-    return this.shop;
+    return context.getShop();
   }
 
   /**
@@ -120,5 +142,21 @@ public class ShopSuccessPurchaseEvent extends AbstractQSEvent {
   public double getTax() {
 
     return this.tax;
+  }
+
+  /**
+   * @return the shared transaction context
+   */
+  public @NotNull ShopTransactionContext getContext() {
+
+    return context;
+  }
+
+  /**
+   * @return the id shared by all lifecycle events for this transaction attempt
+   */
+  public @NotNull UUID getTransactionId() {
+
+    return context.getTransactionId();
   }
 }
