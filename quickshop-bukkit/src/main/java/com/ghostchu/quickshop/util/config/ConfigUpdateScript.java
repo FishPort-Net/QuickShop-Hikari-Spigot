@@ -3,6 +3,7 @@ package com.ghostchu.quickshop.util.config;
 import com.ghostchu.quickshop.QuickShop;
 import com.ghostchu.quickshop.util.Util;
 import lombok.Getter;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,6 +22,39 @@ public class ConfigUpdateScript {
 
     this.config = config;
     this.plugin = plugin;
+  }
+
+  @UpdateScript(version = 1038)
+  public void virtualAccountSettings() {
+
+    final String oldRoot = "shop.unlimited-shop-owner-money.virtual-accounts";
+    final String newRoot = "shop.virtual-accounts";
+    final ConfigurationSection oldAccounts = getConfig().getConfigurationSection(oldRoot);
+    if(oldAccounts != null) {
+      for(final String accountName : oldAccounts.getKeys(false)) {
+        final ConfigurationSection oldAccount = oldAccounts.getConfigurationSection(accountName);
+        if(oldAccount == null) {
+          continue;
+        }
+        copyIfMissing(oldAccount, "pay-owner", newRoot + "." + accountName + ".unlimited-shop-money.pay-owner");
+        copyIfMissing(oldAccount, "take-from-owner", newRoot + "." + accountName + ".unlimited-shop-money.take-from-owner");
+        copyIfMissing(oldAccount, "insufficient-funds-message", newRoot + "." + accountName + ".insufficient-funds-message");
+        copyIfMissing(oldAccount, "out-of-funds-sign", newRoot + "." + accountName + ".out-of-funds-sign");
+      }
+    }
+    getConfig().set(oldRoot, null);
+    if(!getConfig().isConfigurationSection(newRoot)) {
+      getConfig().set(newRoot, Collections.emptyMap());
+    }
+  }
+
+  private void copyIfMissing(@NotNull final ConfigurationSection source,
+                             @NotNull final String sourceKey,
+                             @NotNull final String targetPath) {
+
+    if(source.isSet(sourceKey) && !getConfig().isSet(targetPath)) {
+      getConfig().set(targetPath, source.get(sourceKey));
+    }
   }
 
   @UpdateScript(version = 1037)
