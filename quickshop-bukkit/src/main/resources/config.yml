@@ -44,9 +44,6 @@ tax: 0.05
 #Set this to "" to disable it (Taxing will still work but not deposit to any account)
 tax-account: tax
 
-# Disable taxes for unlimited shop
-tax-free-for-unlimited-shop: false
-
 #Turn on this option will migrate shop owner to specified account when you set a shop to unlimited.
 #It won't affect exists shops, you will need switch to unlimited again to apply it.
 unlimited-shop-owner-change: false
@@ -278,10 +275,12 @@ shop:
 
   #Per-account settings only apply to virtual owners. Use the account name without brackets as the key.
   #The unlimited-shop-money values inherit the defaults above when omitted.
+  #Set tax-free to true to exempt every shop owned by that virtual account from transaction tax.
   #Messages support MiniMessage. The failure message accepts <price>, <balance>, <account>, and <owner>.
   #The sign text accepts <account> and <owner>.
   #Example:
   #  bank-issue:
+  #    tax-free: true
   #    unlimited-shop-money:
   #      pay-owner: true
   #      take-from-owner: true

@@ -39,6 +39,7 @@ public final class ShopOwnerMoneyPolicy {
   private static final String VIRTUAL_ACCOUNTS_ROOT = "shop.virtual-accounts";
   private static final String ACCOUNT_UNLIMITED_ROOT = "unlimited-shop-money";
   private static final String LEGACY_CONFIG = "shop.pay-unlimited-shop-owners";
+  private static final String LEGACY_TAX_FREE_CONFIG = "tax-free-for-unlimited-shop";
 
   private ShopOwnerMoneyPolicy() {
   }
@@ -59,6 +60,12 @@ public final class ShopOwnerMoneyPolicy {
   public static boolean shouldTakeFromOwner(@NotNull final Shop shop) {
 
     return !shop.isUnlimited() || resolve(shop).takeFromOwner();
+  }
+
+  /** Returns whether transactions through this shop should be exempt from tax. */
+  public static boolean isTaxFree(@NotNull final Shop shop) {
+
+    return resolve(shop).taxFree();
   }
 
   /** Returns the number of shop trade units the owner can currently afford. */
@@ -127,6 +134,7 @@ public final class ShopOwnerMoneyPolicy {
     boolean takeFromOwner = config.getBoolean(CONFIG_ROOT + ".defaults.take-from-owner", legacy);
     String insufficientFundsMessage = null;
     String outOfFundsSign = null;
+    boolean taxFree = shop.isUnlimited() && config.getBoolean(LEGACY_TAX_FREE_CONFIG, false);
 
     final ConfigurationSection account = virtualAccountSection(config, shop.getOwner());
     if(account != null) {
@@ -141,8 +149,11 @@ public final class ShopOwnerMoneyPolicy {
       }
       insufficientFundsMessage = account.getString("insufficient-funds-message");
       outOfFundsSign = account.getString("out-of-funds-sign");
+      if(account.isSet("tax-free")) {
+        taxFree = account.getBoolean("tax-free");
+      }
     }
-    return new ResolvedPolicy(payOwner, takeFromOwner, insufficientFundsMessage, outOfFundsSign);
+    return new ResolvedPolicy(payOwner, takeFromOwner, insufficientFundsMessage, outOfFundsSign, taxFree);
   }
 
   @Nullable
@@ -172,6 +183,7 @@ public final class ShopOwnerMoneyPolicy {
   private record ResolvedPolicy(boolean payOwner,
                                 boolean takeFromOwner,
                                 @Nullable String insufficientFundsMessage,
-                                @Nullable String outOfFundsSign) {
+                                @Nullable String outOfFundsSign,
+                                boolean taxFree) {
   }
 }
