@@ -327,8 +327,7 @@ shop:
   #It doesn't work under Virtual DisplayItem.
   display-check-time: 40
 
-  #Allow displays to show stack effects when stack creation is turned on.
-  #It doesn't work under Virtual DisplayItem.
+  #Allow displays, including Virtual DisplayItem, to show stack effects when stack creation is turned on.
   display-allow-stacks: false
 
   # Display entity rotation. Only used by display-type 3; chest facing is added automatically.

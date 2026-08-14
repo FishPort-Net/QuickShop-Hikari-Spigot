@@ -48,7 +48,7 @@ public abstract class AbstractDisplayItem implements Reloadable {
   protected static final QuickShop PLUGIN = QuickShop.getInstance();
   private static final NamespacedKey DISPLAY_MARK_NAMESPACE = new NamespacedKey(QuickShop.getInstance().getJavaPlugin(), "display_protection");
   private static boolean virtualDisplayDoesntWork = false;
-  protected final ItemStack originalItemStack;
+  protected ItemStack originalItemStack;
   protected final Shop shop;
   @Nullable
   protected ItemStack guardedStack;
@@ -57,7 +57,6 @@ public abstract class AbstractDisplayItem implements Reloadable {
   protected AbstractDisplayItem(final Shop shop) {
 
     this.shop = shop;
-    this.originalItemStack = shop.getItem().clone();
     PLUGIN.getReloadManager().register(this);
     init();
   }
@@ -164,12 +163,14 @@ public abstract class AbstractDisplayItem implements Reloadable {
 
   protected void init() {
 
+    final ItemStack refreshedItemStack = shop.getItem().clone();
     if(PLUGIN.getConfig().getBoolean("shop.display-allow-stacks")) {
       //Prevent stack over the normal size
-      originalItemStack.setAmount(Math.min(originalItemStack.getAmount(), originalItemStack.getMaxStackSize()));
+      refreshedItemStack.setAmount(Math.min(refreshedItemStack.getAmount(), refreshedItemStack.getMaxStackSize()));
     } else {
-      this.originalItemStack.setAmount(1);
+      refreshedItemStack.setAmount(1);
     }
+    this.originalItemStack = refreshedItemStack;
   }
 
   /**
