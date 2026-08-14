@@ -12,7 +12,6 @@ import com.ghostchu.quickshop.api.localization.text.Text;
 import com.ghostchu.quickshop.api.shop.Shop;
 import com.ghostchu.quickshop.util.Util;
 import com.ghostchu.quickshop.util.logger.Log;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -65,11 +64,14 @@ public final class Main extends JavaPlugin implements Listener {
     final int limit = storage.getInt("limit");
     final UUID uuid = event.getPurchaser().getUniqueIdIfRealPlayer().orElse(null);
     if(uuid != null) {
-      final int playerUsedLimit = storage.getInt("data." + uuid, 0);
-      if(playerUsedLimit + event.getAmount() > limit) {
+      final int playerUsedLimit = getPlayerUsedLimit(shop, storage, uuid);
+      final int requestedAmount = event.getAmount();
+      if(requestedAmount < 1 || (long)playerUsedLimit + requestedAmount > limit) {
         final Text text = plugin.text().of(event.getPurchaser(), "addon.limited.trade-limit-reached-cancel-reason");
         text.send();
-        event.setCancelled(true, PlainTextComponentSerializer.plainText().serialize(text.forLocale()));
+        // Keep this addon independent from QuickShop's privately relocated Adventure classes.
+        // QSCancellable converts the plain String into its own Component inside QuickShop.
+        event.setCancelled(true, text.plain());
       }
     }
   }
@@ -86,8 +88,8 @@ public final class Main extends JavaPlugin implements Listener {
         return;
       }
       final int limit = storage.getInt("limit");
-      final int playerUsedLimit = storage.getInt("data." + event.user().getUniqueId(), 0);
-      plugin.text().of(event.user(), "addon.limited.remains-limits", limit - playerUsedLimit).send();
+      final int playerUsedLimit = getPlayerUsedLimit(shop, storage, event.user().getUniqueId());
+      plugin.text().of(event.user(), "addon.limited.remains-limits", getRemainingLimit(limit, playerUsedLimit)).send();
       Log.debug("Shop limit is enabled on this shop. Limit: " + limit + " Used: " + playerUsedLimit);
     }
   }
@@ -103,16 +105,42 @@ public final class Main extends JavaPlugin implements Listener {
     final UUID uuid = event.getPurchaser().getUniqueIdIfRealPlayer().orElse(null);
     if(uuid != null) {
       final int limit = storage.getInt("limit");
-      int playerUsedLimit = storage.getInt("data." + uuid, 0);
-      playerUsedLimit += event.getAmount();
+      final int purchasedAmount = event.getAmount();
+      if(purchasedAmount < 1) {
+        getLogger().warning("Ignored a successful shop transaction with a non-positive item amount: " + purchasedAmount);
+        return;
+      }
+      int playerUsedLimit = getPlayerUsedLimit(shop, storage, uuid);
+      playerUsedLimit = (int)Math.min(Integer.MAX_VALUE, (long)playerUsedLimit + purchasedAmount);
       storage.set("data." + uuid, playerUsedLimit);
       shop.setExtra(this, storage);
       final Player player = Bukkit.getPlayer(uuid);
       if(player != null) {
         player.sendTitle(plugin.text().of(player, "addon.limited.titles.title").legacy(),
-                         plugin.text().of(player, "addon.limited.titles.subtitle", (limit - playerUsedLimit)).legacy());
+                         plugin.text().of(player, "addon.limited.titles.subtitle", getRemainingLimit(limit, playerUsedLimit)).legacy());
       }
     }
+  }
+
+  private int getPlayerUsedLimit(
+          final Shop shop,
+          final ConfigurationSection storage,
+          final UUID uuid) {
+
+    final String path = "data." + uuid;
+    final int storedAmount = storage.getInt(path, 0);
+    if(storedAmount >= 0) {
+      return storedAmount;
+    }
+    storage.set(path, 0);
+    shop.setExtra(this, storage);
+    getLogger().warning("Reset a negative Limited usage counter for shop " + shop.getShopId() + " and player " + uuid);
+    return 0;
+  }
+
+  private static int getRemainingLimit(final int limit, final int used) {
+
+    return (int)Math.max(0L, (long)limit - used);
   }
 
   @EventHandler(ignoreCancelled = true)
