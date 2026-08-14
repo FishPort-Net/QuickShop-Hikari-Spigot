@@ -84,7 +84,7 @@ loadScripts(document, 'script');</script>
 <dd><code><a href="../QSCancellable.html" title="interface in com.ghostchu.quickshop.api.event">QSCancellable</a></code>, <code>org.bukkit.event.Cancellable</code></dd>
 </dl>
 <hr>
-<div class="type-signature"><span class="modifiers">public class </span><span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-15">ShopPurchaseEvent</a></span>
+<div class="type-signature"><span class="modifiers">public class </span><span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-18">ShopPurchaseEvent</a></span>
 <span class="extends-implements">extends <a href="../AbstractQSEvent.html" title="class in com.ghostchu.quickshop.api.event">AbstractQSEvent</a>
 implements <a href="../QSCancellable.html" title="interface in com.ghostchu.quickshop.api.event">QSCancellable</a></span></div>
 <div class="block">Calling when purchaser purchased a shop</div>
@@ -108,12 +108,16 @@ implements <a href="../QSCancellable.html" title="interface in com.ghostchu.quic
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(com.ghostchu.quickshop.api.shop.Shop,com.ghostchu.quickshop.api.obj.QUser,com.ghostchu.quickshop.api.inventory.InventoryWrapper,int,double)" class="member-name-link">ShopPurchaseEvent</a><wbr>(@NotNull <a href="../../shop/Shop.html" title="interface in com.ghostchu.quickshop.api.shop">Shop</a>&nbsp;shop,
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(com.ghostchu.quickshop.api.event.economy.ShopTransactionContext)" class="member-name-link">ShopPurchaseEvent</a><wbr>(@NotNull <a href="ShopTransactionContext.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionContext</a>&nbsp;context)</code></div>
+<div class="col-last even-row-color">
+<div class="block">Builds a pre-transaction event around a shared lifecycle context.</div>
+</div>
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(com.ghostchu.quickshop.api.shop.Shop,com.ghostchu.quickshop.api.obj.QUser,com.ghostchu.quickshop.api.inventory.InventoryWrapper,int,double)" class="member-name-link">ShopPurchaseEvent</a><wbr>(@NotNull <a href="../../shop/Shop.html" title="interface in com.ghostchu.quickshop.api.shop">Shop</a>&nbsp;shop,
  @NotNull <a href="../../obj/QUser.html" title="interface in com.ghostchu.quickshop.api.obj">QUser</a>&nbsp;purchaser,
  @NotNull <a href="../../inventory/InventoryWrapper.html" title="interface in com.ghostchu.quickshop.api.inventory">InventoryWrapper</a>&nbsp;purchaserInventory,
  int&nbsp;amount,
  double&nbsp;total)</code></div>
-<div class="col-last even-row-color">
+<div class="col-last odd-row-color">
 <div class="block">Builds a new shop purchase event Will called when purchase starting For recording purchase,
  please listen to ShopSuccessPurchaseEvent.</div>
 </div>
@@ -139,25 +143,45 @@ implements <a href="../QSCancellable.html" title="interface in com.ghostchu.quic
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@Nullable net.kyori.adventure.text.Component</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getCancelReason()" class="member-name-link">getCancelReason</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NotNull <a href="../../obj/QUser.html" title="interface in com.ghostchu.quickshop.api.obj">QUser</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPurchaser()" class="member-name-link">getPurchaser</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NotNull <a href="ShopTransactionContext.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionContext</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getContext()" class="member-name-link">getContext</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Gets the shared lifecycle context.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NotNull <a href="../../obj/QUser.html" title="interface in com.ghostchu.quickshop.api.obj">QUser</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPurchaser()" class="member-name-link">getPurchaser</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Gets the purchaser, that maybe is a online/offline/virtual player.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NotNull <a href="../../inventory/InventoryWrapper.html" title="interface in com.ghostchu.quickshop.api.inventory">InventoryWrapper</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPurchaserInventory()" class="member-name-link">getPurchaserInventory</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NotNull <a href="../../inventory/InventoryWrapper.html" title="interface in com.ghostchu.quickshop.api.inventory">InventoryWrapper</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPurchaserInventory()" class="member-name-link">getPurchaserInventory</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Gets the inventory of purchaser (the item will put to)</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NotNull <a href="../../shop/Shop.html" title="interface in com.ghostchu.quickshop.api.shop">Shop</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getShop()" class="member-name-link">getShop</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NotNull <a href="../../shop/Shop.html" title="interface in com.ghostchu.quickshop.api.shop">Shop</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getShop()" class="member-name-link">getShop</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Gets the shop</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getTotal()" class="member-name-link">getTotal</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getTotal()" class="member-name-link">getTotal</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Gets the total money trans for</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/math/BigDecimal.html" title="class or interface in java.math" class="external-link">BigDecimal</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getTotalPrice()" class="member-name-link">getTotalPrice</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Gets the effective total price before tax without converting it to a double.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getTradeCount()" class="member-name-link">getTradeCount</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Gets the number of configured shop units requested in this transaction.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/UUID.html" title="class or interface in java.util" class="external-link">UUID</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getTransactionId()" class="member-name-link">getTransactionId</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Gets the id shared by all lifecycle events for this transaction attempt.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isCancelled()" class="member-name-link">isCancelled</a>()</code></div>
@@ -170,6 +194,11 @@ implements <a href="../QSCancellable.html" title="interface in com.ghostchu.quic
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setTotal(double)" class="member-name-link">setTotal</a><wbr>(double&nbsp;total)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets new total money trans for</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setTotalPrice(java.math.BigDecimal)" class="member-name-link">setTotalPrice</a><wbr>(@NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/math/BigDecimal.html" title="class or interface in java.math" class="external-link">BigDecimal</a>&nbsp;total)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the effective total price before tax.</div>
 </div>
 </div>
 </div>
@@ -200,7 +229,7 @@ implements <a href="../QSCancellable.html" title="interface in com.ghostchu.quic
 <li>
 <section class="detail" id="&lt;init&gt;(com.ghostchu.quickshop.api.shop.Shop,com.ghostchu.quickshop.api.obj.QUser,com.ghostchu.quickshop.api.inventory.InventoryWrapper,int,double)">
 <h3>ShopPurchaseEvent</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-43">ShopPurchaseEvent</a></span><wbr><span class="parameters">(@NotNull
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-36">ShopPurchaseEvent</a></span><wbr><span class="parameters">(@NotNull
  @NotNull <a href="../../shop/Shop.html" title="interface in com.ghostchu.quickshop.api.shop">Shop</a>&nbsp;shop,
  @NotNull
  @NotNull <a href="../../obj/QUser.html" title="interface in com.ghostchu.quickshop.api.obj">QUser</a>&nbsp;purchaser,
@@ -221,6 +250,18 @@ implements <a href="../QSCancellable.html" title="interface in com.ghostchu.quic
 </dl>
 </section>
 </li>
+<li>
+<section class="detail" id="&lt;init&gt;(com.ghostchu.quickshop.api.event.economy.ShopTransactionContext)">
+<h3>ShopPurchaseEvent</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-53">ShopPurchaseEvent</a></span><wbr><span class="parameters">(@NotNull
+ @NotNull <a href="ShopTransactionContext.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionContext</a>&nbsp;context)</span></div>
+<div class="block">Builds a pre-transaction event around a shared lifecycle context.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>context</code> - the context that will also be used by the success or failure event</dd>
+</dl>
+</section>
+</li>
 </ul>
 </section>
 </li>
@@ -232,7 +273,7 @@ implements <a href="../QSCancellable.html" title="interface in com.ghostchu.quic
 <li>
 <section class="detail" id="getAmount()">
 <h3>getAmount</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-57">getAmount</a></span>()</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-63">getAmount</a></span>()</div>
 <div class="block">Gets the item stack amounts</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -241,10 +282,22 @@ implements <a href="../QSCancellable.html" title="interface in com.ghostchu.quic
 </section>
 </li>
 <li>
+<section class="detail" id="getTradeCount()">
+<h3>getTradeCount</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-74">getTradeCount</a></span>()</div>
+<div class="block">Gets the number of configured shop units requested in this transaction. A shop unit may contain
+ more than one individual item.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the requested shop unit count</dd>
+</dl>
+</section>
+</li>
+<li>
 <section class="detail" id="getCancelReason()">
 <h3>getCancelReason</h3>
 <div class="member-signature"><span class="annotations">@Nullable
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">@Nullable net.kyori.adventure.text.Component</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-62">getCancelReason</a></span>()</div>
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">@Nullable net.kyori.adventure.text.Component</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-79">getCancelReason</a></span>()</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../QSCancellable.html#getCancelReason()">getCancelReason</a></code>&nbsp;in interface&nbsp;<code><a href="../QSCancellable.html" title="interface in com.ghostchu.quickshop.api.event">QSCancellable</a></code></dd>
@@ -254,7 +307,7 @@ implements <a href="../QSCancellable.html" title="interface in com.ghostchu.quic
 <li>
 <section class="detail" id="setCancelled(boolean,net.kyori.adventure.text.Component)">
 <h3>setCancelled</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-68">setCancelled</a></span><wbr><span class="parameters">(boolean&nbsp;cancel,
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-85">setCancelled</a></span><wbr><span class="parameters">(boolean&nbsp;cancel,
  @Nullable
  @Nullable net.kyori.adventure.text.Component&nbsp;reason)</span></div>
 <dl class="notes">
@@ -267,7 +320,7 @@ implements <a href="../QSCancellable.html" title="interface in com.ghostchu.quic
 <section class="detail" id="getPurchaser()">
 <h3>getPurchaser</h3>
 <div class="member-signature"><span class="annotations">@NotNull
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NotNull <a href="../../obj/QUser.html" title="interface in com.ghostchu.quickshop.api.obj">QUser</a></span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-80">getPurchaser</a></span>()</div>
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NotNull <a href="../../obj/QUser.html" title="interface in com.ghostchu.quickshop.api.obj">QUser</a></span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-97">getPurchaser</a></span>()</div>
 <div class="block">Gets the purchaser, that maybe is a online/offline/virtual player.</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -279,7 +332,7 @@ implements <a href="../QSCancellable.html" title="interface in com.ghostchu.quic
 <section class="detail" id="getPurchaserInventory()">
 <h3>getPurchaserInventory</h3>
 <div class="member-signature"><span class="annotations">@NotNull
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NotNull <a href="../../inventory/InventoryWrapper.html" title="interface in com.ghostchu.quickshop.api.inventory">InventoryWrapper</a></span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-90">getPurchaserInventory</a></span>()</div>
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NotNull <a href="../../inventory/InventoryWrapper.html" title="interface in com.ghostchu.quickshop.api.inventory">InventoryWrapper</a></span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-107">getPurchaserInventory</a></span>()</div>
 <div class="block">Gets the inventory of purchaser (the item will put to)</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -291,7 +344,7 @@ implements <a href="../QSCancellable.html" title="interface in com.ghostchu.quic
 <section class="detail" id="getShop()">
 <h3>getShop</h3>
 <div class="member-signature"><span class="annotations">@NotNull
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NotNull <a href="../../shop/Shop.html" title="interface in com.ghostchu.quickshop.api.shop">Shop</a></span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-100">getShop</a></span>()</div>
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NotNull <a href="../../shop/Shop.html" title="interface in com.ghostchu.quickshop.api.shop">Shop</a></span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-117">getShop</a></span>()</div>
 <div class="block">Gets the shop</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -302,7 +355,7 @@ implements <a href="../QSCancellable.html" title="interface in com.ghostchu.quic
 <li>
 <section class="detail" id="getTotal()">
 <h3>getTotal</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-110">getTotal</a></span>()</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-127">getTotal</a></span>()</div>
 <div class="block">Gets the total money trans for</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -311,9 +364,21 @@ implements <a href="../QSCancellable.html" title="interface in com.ghostchu.quic
 </section>
 </li>
 <li>
+<section class="detail" id="getTotalPrice()">
+<h3>getTotalPrice</h3>
+<div class="member-signature"><span class="annotations">@NotNull
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/math/BigDecimal.html" title="class or interface in java.math" class="external-link">BigDecimal</a></span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-137">getTotalPrice</a></span>()</div>
+<div class="block">Gets the effective total price before tax without converting it to a double.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the effective total price</dd>
+</dl>
+</section>
+</li>
+<li>
 <section class="detail" id="setTotal(double)">
 <h3>setTotal</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-120">setTotal</a></span><wbr><span class="parameters">(double&nbsp;total)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-147">setTotal</a></span><wbr><span class="parameters">(double&nbsp;total)</span></div>
 <div class="block">Sets new total money trans for</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -322,9 +387,45 @@ implements <a href="../QSCancellable.html" title="interface in com.ghostchu.quic
 </section>
 </li>
 <li>
+<section class="detail" id="setTotalPrice(java.math.BigDecimal)">
+<h3>setTotalPrice</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-157">setTotalPrice</a></span><wbr><span class="parameters">(@NotNull
+ @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/math/BigDecimal.html" title="class or interface in java.math" class="external-link">BigDecimal</a>&nbsp;total)</span></div>
+<div class="block">Sets the effective total price before tax.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>total</code> - the new effective total price</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getContext()">
+<h3>getContext</h3>
+<div class="member-signature"><span class="annotations">@NotNull
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NotNull <a href="ShopTransactionContext.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionContext</a></span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-167">getContext</a></span>()</div>
+<div class="block">Gets the shared lifecycle context.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the transaction context</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getTransactionId()">
+<h3>getTransactionId</h3>
+<div class="member-signature"><span class="annotations">@NotNull
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">@NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/UUID.html" title="class or interface in java.util" class="external-link">UUID</a></span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-177">getTransactionId</a></span>()</div>
+<div class="block">Gets the id shared by all lifecycle events for this transaction attempt.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the transaction id</dd>
+</dl>
+</section>
+</li>
+<li>
 <section class="detail" id="isCancelled()">
 <h3>isCancelled</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-125">isCancelled</a></span>()</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name"><a href="../../../../../../src-html/com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#line-182">isCancelled</a></span>()</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code>isCancelled</code>&nbsp;in interface&nbsp;<code>org.bukkit.event.Cancellable</code></dd>

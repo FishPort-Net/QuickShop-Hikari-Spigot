@@ -19,122 +19,160 @@
 <span class="source-line-no">006</span><span id="line-6">import com.ghostchu.quickshop.api.shop.Shop;</span>
 <span class="source-line-no">007</span><span id="line-7">import org.jetbrains.annotations.NotNull;</span>
 <span class="source-line-no">008</span><span id="line-8"></span>
-<span class="source-line-no">009</span><span id="line-9">/**</span>
-<span class="source-line-no">010</span><span id="line-10"> * Calling when success purchase in shop</span>
-<span class="source-line-no">011</span><span id="line-11"> */</span>
-<span class="source-line-no">012</span><span id="line-12">public class ShopSuccessPurchaseEvent extends AbstractQSEvent {</span>
-<span class="source-line-no">013</span><span id="line-13"></span>
-<span class="source-line-no">014</span><span id="line-14">  @NotNull</span>
-<span class="source-line-no">015</span><span id="line-15">  private final Shop shop;</span>
+<span class="source-line-no">009</span><span id="line-9">import java.math.BigDecimal;</span>
+<span class="source-line-no">010</span><span id="line-10">import java.util.UUID;</span>
+<span class="source-line-no">011</span><span id="line-11"></span>
+<span class="source-line-no">012</span><span id="line-12">/**</span>
+<span class="source-line-no">013</span><span id="line-13"> * Calling when success purchase in shop</span>
+<span class="source-line-no">014</span><span id="line-14"> */</span>
+<span class="source-line-no">015</span><span id="line-15">public class ShopSuccessPurchaseEvent extends AbstractQSEvent {</span>
 <span class="source-line-no">016</span><span id="line-16"></span>
-<span class="source-line-no">017</span><span id="line-17">  private final int amount;</span>
-<span class="source-line-no">018</span><span id="line-18"></span>
-<span class="source-line-no">019</span><span id="line-19">  @NotNull</span>
-<span class="source-line-no">020</span><span id="line-20">  private final QUser purchaser;</span>
-<span class="source-line-no">021</span><span id="line-21"></span>
-<span class="source-line-no">022</span><span id="line-22">  @NotNull</span>
-<span class="source-line-no">023</span><span id="line-23">  private final InventoryWrapper purchaserInventory;</span>
-<span class="source-line-no">024</span><span id="line-24"></span>
-<span class="source-line-no">025</span><span id="line-25">  private final double tax;</span>
-<span class="source-line-no">026</span><span id="line-26"></span>
-<span class="source-line-no">027</span><span id="line-27">  private final double</span>
-<span class="source-line-no">028</span><span id="line-28">          total; // Don't use getter, we have important notice need told dev in javadoc.</span>
-<span class="source-line-no">029</span><span id="line-29"></span>
-<span class="source-line-no">030</span><span id="line-30">  /**</span>
-<span class="source-line-no">031</span><span id="line-31">   * Builds a new shop purchase event Will called when purchase ended</span>
-<span class="source-line-no">032</span><span id="line-32">   *</span>
-<span class="source-line-no">033</span><span id="line-33">   * @param shop               The shop bought from</span>
-<span class="source-line-no">034</span><span id="line-34">   * @param purchaser          The player buying, may offline if purchase by plugin</span>
-<span class="source-line-no">035</span><span id="line-35">   * @param purchaserInventory The purchaseing target inventory, *MAY NOT A PLAYER INVENTORY IF</span>
-<span class="source-line-no">036</span><span id="line-36">   *                           PLUGIN PURCHASE THIS*</span>
-<span class="source-line-no">037</span><span id="line-37">   * @param amount             The amount they're buying</span>
-<span class="source-line-no">038</span><span id="line-38">   * @param tax                The tax in this purchase</span>
-<span class="source-line-no">039</span><span id="line-39">   * @param total              The money in this purchase</span>
-<span class="source-line-no">040</span><span id="line-40">   */</span>
-<span class="source-line-no">041</span><span id="line-41">  public ShopSuccessPurchaseEvent(</span>
-<span class="source-line-no">042</span><span id="line-42">          @NotNull final Shop shop, @NotNull final QUser purchaser, @NotNull final InventoryWrapper purchaserInventory, final int amount, final double total, final double tax) {</span>
+<span class="source-line-no">017</span><span id="line-17">  private final ShopTransactionContext context;</span>
+<span class="source-line-no">018</span><span id="line-18">  private final double tax;</span>
+<span class="source-line-no">019</span><span id="line-19"></span>
+<span class="source-line-no">020</span><span id="line-20">  /**</span>
+<span class="source-line-no">021</span><span id="line-21">   * Builds a new shop purchase event Will called when purchase ended</span>
+<span class="source-line-no">022</span><span id="line-22">   *</span>
+<span class="source-line-no">023</span><span id="line-23">   * @param shop               The shop bought from</span>
+<span class="source-line-no">024</span><span id="line-24">   * @param purchaser          The player buying, may offline if purchase by plugin</span>
+<span class="source-line-no">025</span><span id="line-25">   * @param purchaserInventory The purchaseing target inventory, *MAY NOT A PLAYER INVENTORY IF</span>
+<span class="source-line-no">026</span><span id="line-26">   *                           PLUGIN PURCHASE THIS*</span>
+<span class="source-line-no">027</span><span id="line-27">   * @param amount             The amount they're buying</span>
+<span class="source-line-no">028</span><span id="line-28">   * @param tax                The tax in this purchase</span>
+<span class="source-line-no">029</span><span id="line-29">   * @param total              The money in this purchase</span>
+<span class="source-line-no">030</span><span id="line-30">   */</span>
+<span class="source-line-no">031</span><span id="line-31">  public ShopSuccessPurchaseEvent(</span>
+<span class="source-line-no">032</span><span id="line-32">          @NotNull final Shop shop, @NotNull final QUser purchaser, @NotNull final InventoryWrapper purchaserInventory, final int amount, final double total, final double tax) {</span>
+<span class="source-line-no">033</span><span id="line-33"></span>
+<span class="source-line-no">034</span><span id="line-34">    this(new ShopTransactionContext(</span>
+<span class="source-line-no">035</span><span id="line-35">            shop,</span>
+<span class="source-line-no">036</span><span id="line-36">            purchaser,</span>
+<span class="source-line-no">037</span><span id="line-37">            purchaserInventory,</span>
+<span class="source-line-no">038</span><span id="line-38">            ShopTransactionDirection.fromShopType(shop.getShopType()),</span>
+<span class="source-line-no">039</span><span id="line-39">            amount,</span>
+<span class="source-line-no">040</span><span id="line-40">            BigDecimal.valueOf(shop.getPrice()),</span>
+<span class="source-line-no">041</span><span id="line-41">            BigDecimal.valueOf(total)), tax);</span>
+<span class="source-line-no">042</span><span id="line-42">  }</span>
 <span class="source-line-no">043</span><span id="line-43"></span>
-<span class="source-line-no">044</span><span id="line-44">    this.shop = shop;</span>
-<span class="source-line-no">045</span><span id="line-45">    this.purchaser = purchaser;</span>
-<span class="source-line-no">046</span><span id="line-46">    this.purchaserInventory = purchaserInventory;</span>
-<span class="source-line-no">047</span><span id="line-47">    this.amount = amount * shop.getItem().getAmount();</span>
-<span class="source-line-no">048</span><span id="line-48">    this.tax = tax;</span>
-<span class="source-line-no">049</span><span id="line-49">    this.total = total;</span>
-<span class="source-line-no">050</span><span id="line-50">  }</span>
+<span class="source-line-no">044</span><span id="line-44">  /**</span>
+<span class="source-line-no">045</span><span id="line-45">   * Builds a success event around the context from the corresponding pre-transaction event.</span>
+<span class="source-line-no">046</span><span id="line-46">   *</span>
+<span class="source-line-no">047</span><span id="line-47">   * @param context the shared transaction context</span>
+<span class="source-line-no">048</span><span id="line-48">   * @param tax     the tax charged by the transaction</span>
+<span class="source-line-no">049</span><span id="line-49">   */</span>
+<span class="source-line-no">050</span><span id="line-50">  public ShopSuccessPurchaseEvent(@NotNull final ShopTransactionContext context, final double tax) {</span>
 <span class="source-line-no">051</span><span id="line-51"></span>
-<span class="source-line-no">052</span><span id="line-52">  /**</span>
-<span class="source-line-no">053</span><span id="line-53">   * Gets the item stack amounts</span>
-<span class="source-line-no">054</span><span id="line-54">   *</span>
-<span class="source-line-no">055</span><span id="line-55">   * @return Item stack amounts</span>
-<span class="source-line-no">056</span><span id="line-56">   */</span>
-<span class="source-line-no">057</span><span id="line-57">  public int getAmount() {</span>
-<span class="source-line-no">058</span><span id="line-58"></span>
-<span class="source-line-no">059</span><span id="line-59">    return this.amount;</span>
-<span class="source-line-no">060</span><span id="line-60">  }</span>
-<span class="source-line-no">061</span><span id="line-61"></span>
-<span class="source-line-no">062</span><span id="line-62">  /**</span>
-<span class="source-line-no">063</span><span id="line-63">   * The total money changes in this purchase. Calculate tax, if you want get total without tax,</span>
-<span class="source-line-no">064</span><span id="line-64">   * please use getBalanceWithoutTax()</span>
-<span class="source-line-no">065</span><span id="line-65">   *</span>
-<span class="source-line-no">066</span><span id="line-66">   * @return the total money with calculate tax</span>
-<span class="source-line-no">067</span><span id="line-67">   */</span>
-<span class="source-line-no">068</span><span id="line-68">  public double getBalance() {</span>
-<span class="source-line-no">069</span><span id="line-69"></span>
-<span class="source-line-no">070</span><span id="line-70">    return this.total - tax;</span>
-<span class="source-line-no">071</span><span id="line-71">  }</span>
-<span class="source-line-no">072</span><span id="line-72"></span>
-<span class="source-line-no">073</span><span id="line-73">  /**</span>
-<span class="source-line-no">074</span><span id="line-74">   * The total money changes in this purchase. No calculate tax, if you want get total with tax,</span>
-<span class="source-line-no">075</span><span id="line-75">   * please use getBalance()</span>
-<span class="source-line-no">076</span><span id="line-76">   *</span>
-<span class="source-line-no">077</span><span id="line-77">   * @return the total money without calculate tax</span>
-<span class="source-line-no">078</span><span id="line-78">   */</span>
-<span class="source-line-no">079</span><span id="line-79">  public double getBalanceWithoutTax() {</span>
-<span class="source-line-no">080</span><span id="line-80"></span>
-<span class="source-line-no">081</span><span id="line-81">    return this.total;</span>
-<span class="source-line-no">082</span><span id="line-82">  }</span>
-<span class="source-line-no">083</span><span id="line-83"></span>
+<span class="source-line-no">052</span><span id="line-52">    this.context = context;</span>
+<span class="source-line-no">053</span><span id="line-53">    this.tax = tax;</span>
+<span class="source-line-no">054</span><span id="line-54">  }</span>
+<span class="source-line-no">055</span><span id="line-55"></span>
+<span class="source-line-no">056</span><span id="line-56">  /**</span>
+<span class="source-line-no">057</span><span id="line-57">   * Gets the item stack amounts</span>
+<span class="source-line-no">058</span><span id="line-58">   *</span>
+<span class="source-line-no">059</span><span id="line-59">   * @return Item stack amounts</span>
+<span class="source-line-no">060</span><span id="line-60">   */</span>
+<span class="source-line-no">061</span><span id="line-61">  public int getAmount() {</span>
+<span class="source-line-no">062</span><span id="line-62"></span>
+<span class="source-line-no">063</span><span id="line-63">    return context.getItemAmount();</span>
+<span class="source-line-no">064</span><span id="line-64">  }</span>
+<span class="source-line-no">065</span><span id="line-65"></span>
+<span class="source-line-no">066</span><span id="line-66">  /**</span>
+<span class="source-line-no">067</span><span id="line-67">   * @return the number of configured shop units traded</span>
+<span class="source-line-no">068</span><span id="line-68">   */</span>
+<span class="source-line-no">069</span><span id="line-69">  public int getTradeCount() {</span>
+<span class="source-line-no">070</span><span id="line-70"></span>
+<span class="source-line-no">071</span><span id="line-71">    return context.getTradeCount();</span>
+<span class="source-line-no">072</span><span id="line-72">  }</span>
+<span class="source-line-no">073</span><span id="line-73"></span>
+<span class="source-line-no">074</span><span id="line-74">  /**</span>
+<span class="source-line-no">075</span><span id="line-75">   * The total money changes in this purchase. Calculate tax, if you want get total without tax,</span>
+<span class="source-line-no">076</span><span id="line-76">   * please use getBalanceWithoutTax()</span>
+<span class="source-line-no">077</span><span id="line-77">   *</span>
+<span class="source-line-no">078</span><span id="line-78">   * @return the total money with calculate tax</span>
+<span class="source-line-no">079</span><span id="line-79">   */</span>
+<span class="source-line-no">080</span><span id="line-80">  public double getBalance() {</span>
+<span class="source-line-no">081</span><span id="line-81"></span>
+<span class="source-line-no">082</span><span id="line-82">    return context.getTotalPrice().doubleValue() - tax;</span>
+<span class="source-line-no">083</span><span id="line-83">  }</span>
 <span class="source-line-no">084</span><span id="line-84"></span>
 <span class="source-line-no">085</span><span id="line-85">  /**</span>
-<span class="source-line-no">086</span><span id="line-86">   * Gets the purchaser, that maybe is a online/offline/virtual player.</span>
-<span class="source-line-no">087</span><span id="line-87">   *</span>
-<span class="source-line-no">088</span><span id="line-88">   * @return The purchaser uuid</span>
-<span class="source-line-no">089</span><span id="line-89">   */</span>
-<span class="source-line-no">090</span><span id="line-90">  public @NotNull QUser getPurchaser() {</span>
-<span class="source-line-no">091</span><span id="line-91"></span>
-<span class="source-line-no">092</span><span id="line-92">    return this.purchaser;</span>
-<span class="source-line-no">093</span><span id="line-93">  }</span>
-<span class="source-line-no">094</span><span id="line-94"></span>
-<span class="source-line-no">095</span><span id="line-95">  /**</span>
-<span class="source-line-no">096</span><span id="line-96">   * Gets the inventory of purchaser (the item will put to)</span>
-<span class="source-line-no">097</span><span id="line-97">   *</span>
-<span class="source-line-no">098</span><span id="line-98">   * @return The inventory</span>
-<span class="source-line-no">099</span><span id="line-99">   */</span>
-<span class="source-line-no">100</span><span id="line-100">  public @NotNull InventoryWrapper getPurchaserInventory() {</span>
-<span class="source-line-no">101</span><span id="line-101"></span>
-<span class="source-line-no">102</span><span id="line-102">    return this.purchaserInventory;</span>
-<span class="source-line-no">103</span><span id="line-103">  }</span>
-<span class="source-line-no">104</span><span id="line-104"></span>
-<span class="source-line-no">105</span><span id="line-105">  /**</span>
-<span class="source-line-no">106</span><span id="line-106">   * Gets the shop</span>
-<span class="source-line-no">107</span><span id="line-107">   *</span>
-<span class="source-line-no">108</span><span id="line-108">   * @return the shop</span>
-<span class="source-line-no">109</span><span id="line-109">   */</span>
-<span class="source-line-no">110</span><span id="line-110">  public @NotNull Shop getShop() {</span>
-<span class="source-line-no">111</span><span id="line-111"></span>
-<span class="source-line-no">112</span><span id="line-112">    return this.shop;</span>
-<span class="source-line-no">113</span><span id="line-113">  }</span>
-<span class="source-line-no">114</span><span id="line-114"></span>
-<span class="source-line-no">115</span><span id="line-115">  /**</span>
-<span class="source-line-no">116</span><span id="line-116">   * Gets the tax in this purchase</span>
-<span class="source-line-no">117</span><span id="line-117">   *</span>
-<span class="source-line-no">118</span><span id="line-118">   * @return The tax</span>
-<span class="source-line-no">119</span><span id="line-119">   */</span>
-<span class="source-line-no">120</span><span id="line-120">  public double getTax() {</span>
-<span class="source-line-no">121</span><span id="line-121"></span>
-<span class="source-line-no">122</span><span id="line-122">    return this.tax;</span>
-<span class="source-line-no">123</span><span id="line-123">  }</span>
-<span class="source-line-no">124</span><span id="line-124">}</span>
+<span class="source-line-no">086</span><span id="line-86">   * The total money changes in this purchase. No calculate tax, if you want get total with tax,</span>
+<span class="source-line-no">087</span><span id="line-87">   * please use getBalance()</span>
+<span class="source-line-no">088</span><span id="line-88">   *</span>
+<span class="source-line-no">089</span><span id="line-89">   * @return the total money without calculate tax</span>
+<span class="source-line-no">090</span><span id="line-90">   */</span>
+<span class="source-line-no">091</span><span id="line-91">  public double getBalanceWithoutTax() {</span>
+<span class="source-line-no">092</span><span id="line-92"></span>
+<span class="source-line-no">093</span><span id="line-93">    return context.getTotalPrice().doubleValue();</span>
+<span class="source-line-no">094</span><span id="line-94">  }</span>
+<span class="source-line-no">095</span><span id="line-95"></span>
+<span class="source-line-no">096</span><span id="line-96">  /**</span>
+<span class="source-line-no">097</span><span id="line-97">   * Gets the effective total price before tax without converting it to a double.</span>
+<span class="source-line-no">098</span><span id="line-98">   *</span>
+<span class="source-line-no">099</span><span id="line-99">   * @return the effective total price</span>
+<span class="source-line-no">100</span><span id="line-100">   */</span>
+<span class="source-line-no">101</span><span id="line-101">  public @NotNull BigDecimal getTotalPrice() {</span>
+<span class="source-line-no">102</span><span id="line-102"></span>
+<span class="source-line-no">103</span><span id="line-103">    return context.getTotalPrice();</span>
+<span class="source-line-no">104</span><span id="line-104">  }</span>
+<span class="source-line-no">105</span><span id="line-105"></span>
+<span class="source-line-no">106</span><span id="line-106"></span>
+<span class="source-line-no">107</span><span id="line-107">  /**</span>
+<span class="source-line-no">108</span><span id="line-108">   * Gets the purchaser, that maybe is a online/offline/virtual player.</span>
+<span class="source-line-no">109</span><span id="line-109">   *</span>
+<span class="source-line-no">110</span><span id="line-110">   * @return The purchaser uuid</span>
+<span class="source-line-no">111</span><span id="line-111">   */</span>
+<span class="source-line-no">112</span><span id="line-112">  public @NotNull QUser getPurchaser() {</span>
+<span class="source-line-no">113</span><span id="line-113"></span>
+<span class="source-line-no">114</span><span id="line-114">    return context.getTrader();</span>
+<span class="source-line-no">115</span><span id="line-115">  }</span>
+<span class="source-line-no">116</span><span id="line-116"></span>
+<span class="source-line-no">117</span><span id="line-117">  /**</span>
+<span class="source-line-no">118</span><span id="line-118">   * Gets the inventory of purchaser (the item will put to)</span>
+<span class="source-line-no">119</span><span id="line-119">   *</span>
+<span class="source-line-no">120</span><span id="line-120">   * @return The inventory</span>
+<span class="source-line-no">121</span><span id="line-121">   */</span>
+<span class="source-line-no">122</span><span id="line-122">  public @NotNull InventoryWrapper getPurchaserInventory() {</span>
+<span class="source-line-no">123</span><span id="line-123"></span>
+<span class="source-line-no">124</span><span id="line-124">    return context.getTraderInventory();</span>
+<span class="source-line-no">125</span><span id="line-125">  }</span>
+<span class="source-line-no">126</span><span id="line-126"></span>
+<span class="source-line-no">127</span><span id="line-127">  /**</span>
+<span class="source-line-no">128</span><span id="line-128">   * Gets the shop</span>
+<span class="source-line-no">129</span><span id="line-129">   *</span>
+<span class="source-line-no">130</span><span id="line-130">   * @return the shop</span>
+<span class="source-line-no">131</span><span id="line-131">   */</span>
+<span class="source-line-no">132</span><span id="line-132">  public @NotNull Shop getShop() {</span>
+<span class="source-line-no">133</span><span id="line-133"></span>
+<span class="source-line-no">134</span><span id="line-134">    return context.getShop();</span>
+<span class="source-line-no">135</span><span id="line-135">  }</span>
+<span class="source-line-no">136</span><span id="line-136"></span>
+<span class="source-line-no">137</span><span id="line-137">  /**</span>
+<span class="source-line-no">138</span><span id="line-138">   * Gets the tax in this purchase</span>
+<span class="source-line-no">139</span><span id="line-139">   *</span>
+<span class="source-line-no">140</span><span id="line-140">   * @return The tax</span>
+<span class="source-line-no">141</span><span id="line-141">   */</span>
+<span class="source-line-no">142</span><span id="line-142">  public double getTax() {</span>
+<span class="source-line-no">143</span><span id="line-143"></span>
+<span class="source-line-no">144</span><span id="line-144">    return this.tax;</span>
+<span class="source-line-no">145</span><span id="line-145">  }</span>
+<span class="source-line-no">146</span><span id="line-146"></span>
+<span class="source-line-no">147</span><span id="line-147">  /**</span>
+<span class="source-line-no">148</span><span id="line-148">   * @return the shared transaction context</span>
+<span class="source-line-no">149</span><span id="line-149">   */</span>
+<span class="source-line-no">150</span><span id="line-150">  public @NotNull ShopTransactionContext getContext() {</span>
+<span class="source-line-no">151</span><span id="line-151"></span>
+<span class="source-line-no">152</span><span id="line-152">    return context;</span>
+<span class="source-line-no">153</span><span id="line-153">  }</span>
+<span class="source-line-no">154</span><span id="line-154"></span>
+<span class="source-line-no">155</span><span id="line-155">  /**</span>
+<span class="source-line-no">156</span><span id="line-156">   * @return the id shared by all lifecycle events for this transaction attempt</span>
+<span class="source-line-no">157</span><span id="line-157">   */</span>
+<span class="source-line-no">158</span><span id="line-158">  public @NotNull UUID getTransactionId() {</span>
+<span class="source-line-no">159</span><span id="line-159"></span>
+<span class="source-line-no">160</span><span id="line-160">    return context.getTransactionId();</span>
+<span class="source-line-no">161</span><span id="line-161">  }</span>
+<span class="source-line-no">162</span><span id="line-162">}</span>
 
 
 

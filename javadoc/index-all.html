@@ -234,6 +234,10 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="com/ghostchu/quickshop/api/event/PhasedEvent.html#cancelled" class="member-name-link">cancelled</a> - Variable in class com.ghostchu.quickshop.api.event.<a href="com/ghostchu/quickshop/api/event/PhasedEvent.html" title="class in com.ghostchu.quickshop.api.event">PhasedEvent</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailureReason.html#CANCELLED" class="member-name-link">CANCELLED</a> - Enum constant in enum class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailureReason.html" title="enum class in com.ghostchu.quickshop.api.event.economy">ShopTransactionFailureReason</a></dt>
+<dd>
+<div class="block">A plugin cancelled the pre-transaction event.</div>
+</dd>
 <dt><a href="com/ghostchu/quickshop/api/shop/ShopAction.html#CANCELLED" class="member-name-link">CANCELLED</a> - Enum constant in enum class com.ghostchu.quickshop.api.shop.<a href="com/ghostchu/quickshop/api/shop/ShopAction.html" title="enum class in com.ghostchu.quickshop.api.shop">ShopAction</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/event/PhasedEvent.html#cancelReason" class="member-name-link">cancelReason</a> - Variable in class com.ghostchu.quickshop.api.event.<a href="com/ghostchu/quickshop/api/event/PhasedEvent.html" title="class in com.ghostchu.quickshop.api.event">PhasedEvent</a></dt>
@@ -786,6 +790,10 @@ loadScripts(document, 'script');</script>
 </dl>
 <h2 class="title" id="I:E">E</h2>
 <dl class="index">
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailureReason.html#ECONOMY_TRANSACTION_FAILED" class="member-name-link">ECONOMY_TRANSACTION_FAILED</a> - Enum constant in enum class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailureReason.html" title="enum class in com.ghostchu.quickshop.api.event.economy">ShopTransactionFailureReason</a></dt>
+<dd>
+<div class="block">The economy provider could not commit the money transaction.</div>
+</dd>
 <dt><a href="com/ghostchu/quickshop/api/economy/EconomyCore.html" class="type-name-link" title="interface in com.ghostchu.quickshop.api.economy">EconomyCore</a> - Interface in <a href="com/ghostchu/quickshop/api/economy/package-summary.html">com.ghostchu.quickshop.api.economy</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/economy/EconomyTransaction.html" class="type-name-link" title="interface in com.ghostchu.quickshop.api.economy">EconomyTransaction</a> - Interface in <a href="com/ghostchu/quickshop/api/economy/package-summary.html">com.ghostchu.quickshop.api.economy</a></dt>
@@ -891,6 +899,10 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/shop/ShopType.html#fromID(int)" class="member-name-link">fromID(int)</a> - Static method in enum class com.ghostchu.quickshop.api.shop.<a href="com/ghostchu/quickshop/api/shop/ShopType.html" title="enum class in com.ghostchu.quickshop.api.shop">ShopType</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionDirection.html#fromShopType(com.ghostchu.quickshop.api.shop.ShopType)" class="member-name-link">fromShopType(ShopType)</a> - Static method in enum class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionDirection.html" title="enum class in com.ghostchu.quickshop.api.event.economy">ShopTransactionDirection</a></dt>
+<dd>
+<div class="block">Converts QuickShop's shop-oriented type to a player-oriented direction.</div>
+</dd>
 <dt><a href="com/ghostchu/quickshop/api/shop/ShopType.html#fromString(java.lang.String)" class="member-name-link">fromString(String)</a> - Static method in enum class com.ghostchu.quickshop.api.shop.<a href="com/ghostchu/quickshop/api/shop/ShopType.html" title="enum class in com.ghostchu.quickshop.api.shop">ShopType</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/database/ShopOperationEnum.html#FROZEN" class="member-name-link">FROZEN</a> - Enum constant in enum class com.ghostchu.quickshop.api.database.<a href="com/ghostchu/quickshop/api/database/ShopOperationEnum.html" title="enum class in com.ghostchu.quickshop.api.database">ShopOperationEnum</a></dt>
@@ -1040,6 +1052,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/event/QSCancellable.html#getCancelReason()" class="member-name-link">getCancelReason()</a> - Method in interface com.ghostchu.quickshop.api.event.<a href="com/ghostchu/quickshop/api/event/QSCancellable.html" title="interface in com.ghostchu.quickshop.api.event">QSCancellable</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailedEvent.html#getCause()" class="member-name-link">getCause()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailedEvent.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionFailedEvent</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/command/CommandParser.html#getColonArgs()" class="member-name-link">getColonArgs()</a> - Method in class com.ghostchu.quickshop.api.command.<a href="com/ghostchu/quickshop/api/command/CommandParser.html" title="class in com.ghostchu.quickshop.api.command">CommandParser</a></dt>
 <dd>
 <div class="block">Gets the arguments started with `-`.</div>
@@ -1049,6 +1063,14 @@ loadScripts(document, 'script');</script>
 <div class="block">Getting command manager that allow addon direct access QuickShop sub-command system</div>
 </dd>
 <dt><a href="com/ghostchu/quickshop/api/event/display/ItemPreviewComponentPopulateEvent.html#getComponent()" class="member-name-link">getComponent()</a> - Method in class com.ghostchu.quickshop.api.event.display.<a href="com/ghostchu/quickshop/api/event/display/ItemPreviewComponentPopulateEvent.html" title="class in com.ghostchu.quickshop.api.event.display">ItemPreviewComponentPopulateEvent</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#getContext()" class="member-name-link">getContext()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopPurchaseEvent</a></dt>
+<dd>
+<div class="block">Gets the shared lifecycle context.</div>
+</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopSuccessPurchaseEvent.html#getContext()" class="member-name-link">getContext()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopSuccessPurchaseEvent.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopSuccessPurchaseEvent</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailedEvent.html#getContext()" class="member-name-link">getContext()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailedEvent.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionFailedEvent</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/economy/EconomyTransaction.html#getCore()" class="member-name-link">getCore()</a> - Method in interface com.ghostchu.quickshop.api.economy.<a href="com/ghostchu/quickshop/api/economy/EconomyTransaction.html" title="interface in com.ghostchu.quickshop.api.economy">EconomyTransaction</a></dt>
 <dd>&nbsp;</dd>
@@ -1061,6 +1083,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="com/ghostchu/quickshop/api/database/bean/DataRecord.html#getCurrency()" class="member-name-link">getCurrency()</a> - Method in interface com.ghostchu.quickshop.api.database.bean.<a href="com/ghostchu/quickshop/api/database/bean/DataRecord.html" title="interface in com.ghostchu.quickshop.api.database.bean">DataRecord</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/economy/EconomyTransaction.html#getCurrency()" class="member-name-link">getCurrency()</a> - Method in interface com.ghostchu.quickshop.api.economy.<a href="com/ghostchu/quickshop/api/economy/EconomyTransaction.html" title="interface in com.ghostchu.quickshop.api.economy">EconomyTransaction</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html#getCurrency()" class="member-name-link">getCurrency()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionContext</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/shop/Shop.html#getCurrency()" class="member-name-link">getCurrency()</a> - Method in interface com.ghostchu.quickshop.api.shop.<a href="com/ghostchu/quickshop/api/shop/Shop.html" title="interface in com.ghostchu.quickshop.api.shop">Shop</a></dt>
 <dd>
@@ -1078,6 +1102,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/shop/permission/BuiltInShopPermissionGroup.html#getDescriptionKey()" class="member-name-link">getDescriptionKey()</a> - Method in enum class com.ghostchu.quickshop.api.shop.permission.<a href="com/ghostchu/quickshop/api/shop/permission/BuiltInShopPermissionGroup.html" title="enum class in com.ghostchu.quickshop.api.shop.permission">BuiltInShopPermissionGroup</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html#getDirection()" class="member-name-link">getDirection()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionContext</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/command/CommandContainer.html#getDisableText(org.bukkit.command.CommandSender)" class="member-name-link">getDisableText(CommandSender)</a> - Method in class com.ghostchu.quickshop.api.command.<a href="com/ghostchu/quickshop/api/command/CommandContainer.html" title="class in com.ghostchu.quickshop.api.command">CommandContainer</a></dt>
 <dd>
 <div class="block">Gets the text should be shown while command was disabled.</div>
@@ -1093,6 +1119,8 @@ loadScripts(document, 'script');</script>
 <div class="block">Get shop's item durability, if have.</div>
 </dd>
 <dt><a href="com/ghostchu/quickshop/api/database/bean/DataRecord.html#getEncoded()" class="member-name-link">getEncoded()</a> - Method in interface com.ghostchu.quickshop.api.database.bean.<a href="com/ghostchu/quickshop/api/database/bean/DataRecord.html" title="interface in com.ghostchu.quickshop.api.database.bean">DataRecord</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailedEvent.html#getErrorMessage()" class="member-name-link">getErrorMessage()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailedEvent.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionFailedEvent</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/event/general/ShopProtectionCheckEvent.html#getEvent()" class="member-name-link">getEvent()</a> - Method in class com.ghostchu.quickshop.api.event.general.<a href="com/ghostchu/quickshop/api/event/general/ShopProtectionCheckEvent.html" title="class in com.ghostchu.quickshop.api.event.general">ShopProtectionCheckEvent</a></dt>
 <dd>
@@ -1189,6 +1217,8 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="com/ghostchu/quickshop/api/database/bean/DataRecord.html#getItem()" class="member-name-link">getItem()</a> - Method in interface com.ghostchu.quickshop.api.database.bean.<a href="com/ghostchu/quickshop/api/database/bean/DataRecord.html" title="interface in com.ghostchu.quickshop.api.database.bean">DataRecord</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html#getItem()" class="member-name-link">getItem()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionContext</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/shop/Info.html#getItem()" class="member-name-link">getItem()</a> - Method in interface com.ghostchu.quickshop.api.shop.<a href="com/ghostchu/quickshop/api/shop/Info.html" title="interface in com.ghostchu.quickshop.api.shop">Info</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/shop/InventoryTransaction.html#getItem()" class="member-name-link">getItem()</a> - Method in interface com.ghostchu.quickshop.api.shop.<a href="com/ghostchu/quickshop/api/shop/InventoryTransaction.html" title="interface in com.ghostchu.quickshop.api.shop">InventoryTransaction</a></dt>
@@ -1197,6 +1227,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Get shop item's ItemStack</div>
 </dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html#getItemAmount()" class="member-name-link">getItemAmount()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionContext</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/QuickShopAPI.html#getItemMatcher()" class="member-name-link">getItemMatcher()</a> - Method in interface com.ghostchu.quickshop.api.<a href="com/ghostchu/quickshop/api/QuickShopAPI.html" title="interface in com.ghostchu.quickshop.api">QuickShopAPI</a></dt>
 <dd>
 <div class="block">Getting current using ItemMatcher impl</div>
@@ -1446,6 +1478,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/shop/permission/BuiltInShopPermissionGroup.html#getRawNode()" class="member-name-link">getRawNode()</a> - Method in enum class com.ghostchu.quickshop.api.shop.permission.<a href="com/ghostchu/quickshop/api/shop/permission/BuiltInShopPermissionGroup.html" title="enum class in com.ghostchu.quickshop.api.shop.permission">BuiltInShopPermissionGroup</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailedEvent.html#getReason()" class="member-name-link">getReason()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailedEvent.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionFailedEvent</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/command/CommandManager.html#getRegisteredCommands()" class="member-name-link">getRegisteredCommands()</a> - Method in interface com.ghostchu.quickshop.api.command.<a href="com/ghostchu/quickshop/api/command/CommandManager.html" title="interface in com.ghostchu.quickshop.api.command">CommandManager</a></dt>
 <dd>
 <div class="block">Gets a list contains all registered commands</div>
@@ -1513,6 +1547,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Gets the shop</div>
 </dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html#getShop()" class="member-name-link">getShop()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionContext</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/event/general/ShopControlPanelOpenEvent.html#getShop()" class="member-name-link">getShop()</a> - Method in class com.ghostchu.quickshop.api.event.general.<a href="com/ghostchu/quickshop/api/event/general/ShopControlPanelOpenEvent.html" title="class in com.ghostchu.quickshop.api.event.general">ShopControlPanelOpenEvent</a></dt>
 <dd>
 <div class="block">Gets the shop of control panel opened</div>
@@ -1559,6 +1595,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/database/bean/InfoRecord.html#getShopId()" class="member-name-link">getShopId()</a> - Method in interface com.ghostchu.quickshop.api.database.bean.<a href="com/ghostchu/quickshop/api/database/bean/InfoRecord.html" title="interface in com.ghostchu.quickshop.api.database.bean">InfoRecord</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html#getShopId()" class="member-name-link">getShopId()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionContext</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/shop/Shop.html#getShopId()" class="member-name-link">getShopId()</a> - Method in interface com.ghostchu.quickshop.api.shop.<a href="com/ghostchu/quickshop/api/shop/Shop.html" title="interface in com.ghostchu.quickshop.api.shop">Shop</a></dt>
 <dd>
 <div class="block">Gets the Shop ID to identify the shop.</div>
@@ -1588,6 +1626,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Gets this shop name that set by player</div>
 </dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html#getShopOwner()" class="member-name-link">getShopOwner()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionContext</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/shop/ShopManager.html#getShops()" class="member-name-link">getShops()</a> - Method in interface com.ghostchu.quickshop.api.shop.<a href="com/ghostchu/quickshop/api/shop/ShopManager.html" title="interface in com.ghostchu.quickshop.api.shop">ShopManager</a></dt>
 <dd>
 <div class="block">Returns a map of World - Chunk - Shop</div>
@@ -1623,6 +1663,8 @@ loadScripts(document, 'script');</script>
 <div class="block">Get the all shops in the world.</div>
 </dd>
 <dt><a href="com/ghostchu/quickshop/api/shop/Shop.html#getShopStackingAmount()" class="member-name-link">getShopStackingAmount()</a> - Method in interface com.ghostchu.quickshop.api.shop.<a href="com/ghostchu/quickshop/api/shop/Shop.html" title="interface in com.ghostchu.quickshop.api.shop">Shop</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html#getShopType()" class="member-name-link">getShopType()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionContext</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/shop/Shop.html#getShopType()" class="member-name-link">getShopType()</a> - Method in interface com.ghostchu.quickshop.api.shop.<a href="com/ghostchu/quickshop/api/shop/Shop.html" title="interface in com.ghostchu.quickshop.api.shop">Shop</a></dt>
 <dd>
@@ -1726,9 +1768,45 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Gets the total money trans for</div>
 </dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#getTotalPrice()" class="member-name-link">getTotalPrice()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopPurchaseEvent</a></dt>
+<dd>
+<div class="block">Gets the effective total price before tax without converting it to a double.</div>
+</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopSuccessPurchaseEvent.html#getTotalPrice()" class="member-name-link">getTotalPrice()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopSuccessPurchaseEvent.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopSuccessPurchaseEvent</a></dt>
+<dd>
+<div class="block">Gets the effective total price before tax without converting it to a double.</div>
+</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html#getTotalPrice()" class="member-name-link">getTotalPrice()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionContext</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#getTradeCount()" class="member-name-link">getTradeCount()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopPurchaseEvent</a></dt>
+<dd>
+<div class="block">Gets the number of configured shop units requested in this transaction.</div>
+</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopSuccessPurchaseEvent.html#getTradeCount()" class="member-name-link">getTradeCount()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopSuccessPurchaseEvent.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopSuccessPurchaseEvent</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html#getTradeCount()" class="member-name-link">getTradeCount()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionContext</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html#getTrader()" class="member-name-link">getTrader()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionContext</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html#getTraderInventory()" class="member-name-link">getTraderInventory()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionContext</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html#getTraderUniqueId()" class="member-name-link">getTraderUniqueId()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionContext</a></dt>
+<dd>
+<div class="block">Returns the trader UUID when the supplied user has one.</div>
+</dd>
 <dt><a href="com/ghostchu/quickshop/api/event/economy/EconomyTransactionEvent.html#getTransaction()" class="member-name-link">getTransaction()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/EconomyTransactionEvent.html" title="class in com.ghostchu.quickshop.api.event.economy">EconomyTransactionEvent</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/event/inventory/InventoryTransactionEvent.html#getTransaction()" class="member-name-link">getTransaction()</a> - Method in class com.ghostchu.quickshop.api.event.inventory.<a href="com/ghostchu/quickshop/api/event/inventory/InventoryTransactionEvent.html" title="class in com.ghostchu.quickshop.api.event.inventory">InventoryTransactionEvent</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#getTransactionId()" class="member-name-link">getTransactionId()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopPurchaseEvent</a></dt>
+<dd>
+<div class="block">Gets the id shared by all lifecycle events for this transaction attempt.</div>
+</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopSuccessPurchaseEvent.html#getTransactionId()" class="member-name-link">getTransactionId()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopSuccessPurchaseEvent.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopSuccessPurchaseEvent</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html#getTransactionId()" class="member-name-link">getTransactionId()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionContext</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailedEvent.html#getTransactionId()" class="member-name-link">getTransactionId()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailedEvent.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionFailedEvent</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/database/bean/DataRecord.html#getType()" class="member-name-link">getType()</a> - Method in interface com.ghostchu.quickshop.api.database.bean.<a href="com/ghostchu/quickshop/api/database/bean/DataRecord.html" title="interface in com.ghostchu.quickshop.api.database.bean">DataRecord</a></dt>
 <dd>&nbsp;</dd>
@@ -1739,6 +1817,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="com/ghostchu/quickshop/api/obj/QUser.html#getUniqueIdIfRealPlayer()" class="member-name-link">getUniqueIdIfRealPlayer()</a> - Method in interface com.ghostchu.quickshop.api.obj.<a href="com/ghostchu/quickshop/api/obj/QUser.html" title="interface in com.ghostchu.quickshop.api.obj">QUser</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/obj/QUser.html#getUniqueIdOptional()" class="member-name-link">getUniqueIdOptional()</a> - Method in interface com.ghostchu.quickshop.api.obj.<a href="com/ghostchu/quickshop/api/obj/QUser.html" title="interface in com.ghostchu.quickshop.api.obj">QUser</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html#getUnitPrice()" class="member-name-link">getUnitPrice()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionContext</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTaxEvent.html#getUser()" class="member-name-link">getUser()</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTaxEvent.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTaxEvent</a></dt>
 <dd>
@@ -1928,6 +2008,10 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/database/DatabaseHelper.html#insertTransactionRecord(java.util.UUID,java.util.UUID,double,java.lang.String,double,java.util.UUID,java.lang.String)" class="member-name-link">insertTransactionRecord(UUID, UUID, double, String, double, UUID, String)</a> - Method in interface com.ghostchu.quickshop.api.database.<a href="com/ghostchu/quickshop/api/database/DatabaseHelper.html" title="interface in com.ghostchu.quickshop.api.database">DatabaseHelper</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailureReason.html#INSUFFICIENT_FUNDS" class="member-name-link">INSUFFICIENT_FUNDS</a> - Enum constant in enum class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailureReason.html" title="enum class in com.ghostchu.quickshop.api.event.economy">ShopTransactionFailureReason</a></dt>
+<dd>
+<div class="block">The account funding the transaction did not have enough money.</div>
+</dd>
 <dt><a href="com/ghostchu/quickshop/api/shop/interaction/InteractionManager.html#interaction(com.ghostchu.quickshop.api.shop.interaction.InteractionType)" class="member-name-link">interaction(InteractionType)</a> - Method in interface com.ghostchu.quickshop.api.shop.interaction.<a href="com/ghostchu/quickshop/api/shop/interaction/InteractionManager.html" title="interface in com.ghostchu.quickshop.api.shop.interaction">InteractionManager</a></dt>
 <dd>
 <div class="block">Registers an interaction type.</div>
@@ -1958,6 +2042,10 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="com/ghostchu/quickshop/api/shop/display/PacketHandler.html#internal()" class="member-name-link">internal()</a> - Method in interface com.ghostchu.quickshop.api.shop.display.<a href="com/ghostchu/quickshop/api/shop/display/PacketHandler.html" title="interface in com.ghostchu.quickshop.api.shop.display">PacketHandler</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailureReason.html#INTERNAL_ERROR" class="member-name-link">INTERNAL_ERROR</a> - Enum constant in enum class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailureReason.html" title="enum class in com.ghostchu.quickshop.api.event.economy">ShopTransactionFailureReason</a></dt>
+<dd>
+<div class="block">An unexpected exception interrupted the transaction.</div>
+</dd>
 <dt><a href="com/ghostchu/quickshop/api/shop/tag/TaggingResult.html#INVALID_TAG" class="member-name-link">INVALID_TAG</a> - Enum constant in enum class com.ghostchu.quickshop.api.shop.tag.<a href="com/ghostchu/quickshop/api/shop/tag/TaggingResult.html" title="enum class in com.ghostchu.quickshop.api.shop.tag">TaggingResult</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/shop/cache/ShopCache.html#invalidate(com.ghostchu.quickshop.api.shop.cache.ShopCacheNamespacedKey,org.bukkit.Location)" class="member-name-link">invalidate(ShopCacheNamespacedKey, Location)</a> - Method in interface com.ghostchu.quickshop.api.shop.cache.<a href="com/ghostchu/quickshop/api/shop/cache/ShopCache.html" title="interface in com.ghostchu.quickshop.api.shop.cache">ShopCache</a></dt>
@@ -2699,6 +2787,14 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/event/settings/type/ShopPlayerGroupEvent.html#player()" class="member-name-link">player()</a> - Method in class com.ghostchu.quickshop.api.event.settings.type.<a href="com/ghostchu/quickshop/api/event/settings/type/ShopPlayerGroupEvent.html" title="class in com.ghostchu.quickshop.api.event.settings.type">ShopPlayerGroupEvent</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionDirection.html#PLAYER_BUY" class="member-name-link">PLAYER_BUY</a> - Enum constant in enum class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionDirection.html" title="enum class in com.ghostchu.quickshop.api.event.economy">ShopTransactionDirection</a></dt>
+<dd>
+<div class="block">The player buys items from the shop.</div>
+</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionDirection.html#PLAYER_SELL" class="member-name-link">PLAYER_SELL</a> - Enum constant in enum class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionDirection.html" title="enum class in com.ghostchu.quickshop.api.event.economy">ShopTransactionDirection</a></dt>
+<dd>
+<div class="block">The player sells items to the shop.</div>
+</dd>
 <dt><a href="com/ghostchu/quickshop/api/shop/Shop.html#playerAuthorize(java.util.UUID,com.ghostchu.quickshop.api.shop.permission.BuiltInShopPermission)" class="member-name-link">playerAuthorize(UUID, BuiltInShopPermission)</a> - Method in interface com.ghostchu.quickshop.api.shop.<a href="com/ghostchu/quickshop/api/shop/Shop.html" title="interface in com.ghostchu.quickshop.api.shop">Shop</a></dt>
 <dd>
 <div class="block">Check if player have authorized for specific permission on specific shop</div>
@@ -3479,6 +3575,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Sets new total money trans for</div>
 </dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#setTotalPrice(java.math.BigDecimal)" class="member-name-link">setTotalPrice(BigDecimal)</a> - Method in class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopPurchaseEvent</a></dt>
+<dd>
+<div class="block">Sets the effective total price before tax.</div>
+</dd>
 <dt><a href="com/ghostchu/quickshop/api/obj/QUser.html#setUniqueId(java.util.UUID)" class="member-name-link">setUniqueId(UUID)</a> - Method in interface com.ghostchu.quickshop.api.obj.<a href="com/ghostchu/quickshop/api/obj/QUser.html" title="interface in com.ghostchu.quickshop.api.obj">QUser</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/shop/Shop.html#setUnlimited(boolean)" class="member-name-link">setUnlimited(boolean)</a> - Method in interface com.ghostchu.quickshop.api.shop.<a href="com/ghostchu/quickshop/api/shop/Shop.html" title="interface in com.ghostchu.quickshop.api.shop">Shop</a></dt>
@@ -3507,6 +3607,10 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="com/ghostchu/quickshop/api/shop/Shop.html#SHOP_NAMESPACED_KEY" class="member-name-link">SHOP_NAMESPACED_KEY</a> - Static variable in interface com.ghostchu.quickshop.api.shop.<a href="com/ghostchu/quickshop/api/shop/Shop.html" title="interface in com.ghostchu.quickshop.api.shop">Shop</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailureReason.html#SHOP_OPERATION_FAILED" class="member-name-link">SHOP_OPERATION_FAILED</a> - Enum constant in enum class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailureReason.html" title="enum class in com.ghostchu.quickshop.api.event.economy">ShopTransactionFailureReason</a></dt>
+<dd>
+<div class="block">The item transfer failed after the money transaction and triggered a rollback.</div>
+</dd>
 <dt><a href="com/ghostchu/quickshop/api/shop/ShopAction.html" class="type-name-link" title="enum class in com.ghostchu.quickshop.api.shop">ShopAction</a> - Enum Class in <a href="com/ghostchu/quickshop/api/shop/package-summary.html">com.ghostchu.quickshop.api.shop</a></dt>
 <dd>
 <div class="block">The actions about player and shop</div>
@@ -3805,6 +3909,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Calling when purchaser purchased a shop</div>
 </dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#%3Cinit%3E(com.ghostchu.quickshop.api.event.economy.ShopTransactionContext)" class="member-name-link">ShopPurchaseEvent(ShopTransactionContext)</a> - Constructor for class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopPurchaseEvent</a></dt>
+<dd>
+<div class="block">Builds a pre-transaction event around a shared lifecycle context.</div>
+</dd>
 <dt><a href="com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html#%3Cinit%3E(com.ghostchu.quickshop.api.shop.Shop,com.ghostchu.quickshop.api.obj.QUser,com.ghostchu.quickshop.api.inventory.InventoryWrapper,int,double)" class="member-name-link">ShopPurchaseEvent(Shop, QUser, InventoryWrapper, int, double)</a> - Constructor for class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopPurchaseEvent.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopPurchaseEvent</a></dt>
 <dd>
 <div class="block">Builds a new shop purchase event Will called when purchase starting For recording purchase,
@@ -3857,6 +3965,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Calling when success purchase in shop</div>
 </dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopSuccessPurchaseEvent.html#%3Cinit%3E(com.ghostchu.quickshop.api.event.economy.ShopTransactionContext,double)" class="member-name-link">ShopSuccessPurchaseEvent(ShopTransactionContext, double)</a> - Constructor for class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopSuccessPurchaseEvent.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopSuccessPurchaseEvent</a></dt>
+<dd>
+<div class="block">Builds a success event around the context from the corresponding pre-transaction event.</div>
+</dd>
 <dt><a href="com/ghostchu/quickshop/api/event/economy/ShopSuccessPurchaseEvent.html#%3Cinit%3E(com.ghostchu.quickshop.api.shop.Shop,com.ghostchu.quickshop.api.obj.QUser,com.ghostchu.quickshop.api.inventory.InventoryWrapper,int,double,double)" class="member-name-link">ShopSuccessPurchaseEvent(Shop, QUser, InventoryWrapper, int, double, double)</a> - Constructor for class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopSuccessPurchaseEvent.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopSuccessPurchaseEvent</a></dt>
 <dd>
 <div class="block">Builds a new shop purchase event Will called when purchase ended</div>
@@ -3878,6 +3990,34 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Call when shop calc shop tax that will pay to system account and remove from shop owner/player
  received money</div>
+</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html" class="type-name-link" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionContext</a> - Class in <a href="com/ghostchu/quickshop/api/event/economy/package-summary.html">com.ghostchu.quickshop.api.event.economy</a></dt>
+<dd>
+<div class="block">Shared context for every lifecycle event belonging to one shop transaction attempt.</div>
+</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html#%3Cinit%3E(com.ghostchu.quickshop.api.shop.Shop,com.ghostchu.quickshop.api.obj.QUser,com.ghostchu.quickshop.api.inventory.InventoryWrapper,com.ghostchu.quickshop.api.event.economy.ShopTransactionDirection,int,java.math.BigDecimal,java.math.BigDecimal)" class="member-name-link">ShopTransactionContext(Shop, QUser, InventoryWrapper, ShopTransactionDirection, int, BigDecimal, BigDecimal)</a> - Constructor for class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionContext</a></dt>
+<dd>
+<div class="block">Creates a transaction context with a generated transaction id.</div>
+</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html#%3Cinit%3E(java.util.UUID,com.ghostchu.quickshop.api.shop.Shop,com.ghostchu.quickshop.api.obj.QUser,com.ghostchu.quickshop.api.inventory.InventoryWrapper,com.ghostchu.quickshop.api.event.economy.ShopTransactionDirection,int,java.math.BigDecimal,java.math.BigDecimal)" class="member-name-link">ShopTransactionContext(UUID, Shop, QUser, InventoryWrapper, ShopTransactionDirection, int, BigDecimal, BigDecimal)</a> - Constructor for class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionContext.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionContext</a></dt>
+<dd>
+<div class="block">Creates a transaction context with an explicit transaction id.</div>
+</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionDirection.html" class="type-name-link" title="enum class in com.ghostchu.quickshop.api.event.economy">ShopTransactionDirection</a> - Enum Class in <a href="com/ghostchu/quickshop/api/event/economy/package-summary.html">com.ghostchu.quickshop.api.event.economy</a></dt>
+<dd>
+<div class="block">Describes a shop transaction from the player's point of view.</div>
+</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailedEvent.html" class="type-name-link" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionFailedEvent</a> - Class in <a href="com/ghostchu/quickshop/api/event/economy/package-summary.html">com.ghostchu.quickshop.api.event.economy</a></dt>
+<dd>
+<div class="block">Called exactly once when a transaction that reached the pre-transaction event does not succeed.</div>
+</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailedEvent.html#%3Cinit%3E(com.ghostchu.quickshop.api.event.economy.ShopTransactionContext,com.ghostchu.quickshop.api.event.economy.ShopTransactionFailureReason,java.lang.String,java.lang.Throwable)" class="member-name-link">ShopTransactionFailedEvent(ShopTransactionContext, ShopTransactionFailureReason, String, Throwable)</a> - Constructor for class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailedEvent.html" title="class in com.ghostchu.quickshop.api.event.economy">ShopTransactionFailedEvent</a></dt>
+<dd>
+<div class="block">Creates a failed transaction event.</div>
+</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailureReason.html" class="type-name-link" title="enum class in com.ghostchu.quickshop.api.event.economy">ShopTransactionFailureReason</a> - Enum Class in <a href="com/ghostchu/quickshop/api/event/economy/package-summary.html">com.ghostchu.quickshop.api.event.economy</a></dt>
+<dd>
+<div class="block">The terminal reason for a shop transaction that did not complete successfully.</div>
 </dd>
 <dt><a href="com/ghostchu/quickshop/api/shop/ShopType.html" class="type-name-link" title="enum class in com.ghostchu.quickshop.api.shop">ShopType</a> - Enum Class in <a href="com/ghostchu/quickshop/api/shop/package-summary.html">com.ghostchu.quickshop.api.shop</a></dt>
 <dd>
@@ -4030,6 +4170,10 @@ loadScripts(document, 'script');</script>
 <dl class="index">
 <dt><a href="com/ghostchu/quickshop/api/economy/EconomyType.html#UNKNOWN" class="member-name-link">UNKNOWN</a> - Enum constant in enum class com.ghostchu.quickshop.api.economy.<a href="com/ghostchu/quickshop/api/economy/EconomyType.html" title="enum class in com.ghostchu.quickshop.api.economy">EconomyType</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionDirection.html#UNKNOWN" class="member-name-link">UNKNOWN</a> - Enum constant in enum class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionDirection.html" title="enum class in com.ghostchu.quickshop.api.event.economy">ShopTransactionDirection</a></dt>
+<dd>
+<div class="block">The direction cannot be determined, for example for a frozen shop.</div>
+</dd>
 <dt><a href="com/ghostchu/quickshop/api/GameVersion.html#UNKNOWN" class="member-name-link">UNKNOWN</a> - Enum constant in enum class com.ghostchu.quickshop.api.<a href="com/ghostchu/quickshop/api/GameVersion.html" title="enum class in com.ghostchu.quickshop.api">GameVersion</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/ghostchu/quickshop/api/shop/ShopManager.html#unloadShop(com.ghostchu.quickshop.api.shop.Shop)" class="member-name-link">unloadShop(Shop)</a> - Method in interface com.ghostchu.quickshop.api.shop.<a href="com/ghostchu/quickshop/api/shop/ShopManager.html" title="interface in com.ghostchu.quickshop.api.shop">ShopManager</a></dt>
@@ -4201,6 +4345,14 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Returns the enum constant of this class with the specified name.</div>
 </dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionDirection.html#valueOf(java.lang.String)" class="member-name-link">valueOf(String)</a> - Static method in enum class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionDirection.html" title="enum class in com.ghostchu.quickshop.api.event.economy">ShopTransactionDirection</a></dt>
+<dd>
+<div class="block">Returns the enum constant of this class with the specified name.</div>
+</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailureReason.html#valueOf(java.lang.String)" class="member-name-link">valueOf(String)</a> - Static method in enum class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailureReason.html" title="enum class in com.ghostchu.quickshop.api.event.economy">ShopTransactionFailureReason</a></dt>
+<dd>
+<div class="block">Returns the enum constant of this class with the specified name.</div>
+</dd>
 <dt><a href="com/ghostchu/quickshop/api/event/general/ProtectionCheckStatus.html#valueOf(java.lang.String)" class="member-name-link">valueOf(String)</a> - Static method in enum class com.ghostchu.quickshop.api.event.general.<a href="com/ghostchu/quickshop/api/event/general/ProtectionCheckStatus.html" title="enum class in com.ghostchu.quickshop.api.event.general">ProtectionCheckStatus</a></dt>
 <dd>
 <div class="block">Returns the enum constant of this class with the specified name.</div>
@@ -4272,6 +4424,16 @@ the order they are declared.</div>
 the order they are declared.</div>
 </dd>
 <dt><a href="com/ghostchu/quickshop/api/event/CalendarEvent.CalendarTriggerType.html#values()" class="member-name-link">values()</a> - Static method in enum class com.ghostchu.quickshop.api.event.<a href="com/ghostchu/quickshop/api/event/CalendarEvent.CalendarTriggerType.html" title="enum class in com.ghostchu.quickshop.api.event">CalendarEvent.CalendarTriggerType</a></dt>
+<dd>
+<div class="block">Returns an array containing the constants of this enum class, in
+the order they are declared.</div>
+</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionDirection.html#values()" class="member-name-link">values()</a> - Static method in enum class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionDirection.html" title="enum class in com.ghostchu.quickshop.api.event.economy">ShopTransactionDirection</a></dt>
+<dd>
+<div class="block">Returns an array containing the constants of this enum class, in
+the order they are declared.</div>
+</dd>
+<dt><a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailureReason.html#values()" class="member-name-link">values()</a> - Static method in enum class com.ghostchu.quickshop.api.event.economy.<a href="com/ghostchu/quickshop/api/event/economy/ShopTransactionFailureReason.html" title="enum class in com.ghostchu.quickshop.api.event.economy">ShopTransactionFailureReason</a></dt>
 <dd>
 <div class="block">Returns an array containing the constants of this enum class, in
 the order they are declared.</div>
